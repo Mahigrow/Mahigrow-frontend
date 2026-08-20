@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>RythuStore — Bulk Agri Inputs for Retailers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+:root{
+  --g:#0a7a30; --g2:#086826; --g3:#e6f4ec; --g4:#c8e6d0;
+  --or:#e8620a; --or2:#fff3eb;
+  --red:#c0321a; --red2:#fdecea;
+  --ink:#1a1a1a; --ink2:#4b5563; --ink3:#9ca3af;
+  --bg:#f8f8f6; --bg2:#f0f0ec; --bg3:#e5e5df;
+  --card:#ffffff; --border:#e5e7eb;
+  --radius:8px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;}
+button,input,select{font-family:inherit;}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;display:block;}
+
+/* ══ TOPBAR ══ */
+.topbar{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.tb-inner{max-width:1280px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;gap:16px;}
+
+/* logo */
+.logo{display:flex;align-items:center;gap:9px;flex-shrink:0;}
+.logo-leaf{width:34px;height:34px;}
+.logo-text .ln{font-size:1.25rem;font-weight:800;color:var(--g);letter-spacing:-.03em;line-height:1;}
+.logo-text .ls{font-size:.6rem;font-weight:500;color:var(--ink3);letter-spacing:.08em;text-transform:uppercase;}
+
+/* search */
+.tb-search{flex:1;max-width:480px;}
+.tb-search form{display:flex;border:1.5px solid var(--g);border-radius:6px;overflow:hidden;}
+.tb-search input{flex:1;border:none;padding:9px 13px;font-size:.85rem;outline:none;color:var(--ink);}
+.tb-search button{background:var(--g);border:none;padding:0 16px;color:#fff;font-weight:600;font-size:.82rem;cursor:pointer;transition:background .15s;}
+.tb-search button:hover{background:var(--g2);}
+
+.tb-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.lang-sw{display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden;}
+.lang-sw button{background:none;border:none;font-size:.7rem;font-weight:600;color:var(--ink3);padding:4px 9px;cursor:pointer;transition:all .15s;}
+.lang-sw button.on{background:var(--g);color:#fff;}
+.tb-login{background:none;border:1.5px solid var(--g);color:var(--g);font-weight:600;font-size:.8rem;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .15s;}
+.tb-login:hover{background:var(--g);color:#fff;}
+.tb-cart{display:flex;align-items:center;gap:6px;background:var(--g);color:#fff;font-weight:600;font-size:.82rem;padding:7px 14px;border-radius:6px;border:none;cursor:pointer;transition:background .15s;position:relative;}
+.tb-cart:hover{background:var(--g2);}
+.tb-cart svg{width:16px;height:16px;}
+.cart-badge{background:#fff;color:var(--g);border-radius:50%;width:18px;height:18px;font-size:.62rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+
+/* ══ CATEGORY NAV ══ */
+.catnav{background:#fff;border-bottom:1px solid var(--border);}
+.catnav-inner{max-width:1280px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
+.catnav-inner::-webkit-scrollbar{display:none;}
+.cnav-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--ink2);font-size:.8rem;font-weight:500;padding:10px 13px;border-bottom:2.5px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.cnav-btn svg{width:14px;height:14px;flex-shrink:0;}
+.cnav-btn:hover{color:var(--g);}
+.cnav-btn.on{color:var(--g);border-bottom-color:var(--g);font-weight:600;}
+
+/* ══ HERO BANNER ══ */
+.hero{background:linear-gradient(135deg,var(--g2) 0%,var(--g) 60%,#1a9e4a 100%);padding:36px 20px;margin-bottom:0;}
+.hero-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;}
+.hero-tag{display:inline-block;background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-bottom:12px;}
+.hero h1{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;color:#fff;line-height:1.18;letter-spacing:-.03em;margin-bottom:10px;}
+.hero h1 span{color:#7FD49A;}
+.hero p{font-size:.9rem;color:rgba(255,255,255,.7);max-width:40ch;line-height:1.65;margin-bottom:20px;}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.hbtn-white{background:#fff;color:var(--g);border:none;font-weight:700;font-size:.85rem;padding:11px 22px;border-radius:7px;cursor:pointer;transition:opacity .15s;}
+.hbtn-white:hover{opacity:.92;}
+.hbtn-outline{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.45);font-weight:600;font-size:.85rem;padding:10px 20px;border-radius:7px;cursor:pointer;transition:all .15s;}
+.hbtn-outline:hover{background:rgba(255,255,255,.1);}
+.hero-right{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.hero-stat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:16px;text-align:center;}
+.hero-stat .hn{font-size:1.7rem;font-weight:800;color:#fff;line-height:1;}
+.hero-stat .hl{font-size:.68rem;color:rgba(255,255,255,.6);margin-top:3px;letter-spacing:.04em;}
+@media(max-width:640px){.hero-inner{grid-template-columns:1fr;}.hero-right{display:none;}}
+
+/* ══ TRUST STRIP ══ */
+.trust{background:#fff;border-bottom:1px solid var(--border);}
+.trust-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);}
+.trust-item{display:flex;align-items:center;gap:10px;padding:14px 20px;border-right:1px solid var(--border);}
+.trust-item:last-child{border:none;}
+.trust-item svg{width:22px;height:22px;color:var(--g);flex-shrink:0;}
+.trust-item .tt{font-weight:600;font-size:.8rem;color:var(--ink);}
+.trust-item .ts{font-size:.7rem;color:var(--ink3);margin-top:1px;}
+@media(max-width:700px){.trust-inner{grid-template-columns:1fr 1fr;}.trust-item{border-right:none;border-bottom:1px solid var(--border);}}
+
+/* ══ MAIN LAYOUT ══ */
+.main{max-width:1280px;margin:0 auto;padding:24px 20px;}
+
+/* ══ CATEGORY GRID ══ */
+.cat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:32px;}
+@media(max-width:900px){.cat-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:560px){.cat-grid{grid-template-columns:repeat(3,1fr);}}
+.cat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 10px;text-align:center;cursor:pointer;transition:all .15s;}
+.cat-card:hover{border-color:var(--g);box-shadow:0 4px 12px rgba(10,122,48,.1);transform:translateY(-2px);}
+.cat-card .cat-ic{width:48px;height:48px;margin:0 auto 8px;}
+.cat-card .cat-ic svg{width:100%;height:100%;}
+.cat-card .cat-nm{font-size:.75rem;font-weight:600;color:var(--ink);line-height:1.3;}
+.cat-card .cat-ct{font-size:.65rem;color:var(--ink3);margin-top:2px;}
+
+/* ══ BRANDS STRIP ══ */
+.brands-strip{margin-bottom:32px;}
+.brands-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.brands-scroll::-webkit-scrollbar{display:none;}
+.brand-pill{flex-shrink:0;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-size:.78rem;font-weight:700;color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.brand-pill:hover{border-color:var(--g);color:var(--g);}
+
+/* ══ SECTION ══ */
+.section{margin-bottom:36px;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sec-title{font-size:1.05rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.sec-title svg{width:18px;height:18px;color:var(--g);}
+.sec-sub{font-size:.72rem;color:var(--ink3);background:var(--g3);border:1px solid var(--g4);padding:3px 9px;border-radius:20px;margin-left:6px;font-weight:500;}
+.view-all{font-size:.78rem;font-weight:600;color:var(--g);background:none;border:1px solid var(--g4);border-radius:5px;padding:5px 12px;cursor:pointer;transition:all .15s;}
+.view-all:hover{background:var(--g3);}
+
+/* ══ PRODUCT GRID ══ */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+@media(max-width:560px){.prod-grid{grid-template-columns:repeat(2,1fr);gap:10px;}}
+
+/* ══ PRODUCT CARD ══ */
+.pcard{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s;}
+.pcard:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px);}
+
+.pcard-img{position:relative;background:var(--bg2);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.pcard-img svg{width:70%;height:70%;}
+.disc-badge{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.03em;}
+.bulk-badge{position:absolute;top:8px;right:8px;background:var(--or);color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.02em;}
+.cert-flag{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(10,122,48,.7));color:#fff;font-size:.58rem;font-weight:600;padding:6px 8px 4px;letter-spacing:.03em;}
+
+.pcard-body{padding:10px 12px;flex:1;display:flex;flex-direction:column;gap:3px;}
+.pcat-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g);}
+.pname{font-size:.82rem;font-weight:600;color:var(--ink);line-height:1.35;min-height:2.6em;}
+.psize{font-size:.68rem;color:var(--ink3);}
+.price-row{display:flex;align-items:baseline;gap:7px;margin-top:4px;}
+.price-now{font-size:1rem;font-weight:700;color:var(--ink);}
+.price-mrp{font-size:.72rem;color:var(--ink3);text-decoration:line-through;}
+.price-save{font-size:.65rem;font-weight:600;color:var(--red);}
+
+/* tier info */
+.tier-chip{display:inline-flex;align-items:center;gap:4px;background:var(--or2);border:1px solid #f8c89a;border-radius:4px;padding:2px 7px;font-size:.6rem;font-weight:600;color:var(--or);margin-top:4px;}
+.tier-chip svg{width:10px;height:10px;}
+
+/* order row */
+.pcard-foot{padding:8px 12px 12px;display:flex;flex-direction:column;gap:7px;}
+.qty-row{display:flex;align-items:center;gap:6px;}
+.qty-ctl{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:6px;overflow:hidden;}
+.qb{width:28px;height:28px;background:var(--bg2);border:none;font-size:.9rem;font-weight:700;color:var(--ink2);cursor:pointer;transition:background .1s;}
+.qb:hover{background:var(--bg3);}
+.qi{width:42px;height:28px;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);text-align:center;font-size:.78rem;font-weight:700;color:var(--ink);background:#fff;outline:none;}
+.qty-unit{font-size:.62rem;color:var(--ink3);}
+.moq-txt{font-size:.62rem;color:var(--ink3);margin-left:auto;}
+
+.add-btn{width:100%;background:var(--g);color:#fff;border:none;padding:8px;border-radius:6px;font-weight:600;font-size:.78rem;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.add-btn svg{width:12px;height:12px;}
+.add-btn:hover{background:var(--g2);}
+.add-btn.done{background:var(--or);}
+
+/* ══ LOGIN MODAL ══ */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-mask.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.2);}
+.modal-hd{background:var(--g);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;}
+.modal-hd h3{color:#fff;font-size:1rem;font-weight:700;}
+.modal-hd button{background:none;border:none;color:rgba(255,255,255,.7);font-size:1.2rem;cursor:pointer;line-height:1;}
+.modal-bd{padding:22px;}
+.steps-row{display:flex;gap:0;margin-bottom:20px;}
+.step-dot{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;}
+.step-dot:not(:last-child)::after{content:'';position:absolute;top:10px;left:50%;width:100%;height:2px;background:var(--border);z-index:0;}
+.step-dot.done:not(:last-child)::after{background:var(--g);}
+.sd-circle{width:20px;height:20px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;z-index:1;font-size:.62rem;font-weight:700;color:#fff;transition:background .2s;}
+.step-dot.done .sd-circle{background:var(--g);}
+.step-dot.active .sd-circle{background:var(--or);}
+.sd-label{font-size:.6rem;color:var(--ink3);margin-top:4px;font-weight:500;}
+.step-dot.active .sd-label{color:var(--or);font-weight:600;}
+.step-dot.done .sd-label{color:var(--g);}
+
+.mstep{display:none;}
+.mstep.show{display:block;}
+.m-sub{font-size:.82rem;color:var(--ink2);margin-bottom:16px;line-height:1.6;}
+.m-sub strong{color:var(--g);}
+.mfield{margin-bottom:13px;}
+.mfield label{display:block;font-size:.74rem;font-weight:600;color:var(--ink);margin-bottom:5px;}
+.mfield input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.85rem;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.mfield input:focus{border-color:var(--g);background:#fff;}
+.flag-wrap{display:flex;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;background:var(--bg);}
+.flag-pre{display:flex;align-items:center;gap:5px;padding:0 10px;background:var(--bg2);border-right:1px solid var(--border);font-size:.78rem;font-weight:600;color:var(--ink2);flex-shrink:0;}
+.flag-wrap input{border:none;background:var(--bg);padding:9px 12px;flex:1;font-size:.85rem;color:var(--ink);outline:none;}
+.flag-wrap:focus-within{border-color:var(--g);}
+.otp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:5px;}
+.obox{text-align:center;padding:9px 4px;border:1.5px solid var(--border);border-radius:7px;font-size:.95rem;font-weight:700;color:var(--g);background:var(--bg);outline:none;transition:border-color .15s;}
+.obox:focus{border-color:var(--or);background:#fff;}
+.resend-row{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
+.rtimer{font-size:.7rem;color:var(--ink3);}
+.rbtn{background:none;border:none;font-size:.7rem;color:var(--or);font-weight:600;cursor:pointer;}
+.rbtn:disabled{color:var(--ink3);cursor:default;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mbtn{width:100%;background:var(--g);color:#fff;border:none;padding:11px;border-radius:7px;font-weight:700;font-size:.86rem;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;}
+.mbtn:hover{background:var(--g2);}
+.mbtn svg{width:14px;height:14px;}
+.m-or{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:.72rem;color:var(--ink3);}
+.m-or::before,.m-or::after{content:'';flex:1;height:1px;background:var(--border);}
+.google-btn{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:7px;padding:10px;display:flex;align-items:center;justify-content:center;gap:9px;font-size:.82rem;font-weight:500;color:var(--ink);cursor:pointer;transition:border-color .15s;}
+.google-btn:hover{border-color:var(--g);}
+.success-center{text-align:center;padding:8px 0;}
+.s-ic{width:56px;height:56px;border-radius:50%;background:var(--g3);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.s-ic svg{width:30px;height:30px;color:var(--g);}
+.s-title{font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:5px;}
+.s-sub{font-size:.8rem;color:var(--ink2);line-height:1.6;margin-bottom:16px;}
+
+/* ══ CART DRAWER ══ */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;}
+.drawer-mask.open{opacity:1;pointer-events:all;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:95vw;background:#fff;z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .24s ease;box-shadow:-8px 0 28px rgba(0,0,0,.15);}
+.drawer.open{transform:translateX(0);}
+.drawer-hd{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--border);background:var(--g);color:#fff;}
+.drawer-hd h3{font-size:.95rem;font-weight:700;}
+.drawer-hd button{background:none;border:none;color:rgba(255,255,255,.8);font-size:1.1rem;cursor:pointer;}
+.drawer-body{flex:1;overflow-y:auto;padding:14px 16px;}
+.drawer-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--ink3);font-size:.82rem;padding:32px;}
+.drawer-empty svg{width:48px;height:48px;opacity:.2;}
+.di{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:9px;display:flex;gap:10px;}
+.di-ico{width:44px;height:44px;background:#fff;border-radius:7px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.di-ico svg{width:28px;height:28px;}
+.di-info{flex:1;}
+.di-name{font-size:.76rem;font-weight:600;color:var(--ink);line-height:1.3;}
+.di-meta{font-size:.66rem;color:var(--ink3);margin-top:2px;}
+.di-row{display:flex;justify-content:space-between;align-items:center;margin-top:5px;}
+.di-price{font-size:.84rem;font-weight:700;color:var(--ink);}
+.di-rm{background:none;border:none;font-size:.65rem;color:var(--red);cursor:pointer;text-decoration:underline;}
+.drawer-foot{padding:14px 16px;border-top:1px solid var(--border);}
+.df-row{display:flex;justify-content:space-between;font-size:.76rem;color:var(--ink2);padding:3px 0;}
+.df-row span:last-child{font-weight:600;color:var(--ink);}
+.df-total{display:flex;justify-content:space-between;font-size:.95rem;font-weight:700;color:var(--ink);border-top:1px solid var(--border);padding-top:8px;margin:6px 0 10px;}
+.df-total span:last-child{color:var(--g);}
+.df-note{font-size:.67rem;color:var(--ink3);margin-bottom:10px;line-height:1.5;}
+.pay-btn{width:100%;background:var(--g);color:#fff;border:none;padding:11px;border-radius:7px;font-weight:700;font-size:.86rem;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:background .15s;margin-bottom:8px;}
+.pay-btn:hover{background:var(--g2);}
+.pay-btn svg{width:15px;height:15px;}
+.wa-btn{width:100%;background:#F0FFF4;color:#166534;border:1.5px solid #BBF7D0;border-radius:7px;padding:10px;font-weight:600;font-size:.82rem;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:background .15s;}
+.wa-btn:hover{background:#DCFCE7;}
+.wa-btn svg{width:14px;height:14px;}
+.secure-note{font-size:.62rem;color:var(--ink3);text-align:center;margin-top:7px;}
+
+/* ══ FAQ ══ */
+.faq-section{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:32px;}
+.faq-section h2{font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:14px;}
+details.faq{border-bottom:1px solid var(--border);padding:11px 0;}
+details.faq:last-child{border-bottom:none;}
+details.faq summary{cursor:pointer;font-weight:600;font-size:.82rem;color:var(--ink);list-style:none;display:flex;justify-content:space-between;align-items:center;}
+details.faq summary::-webkit-details-marker{display:none;}
+details.faq summary::after{content:'+';font-size:1.1rem;color:var(--g);font-weight:700;}
+details.faq[open] summary::after{content:'−';}
+details.faq p{font-size:.78rem;color:var(--ink2);margin-top:8px;line-height:1.6;}
+
+/* ══ FOOTER ══ */
+footer{background:var(--g2);color:#E9F5EC;padding:36px 20px 16px;}
+.foot-inner{max-width:1280px;margin:0 auto;}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px;margin-bottom:28px;}
+.foot-logo{font-size:1.3rem;font-weight:800;color:#fff;letter-spacing:-.03em;margin-bottom:8px;}
+.foot-logo span{color:#7FD49A;}
+.foot-desc{font-size:.78rem;color:rgba(255,255,255,.6);line-height:1.6;}
+.foot-h{font-size:.8rem;font-weight:700;color:#fff;margin-bottom:10px;}
+.foot-links{display:flex;flex-direction:column;gap:6px;}
+.foot-links a{font-size:.76rem;color:rgba(255,255,255,.6);cursor:pointer;transition:color .15s;}
+.foot-links a:hover{color:#fff;}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:14px;display:flex;justify-content:space-between;align-items:center;font-size:.72rem;color:rgba(255,255,255,.4);}
+@media(max-width:700px){.foot-grid{grid-template-columns:1fr 1fr;}}
+
+/* ══ MOBILE BOTTOM NAV ══ */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);z-index:90;padding:6px 0 env(safe-area-inset-bottom);}
+.mn-inner{display:grid;grid-template-columns:repeat(4,1fr);}
+.mn-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;font-size:.6rem;font-weight:500;color:var(--ink3);padding:6px 4px;cursor:pointer;}
+.mn-btn.on{color:var(--g);}
+.mn-btn svg{width:20px;height:20px;}
+@media(max-width:640px){.mobile-nav{display:block;}.main{padding-bottom:70px;}}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--ink);color:#fff;font-size:.76rem;font-weight:500;padding:8px 18px;border-radius:6px;opacity:0;transition:all .22s;z-index:400;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+@media(min-width:641px){.toast{bottom:20px;}}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <div class="tb-inner">
+    <div class="logo">
+      <!-- Leaf lotus SVG mark -->
+      <svg class="logo-leaf" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="16" fill="#e6f4ec"/>
+        <ellipse cx="17" cy="9" rx="3" ry="7" fill="#0a7a30" opacity=".9"/>
+        <ellipse cx="17" cy="9" rx="3" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(60 17 17)"/>
+        <ellipse cx="17" cy="9" rx="3" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(120 17 17)"/>
+        <ellipse cx="17" cy="9" rx="3" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(180 17 17)"/>
+        <ellipse cx="17" cy="9" rx="3" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(240 17 17)"/>
+        <ellipse cx="17" cy="9" rx="3" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(300 17 17)"/>
+        <circle cx="17" cy="17" r="4.5" fill="#0a7a30"/>
+        <circle cx="17" cy="17" r="2" fill="#e8a020"/>
+      </svg>
+      <div class="logo-text">
+        <div class="ln">Rythu<span style="color:#e8a020">Store</span></div>
+        <div class="ls">Bulk Agri Inputs · AP & TS</div>
+      </div>
+    </div>
+
+    <div class="tb-search">
+      <form onsubmit="return false;">
+        <input type="text" placeholder="Search seeds, pesticides, fertilisers, brands…" aria-label="Search"/>
+        <button type="submit">Search</button>
+      </form>
+    </div>
+
+    <div class="tb-right">
+      <div class="lang-sw">
+        <button class="on">EN</button>
+        <button>తె</button>
+      </div>
+      <button class="tb-login" id="loginBtn" onclick="window.location.href='login.html'">Sign In</button>
+      <button class="tb-cart" onclick="openDrawer()">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M1.5 1.5H3.5L5.5 11H12.5L14 5H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="13.2" r="1.2" fill="currentColor"/><circle cx="11.5" cy="13.2" r="1.2" fill="currentColor"/></svg>
+        Bulk Order
+        <span class="cart-badge" id="cn">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ══ CATEGORY NAV ══ -->
+<div class="catnav">
+  <div class="catnav-inner">
+    <button class="cnav-btn on" onclick="filterAll(this)">
+      <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+      All Products
+    </button>
+    <button class="cnav-btn" onclick="filterCat('seeds',this)">
+      <svg viewBox="0 0 14 14" fill="none"><ellipse cx="7" cy="4" rx="2" ry="3.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 7.5 Q5 10 5 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M7 9.5 Q10 8.5 10.5 6" stroke="currentColor" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg>
+      Seeds
+    </button>
+    <button class="cnav-btn" onclick="filterCat('pesticides',this)">
+      <svg viewBox="0 0 14 14" fill="none"><rect x="4.5" y="5" width="5" height="7.5" rx="1.2" stroke="currentColor" stroke-width="1.2"/><rect x="5.5" y="2" width="3" height="3.5" rx=".8" stroke="currentColor" stroke-width="1.1"/><line x1="6" y1="8" x2="9" y2="8" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+      Pesticides
+    </button>
+    <button class="cnav-btn" onclick="filterCat('insecticides',this)">
+      <svg viewBox="0 0 14 14" fill="none"><ellipse cx="7" cy="9" rx="2.5" ry="3.5" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="5" r="2.2" stroke="currentColor" stroke-width="1.2"/><line x1="5.5" y1="3.2" x2="4" y2="2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><line x1="8.5" y1="3.2" x2="10" y2="2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><line x1="4.5" y1="7.5" x2="2" y2="7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><line x1="9.5" y1="7.5" x2="12" y2="7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+      Insecticides
+    </button>
+    <button class="cnav-btn" onclick="filterCat('fertilisers',this)">
+      <svg viewBox="0 0 14 14" fill="none"><rect x="2" y="7.5" width="10" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.2"/><path d="M4 7.5 L5.5 3 L8.5 3 L10 7.5" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" fill="none"/><path d="M5.5 3 Q7 1.5 8.5 3" stroke="currentColor" stroke-width="1.1" fill="none" stroke-linecap="round"/></svg>
+      Fertilisers
+    </button>
+    <button class="cnav-btn" onclick="filterCat('fungicides',this)">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M7 1.5L12 3.5V7.5C12 10.5 7 13 7 13C7 13 2 10.5 2 7.5V3.5L7 1.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 7.5L6.5 9L9.5 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Fungicides
+    </button>
+    <button class="cnav-btn" onclick="filterCat('herbicides',this)">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M7 13 L7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M7 9 Q4.5 7.5 4.5 4.5 Q7 5 7 7.5" fill="currentColor" opacity=".35"/><path d="M7 7.5 Q9.5 6 10 3.5 Q7 4 7 6.5" fill="currentColor" opacity=".25"/><path d="M5 5.5 L7 3.5 L9 5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Herbicides
+    </button>
+  </div>
+</div>
+
+<!-- ══ HERO ══ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="hero-tag">MahaGoAgro · Bulk Retailer Portal</span>
+      <h1>Agri inputs priced<br/>for the <span>trade.</span></h1>
+      <p>Seeds, pesticides, insecticides, fertilisers — at bulk retailer rates with tiered pricing. Order by the carton, get GST invoice, 2–4 day delivery across AP & Telangana.</p>
+      <div class="hero-btns">
+        <button class="hbtn-white" onclick="document.getElementById('cat-section').scrollIntoView({behavior:'smooth'})">Browse Catalogue</button>
+        <button class="hbtn-outline" onclick="openDrawer()">View Order</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-stat"><div class="hn">340+</div><div class="hl">Products</div></div>
+      <div class="hero-stat"><div class="hn">2–4d</div><div class="hl">AP & TS Delivery</div></div>
+      <div class="hero-stat"><div class="hn">100%</div><div class="hl">CIB Certified</div></div>
+      <div class="hero-stat"><div class="hn">₹0</div><div class="hl">Platform Fee</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TRUST STRIP ══ -->
+<div class="trust">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <svg viewBox="0 0 22 22" fill="none"><path d="M11 2L19 5.5V11C19 15.5 11 20 11 20C11 20 3 15.5 3 11V5.5L11 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7.5 11L10 13.5L15 8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><div class="tt">100% CIB Certified</div><div class="ts">Verified brands only</div></div>
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 22 22" fill="none"><rect x="2" y="3" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.2"/><line x1="5" y1="12" x2="11" y2="12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M14 13L15.5 14.5L18 12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><div class="tt">GST Invoice</div><div class="ts">On every order</div></div>
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 22 22" fill="none"><path d="M3 8H19M3 8L5 5H17L19 8M3 8V17C3 18.1 3.9 19 5 19H17C18.1 19 19 18.1 19 17V8" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 12H13M11 10V14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div><div class="tt">Bulk Pricing</div><div class="ts">Tiered rates per carton</div></div>
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 22 22" fill="none"><path d="M4 14L4 8L10 4L16 8V14" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><rect x="8" y="14" width="4" height="5" rx=".8" stroke="currentColor" stroke-width="1.2"/><path d="M16 8L19 10V20H13" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      <div><div class="tt">2–4 Day Delivery</div><div class="ts">AP & Telangana wide</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main" id="cat-section">
+
+  <!-- Category grid -->
+  <div class="sec-head" style="margin-bottom:12px;">
+    <div class="sec-title">Shop by Category</div>
+  </div>
+  <div class="cat-grid">
+    <div class="cat-card" onclick="filterCat('seeds',null)">
+      <div class="cat-ic">
+        <svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="12" rx="5" ry="10" fill="#0a7a30" opacity=".85"/><path d="M24 22 Q18 30 18 42" stroke="#086826" stroke-width="3" stroke-linecap="round"/><path d="M24 30 Q32 26 33 18" stroke="#0a7a30" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="24" cy="42" r="4" fill="#e8a020"/></svg>
+      </div>
+      <div class="cat-nm">Seeds</div>
+      <div class="cat-ct">86 products</div>
+    </div>
+    <div class="cat-card" onclick="filterCat('pesticides',null)">
+      <div class="cat-ic">
+        <svg viewBox="0 0 48 48" fill="none"><rect x="16" y="18" width="16" height="24" rx="4" fill="#FDF3DC" stroke="#e8a020" stroke-width="2.2"/><rect x="19" y="10" width="10" height="10" rx="2.5" fill="#e8a020" opacity=".65"/><rect x="17" y="7" width="14" height="5" rx="2" fill="#e8a020"/><line x1="20" y1="27" x2="28" y2="27" stroke="#e8a020" stroke-width="1.8" stroke-linecap="round"/><line x1="20" y1="32" x2="28" y2="32" stroke="#e8a020" stroke-width="1.8" stroke-linecap="round"/><circle cx="36" cy="16" r="8" fill="#c0321a" opacity=".9"/><line x1="36" y1="12" x2="36" y2="17.5" stroke="white" stroke-width="2.5" stroke-linecap="round"/><circle cx="36" cy="19.5" r="1.5" fill="white"/></svg>
+      </div>
+      <div class="cat-nm">Pesticides</div>
+      <div class="cat-ct">74 products</div>
+    </div>
+    <div class="cat-card" onclick="filterCat('insecticides',null)">
+      <div class="cat-ic">
+        <svg viewBox="0 0 48 48" fill="none"><ellipse cx="22" cy="32" rx="7" ry="9" fill="#c0321a" opacity=".75"/><circle cx="22" cy="18" rx="7" fill="#c0321a" opacity=".85"/><line x1="19" y1="13" x2="15" y2="9" stroke="#c0321a" stroke-width="2" stroke-linecap="round"/><line x1="25" y1="13" x2="29" y2="9" stroke="#c0321a" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="27" x2="9" y2="25" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><line x1="15" y1="32" x2="9" y2="32" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><line x1="29" y1="27" x2="35" y2="25" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><line x1="29" y1="32" x2="35" y2="32" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><circle cx="36" cy="13" r="9" fill="white" stroke="#0a7a30" stroke-width="2.2"/><line x1="32" y1="9" x2="40" y2="17" stroke="#0a7a30" stroke-width="2.8" stroke-linecap="round"/><line x1="40" y1="9" x2="32" y2="17" stroke="#0a7a30" stroke-width="2.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="cat-nm">Insecticides</div>
+      <div class="cat-ct">58 products</div>
+    </div>
+    <div class="cat-card" onclick="filterCat('fertilisers',null)">
+      <div class="cat-ic">
+        <svg viewBox="0 0 48 48" fill="none"><rect x="10" y="28" width="28" height="16" rx="4" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2.2"/><path d="M15 28 L19 14 L29 14 L33 28" stroke="#1D4ED8" stroke-width="2.2" stroke-linejoin="round" fill="none"/><path d="M19.5 14 Q24 10 28.5 14" stroke="#1D4ED8" stroke-width="2" fill="none" stroke-linecap="round"/><text x="24" y="40" text-anchor="middle" font-size="8" fill="#1D4ED8" font-weight="800" font-family="sans-serif" opacity=".75">NPK</text></svg>
+      </div>
+      <div class="cat-nm">Fertilisers</div>
+      <div class="cat-ct">62 products</div>
+    </div>
+    <div class="cat-card" onclick="filterCat('fungicides',null)">
+      <div class="cat-ic">
+        <svg viewBox="0 0 48 48" fill="none"><path d="M24 4L40 10V22C40 34 24 44 24 44C24 44 8 34 8 22V10L24 4Z" fill="#EDE9FE" stroke="#6D28D9" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 24L21 29L32 18" stroke="#6D28D9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="cat-nm">Fungicides</div>
+      <div class="cat-ct">41 products</div>
+    </div>
+    <div class="cat-card" onclick="filterCat('herbicides',null)">
+      <div class="cat-ic">
+        <svg viewBox="0 0 48 48" fill="none"><path d="M24 44 L24 24" stroke="#0a7a30" stroke-width="3" stroke-linecap="round"/><path d="M24 32 Q16 26 16 16 Q24 17 24 24" fill="#0a7a30" opacity=".6"/><path d="M24 26 Q32 20 33 10 Q24 11 24 20" fill="#0a7a30" opacity=".45"/><path d="M18 18 L24 12 L30 18" stroke="#0a7a30" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="cat-nm">Herbicides</div>
+      <div class="cat-ct">38 products</div>
+    </div>
+  </div>
+
+  <!-- Brands -->
+  <div class="sec-head" style="margin-bottom:10px;">
+    <div class="sec-title">Brands</div>
+  </div>
+  <div class="brands-strip">
+    <div class="brands-scroll">
+      <div class="brand-pill">Bayer CropScience</div>
+      <div class="brand-pill">Syngenta India</div>
+      <div class="brand-pill">FMC India</div>
+      <div class="brand-pill">IFFCO</div>
+      <div class="brand-pill">UPL Limited</div>
+      <div class="brand-pill">Dhanuka Agritech</div>
+      <div class="brand-pill">Indofil</div>
+      <div class="brand-pill">Pioneer Seeds</div>
+      <div class="brand-pill">Rasi Seeds</div>
+      <div class="brand-pill">VNR Seeds</div>
+      <div class="brand-pill">HPM Agro</div>
+      <div class="brand-pill">Crystal Crop</div>
+    </div>
+  </div>
+
+  <!-- Product sections rendered by JS -->
+  <div id="productSections"></div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+    <details class="faq" open>
+      <summary>What is the minimum order quantity?</summary>
+      <p>Each product has its own MOQ — typically 1 carton (e.g. 12 bottles, 10 bags, 50 sachets). The MOQ and carton step are shown on each product card. Tier pricing activates automatically as your quantity increases.</p>
+    </details>
+    <details class="faq">
+      <summary>How does bulk tier pricing work?</summary>
+      <p>Every product has 3 quantity tiers. The more you order, the lower the per-unit price. The active tier is shown on the product card and updates live as you adjust quantity. For example: 12–47 bottles at ₹420, 48–119 at ₹395, 120+ at ₹368.</p>
+    </details>
+    <details class="faq">
+      <summary>How fast will my order be delivered?</summary>
+      <p>Orders placed before 5 PM are dispatched same day. Delivery takes 2–4 working days across AP & Telangana. You'll receive a tracking link on WhatsApp and SMS once dispatched.</p>
+    </details>
+    <details class="faq">
+      <summary>Do I get a GST invoice?</summary>
+      <p>Yes. A GST-compliant purchase invoice is generated automatically after payment and sent to your registered email. Ensure your GSTIN is entered correctly at registration.</p>
+    </details>
+    <details class="faq">
+      <summary>Can I order via WhatsApp?</summary>
+      <p>Yes. Click "Order via WhatsApp" in the order drawer — it pre-fills your full order details and sends them to our team. We'll send a Razorpay payment link within 30 minutes.</p>
+    </details>
+  </div>
+
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo">Rythu<span>Store</span></div>
+        <p class="foot-desc">MahaGoAgro's B2B retailer supply portal. Certified agri inputs at trade prices, delivered across Andhra Pradesh & Telangana. GST invoice on every order.</p>
+      </div>
+      <div>
+        <div class="foot-h">Catalogue</div>
+        <div class="foot-links"><a>Seeds</a><a>Pesticides</a><a>Insecticides</a><a>Fertilisers</a><a>Fungicides</a><a>Herbicides</a></div>
+      </div>
+      <div>
+        <div class="foot-h">Retailer</div>
+        <div class="foot-links"><a>My Orders</a><a>GST Invoices</a><a>Track Delivery</a><a>Returns Policy</a><a>Contact Us</a></div>
+      </div>
+      <div>
+        <div class="foot-h">Contact</div>
+        <div class="foot-links"><a>+91 98765 43210</a><a>WhatsApp Orders</a><a>rythustore.com</a><a>Mon–Sat, 9am–6pm</a><a>GST: 37AABCU9603R1ZX</a></div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 MahaGoAgro · RythuStore. All rights reserved.</span>
+      <span>Made for farmers of AP & Telangana 🌾</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ MOBILE BOTTOM NAV ══ -->
+<div class="mobile-nav">
+  <div class="mn-inner">
+    <button class="mn-btn on">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M3 10L10 4L17 10V18H13V14H7V18H3V10Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Home
+    </button>
+    <button class="mn-btn" onclick="document.getElementById('cat-section').scrollIntoView({behavior:'smooth'})">
+      <svg viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.3"/><rect x="11" y="2" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="11" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.3"/><rect x="11" y="11" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.3"/></svg>
+      Catalogue
+    </button>
+    <button class="mn-btn" onclick="window.location.href='login.html'">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 18c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Sign In
+    </button>
+    <button class="mn-btn" onclick="openDrawer()">
+      <svg viewBox="0 0 20 20" fill="none"><path d="M2 2H4.5L6.5 13H16L18 7H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="16.5" r="1.5" fill="currentColor"/><circle cx="14.5" cy="16.5" r="1.5" fill="currentColor"/></svg>
+      Order (<span id="mn-cn">0</span>)
+    </button>
+  </div>
+</div>
+
+<!-- ══ LOGIN MODAL ══ -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3 id="mTitle">Sign in to order</h3>
+      <button onclick="closeLogin()">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="steps-row">
+        <div class="step-dot active" id="sd1"><div class="sd-circle" id="sc1">1</div><div class="sd-label">Mobile</div></div>
+        <div class="step-dot" id="sd2"><div class="sd-circle" id="sc2">2</div><div class="sd-label">OTP</div></div>
+        <div class="step-dot" id="sd3"><div class="sd-circle" id="sc3">3</div><div class="sd-label">Shop</div></div>
+        <div class="step-dot" id="sd4"><div class="sd-circle" id="sc4">✓</div><div class="sd-label">Done</div></div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="mstep show" id="ms1">
+        <div class="m-sub">Enter your mobile number to receive an OTP via <strong>WhatsApp & SMS.</strong></div>
+        <div class="mfield">
+          <label>Mobile Number *</label>
+          <div class="flag-wrap">
+            <div class="flag-pre">
+              <svg width="18" height="12" viewBox="0 0 18 12"><rect width="18" height="12" rx="1" fill="#fff"/><rect width="18" height="4" fill="#FF9933"/><rect y="4" width="18" height="4" fill="#fff"/><rect y="8" width="18" height="4" fill="#138808"/><circle cx="9" cy="6" r="2" fill="none" stroke="#000088" stroke-width=".6"/><circle cx="9" cy="6" r=".45" fill="#000088"/></svg>
+              +91
+            </div>
+            <input type="tel" id="mobInp" placeholder="98765 43210" maxlength="10" inputmode="numeric" oninput="onMob(this)"/>
+          </div>
+        </div>
+        <button class="mbtn" id="sendBtn" onclick="sendOTP()" disabled>
+          <svg viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8.5 4L12 7L8.5 10" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Send OTP
+        </button>
+        <div class="m-or">or sign in with</div>
+        <button class="google-btn" onclick="googleAuth()">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="mstep" id="ms2">
+        <div class="m-sub">OTP sent to <strong id="sentTo"></strong>. Check WhatsApp or SMS.</div>
+        <div class="mfield">
+          <label>Enter 6-digit OTP</label>
+          <div class="otp-grid">
+            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,0)" onkeydown="oBack(event,this,0)"/>
+            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,1)" onkeydown="oBack(event,this,1)"/>
+            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,2)" onkeydown="oBack(event,this,2)"/>
+            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,3)" onkeydown="oBack(event,this,3)"/>
+            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,4)" onkeydown="oBack(event,this,4)"/>
+            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,5)" onkeydown="oBack(event,this,5)"/>
+          </div>
+          <div class="resend-row">
+            <span class="rtimer" id="rtimer">Resend in 30s</span>
+            <button class="rbtn" id="rbtn" disabled onclick="resendOTP()">Resend OTP</button>
+          </div>
+        </div>
+        <button class="mbtn" onclick="verifyOTP()">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Verify & Continue
+        </button>
+        <div style="text-align:center;margin-top:10px;"><button onclick="goMs(1)" style="background:none;border:none;font-size:.72rem;color:var(--ink3);cursor:pointer;text-decoration:underline;">← Change number</button></div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="mstep" id="ms3">
+        <div class="m-sub">Almost done. Add your shop details for <strong>GST invoicing.</strong></div>
+        <div class="mfield"><label>Shop / Business Name *</label><input type="text" placeholder="e.g. Rao Agri Traders, Guntur"/></div>
+        <div class="two-col">
+          <div class="mfield"><label>GST Number *</label><input type="text" placeholder="37AABCU9603R1ZX" maxlength="15" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"/></div>
+          <div class="mfield"><label>Pincode *</label><input type="text" placeholder="522001" maxlength="6" inputmode="numeric"/></div>
+        </div>
+        <button class="mbtn" onclick="completeLogin()">
+          <svg viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Create Account & Start Ordering
+        </button>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="mstep" id="ms4">
+        <div class="success-center">
+          <div class="s-ic">
+            <svg viewBox="0 0 30 30" fill="none"><circle cx="15" cy="15" r="13" stroke="currentColor" stroke-width="1.8"/><path d="M8 15L12.5 19.5L22 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="s-title">You're logged in!</div>
+          <div class="s-sub">Your retailer account is verified. You can now place bulk orders and receive GST invoices.</div>
+          <button class="mbtn" onclick="closeLogin()">Start ordering →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CART DRAWER ══ -->
+<div class="drawer-mask" id="drawerMask" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-hd">
+    <h3>Bulk Order</h3>
+    <button onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot" style="display:none;">
+    <div class="df-row"><span>Subtotal (ex-GST)</span><span id="dfSub">₹0</span></div>
+    <div class="df-row"><span>GST (~12%)</span><span id="dfGst">₹0</span></div>
+    <div class="df-row"><span>Delivery</span><span style="color:var(--g)">Free</span></div>
+    <div class="df-total"><span>Total payable</span><span id="dfTotal">₹0</span></div>
+    <div class="df-note">GST invoice sent to your email after payment. Free delivery across AP & Telangana.</div>
+    <button class="pay-btn" onclick="checkoutRazorpay()">
+      <svg viewBox="0 0 15 15" fill="none"><rect x="1" y="3.5" width="13" height="9" rx="1.5" stroke="white" stroke-width="1.3"/><line x1="1" y1="6.5" x2="14" y2="6.5" stroke="white" stroke-width="1.3"/><line x1="4" y1="10" x2="7" y2="10" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Pay with Razorpay
+    </button>
+    <button class="wa-btn" onclick="orderViaWhatsApp()">
+      <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#166534" stroke-width="1.1"/><path d="M4 10C4.5 10.5 5.5 11 7 10.5C8 10 9 9 9.5 8C10 7 9.5 5.5 8 5" stroke="#166534" stroke-width="1" stroke-linecap="round"/><path d="M4 10L3.5 11.5L5 11" stroke="#166534" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Order via WhatsApp
+    </button>
+    <div class="secure-note">Secured by Razorpay · GST invoice on every order</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="js/api.js"></script>
+<script src="js/catalogue.js"></script>
+
+</body>
+</html>

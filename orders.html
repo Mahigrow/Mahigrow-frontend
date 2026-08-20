@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>RythuStore — My Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#0a7a30;--g2:#086826;--g3:#e6f4ec;
+  --or:#e8620a;--ink:#111827;--ink2:#374151;--ink3:#6b7280;
+  --border:#e5e7eb;--bg:#f3f4f6;--card:#fff;
+  --red:#dc2626;--yellow:#d97706;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);}
+
+/* NAV */
+.nav{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.nav-inner{max-width:1100px;margin:0 auto;padding:0 20px;height:58px;display:flex;align-items:center;gap:16px;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-size:1.15rem;font-weight:800;color:var(--g);}
+.nav-logo span{color:var(--or);}
+.nav-links{display:flex;gap:4px;margin-left:16px;}
+.nav-link{font-size:.82rem;font-weight:500;color:var(--ink3);padding:6px 12px;border-radius:6px;text-decoration:none;transition:all .15s;}
+.nav-link:hover{background:var(--bg);color:var(--ink);}
+.nav-link.active{color:var(--g);font-weight:600;}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.logout-btn{background:none;border:1px solid var(--border);color:var(--ink3);font-size:.78rem;padding:6px 12px;border-radius:6px;cursor:pointer;}
+.logout-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:28px 20px;}
+.page-title{font-size:1.2rem;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.page-sub{font-size:.8rem;color:var(--ink3);margin-bottom:24px;}
+
+/* ORDERS */
+.orders-list{display:flex;flex-direction:column;gap:14px;}
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.order-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+.order-id{font-size:.78rem;font-weight:700;color:var(--g);}
+.order-date{font-size:.72rem;color:var(--ink3);}
+.status-badge{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:.03em;}
+.status-badge.PENDING    {background:#FEF3C7;color:#92400E;}
+.status-badge.CONFIRMED  {background:var(--g3);color:var(--g2);}
+.status-badge.PROCESSING {background:#EDE9FE;color:#5B21B6;}
+.status-badge.DISPATCHED {background:#DBEAFE;color:#1D4ED8;}
+.status-badge.DELIVERED  {background:var(--g3);color:var(--g2);}
+.status-badge.CANCELLED  {background:#FEE2E2;color:var(--red);}
+.order-items{padding:14px 18px;}
+.order-item-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:.8rem;}
+.order-item-row:last-child{border-bottom:none;}
+.oi-name{color:var(--ink);font-weight:500;}
+.oi-qty{color:var(--ink3);}
+.oi-price{font-weight:600;color:var(--ink);}
+.order-foot{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--bg);border-top:1px solid var(--border);}
+.order-total{font-size:.9rem;font-weight:700;color:var(--ink);}
+.order-total span{color:var(--g);}
+
+/* empty state */
+.empty{text-align:center;padding:64px 20px;color:var(--ink3);}
+.empty svg{width:56px;height:56px;opacity:.2;margin:0 auto 14px;display:block;}
+.empty h2{font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.empty p{font-size:.82rem;margin-bottom:20px;}
+.btn-primary{display:inline-flex;align-items:center;gap:7px;background:var(--g);color:#fff;border:none;padding:11px 22px;border-radius:7px;font-weight:600;font-size:.88rem;cursor:pointer;text-decoration:none;transition:background .15s;}
+.btn-primary:hover{background:var(--g2);}
+
+/* loading */
+.loading{text-align:center;padding:48px;color:var(--ink3);font-size:.85rem;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html">Rythu<span>Store</span></a>
+    <div class="nav-links">
+      <a class="nav-link" href="index.html">Catalogue</a>
+      <a class="nav-link active" href="orders.html">My Orders</a>
+    </div>
+    <div class="nav-right">
+      <span id="shopName" style="font-size:.8rem;font-weight:600;color:var(--ink3);"></span>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">My Orders</div>
+  <div class="page-sub">All your bulk orders in one place</div>
+  <div class="orders-list" id="ordersList">
+    <div class="loading">Loading orders…</div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+// Require login
+if (!isLoggedIn()) window.location.href = '/login.html';
+
+// Show shop name
+const retailer = getRetailer();
+if (retailer) document.getElementById('shopName').textContent = retailer.shopName || '';
+
+function logout() {
+  clearSession();
+  window.location.href = '/login.html';
+}
+
+const STATUS_LABELS = {
+  PENDING:    'Payment Pending',
+  CONFIRMED:  'Confirmed',
+  PROCESSING: 'Processing',
+  DISPATCHED: 'Dispatched',
+  DELIVERED:  'Delivered',
+  CANCELLED:  'Cancelled',
+};
+
+async function loadOrders() {
+  const list = document.getElementById('ordersList');
+  try {
+    const data   = await Orders.getAll();
+    const orders = data.orders;
+
+    if (!orders.length) {
+      list.innerHTML = `
+        <div class="empty">
+          <svg viewBox="0 0 44 44" fill="none"><path d="M5 5H9.5L13 28H34L37.5 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="34" r="3" fill="currentColor" opacity=".4"/><circle cx="29" cy="34" r="3" fill="currentColor" opacity=".4"/></svg>
+          <h2>No orders yet</h2>
+          <p>Browse the catalogue and place your first bulk order.</p>
+          <a class="btn-primary" href="index.html">Browse Catalogue →</a>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = orders.map(o => `
+      <div class="order-card">
+        <div class="order-head">
+          <div>
+            <div class="order-id">Order #${o.id.slice(-8).toUpperCase()}</div>
+            <div class="order-date">${new Date(o.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}</div>
+          </div>
+          <span class="status-badge ${o.status}">${STATUS_LABELS[o.status] || o.status}</span>
+        </div>
+        <div class="order-items">
+          ${o.items.map(i => `
+            <div class="order-item-row">
+              <span class="oi-name">${i.productName}</span>
+              <span class="oi-qty">${i.qty} ${i.qty > 1 ? 'units' : 'unit'} × ₹${i.ratePerUnit.toLocaleString('en-IN')}</span>
+              <span class="oi-price">₹${i.totalAmount.toLocaleString('en-IN')}</span>
+            </div>`).join('')}
+        </div>
+        <div class="order-foot">
+          <div style="font-size:.75rem;color:var(--ink3);">
+            Subtotal ₹${o.subtotal.toLocaleString('en-IN')} + GST ₹${o.gstAmount.toLocaleString('en-IN')}
+          </div>
+          <div class="order-total">Total: <span>₹${o.grandTotal.toLocaleString('en-IN')}</span></div>
+        </div>
+      </div>`
+    ).join('');
+
+  } catch (err) {
+    list.innerHTML = `<div class="empty"><p style="color:var(--red);">Could not load orders. Please refresh.</p><a class="btn-primary" href="orders.html">Retry</a></div>`;
+  }
+}
+
+loadOrders();
+</script>
+</body>
+</html>
