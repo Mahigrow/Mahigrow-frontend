@@ -39,40 +39,41 @@ function buildCard(p) {
   const el = document.createElement('div');
   el.className = 'pcard';
 
-  const base = p.tiers[0][2];
-  const disc = p.mrp > base ? Math.round((p.mrp - base) / p.mrp * 100) : 0;
+  const base     = p.tiers[0][2];
+  const disc     = p.mrp > base ? Math.round((p.mrp - base) / p.mrp * 100) : 0;
   const lastTier = p.tiers[p.tiers.length - 1];
+  const bg       = CAT_BG[p.category] || '#f0f0ec';
 
-  // Image area — real photo or category SVG fallback
-  const imgHtml = p.imageUrl
-    ? `<img src="${p.imageUrl}" alt="${p.name}"
-          style="width:100%;height:100%;object-fit:cover;"
-          onerror="this.outerHTML='${getCatSVG(p.category,56).replace(/'/g,"\'")}'"
+  // Image — real photo fills card, fallback is centered SVG
+  const imgArea = p.imageUrl
+    ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy"
+         onerror="this.parentNode.innerHTML='<div class=cat-icon>${getCatSVG(p.category,72)}</div>'"
        />`
-    : getCatSVG(p.category, 56);
+    : `<div class="cat-icon">${getCatSVG(p.category, 72)}</div>`;
 
   el.innerHTML = `
-    <div class="pcard-img" style="background:${CAT_BG[p.category]||'#f0f0ec'}">
-      ${imgHtml}
-      ${disc > 0 ? `<span class="disc-badge">${disc}%<br/>OFF</span>` : ''}
-      <span class="stock-badge ${p.inStock ? 'in' : 'out'}">${p.inStock ? 'In Stock' : 'Out of Stock'}</span>
+    <div class="pcard-img" style="background:${bg}">
+      ${imgArea}
+      ${disc > 0 ? `<span class="disc-badge">${disc}% OFF</span>` : ''}
+      <span class="stock-badge ${p.inStock ? 'in' : 'out'}">
+        ${p.inStock ? '✓ In Stock' : '⚠ Out of Stock'}
+      </span>
     </div>
 
     <div class="pcard-body">
       <div class="pcat-tag">${p.category}</div>
       <div class="pname">${p.name}</div>
-      <div class="psize">${p.brand} &middot; ${p.size}</div>
-
+      <div class="psize">${p.brand} · ${p.size}</div>
       <div class="price-row">
         <span class="price-now">₹${base.toLocaleString('en-IN')}</span>
         ${p.mrp > base ? `<span class="price-mrp">₹${p.mrp.toLocaleString('en-IN')}</span>` : ''}
         ${disc > 0 ? `<span class="price-save">${disc}% off</span>` : ''}
       </div>
-
-      <div class="tier-info">
-        <span class="tier-range">${p.tiers[0][0]}–${p.tiers[0][1] >= 9999 ? '∞' : p.tiers[0][1]}: ₹${p.tiers[0][2]}</span>
-        <span class="tier-sep">›</span>
-        <span class="tier-range best">${lastTier[0]}+: ₹${lastTier[2]}</span>
+      <div class="tier-row">
+        <span class="t-low">${p.tiers[0][0]}–${p.tiers[0][1] >= 9999 ? '∞' : p.tiers[0][1]}: ₹${p.tiers[0][2]}</span>
+        <span class="t-arr">→</span>
+        <span class="t-best">${lastTier[0]}+: ₹${lastTier[2]}</span>
+        <span class="t-lbl">Bulk rates</span>
       </div>
     </div>
 
@@ -85,16 +86,16 @@ function buildCard(p) {
                  inputmode="numeric"/>
           <button class="qb" onclick="qAdj('${p.id}',${p.step})">+</button>
         </div>
-        <span class="qty-lbl">${p.unit}s &middot; min ${p.moq}</span>
+        <span class="qty-lbl">${p.unit}s<br/>min ${p.moq}</span>
       </div>
       <button class="add-btn" id="ab-${p.id}"
               onclick="tryAddToCart('${p.id}')"
               ${!p.inStock ? 'disabled' : ''}>
-        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-          <path d="M1 1H2.5L4.5 9H10L11.5 4H4" stroke="white" stroke-width="1.3"
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 1H3L5 10H11L12.5 4.5H5" stroke="currentColor" stroke-width="1.4"
                 stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="5.5" cy="11.5" r="1.2" fill="white"/>
-          <circle cx="9" cy="11.5" r="1.2" fill="white"/>
+          <circle cx="6" cy="12.5" r="1.3" fill="currentColor"/>
+          <circle cx="10" cy="12.5" r="1.3" fill="currentColor"/>
         </svg>
         ${p.inStock ? 'Add to order' : 'Out of stock'}
       </button>
