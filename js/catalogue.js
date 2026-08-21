@@ -312,15 +312,17 @@ function showToast(msg, isError = false) {
 // ── Nav: show user info if logged in ─────────
 function updateNav() {
   const retailer = getRetailer();
-  const loginBtn = document.getElementById('loginBtn');
-  if (!loginBtn) return;
-  if (retailer) {
-    loginBtn.textContent = retailer.shopName || 'My Account';
-    loginBtn.onclick = () => window.location.href = '/orders.html';
-  } else {
-    loginBtn.textContent = 'Sign In';
-    loginBtn.onclick = () => window.location.href = '/login.html';
-  }
+  // Update both topbar and mobile nav buttons
+  ['tb-loginBtn', 'loginBtn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    if (retailer) {
+      btn.innerHTML = '<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 18c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>' + (retailer.shopName?.split(' ')[0] || 'Account');
+      btn.onclick = () => window.location.href = 'orders.html';
+    } else {
+      btn.onclick = () => window.location.href = 'login.html';
+    }
+  });
 }
 
 // ── Init ──────────────────────────────────────
