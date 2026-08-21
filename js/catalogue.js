@@ -1,3 +1,4 @@
+
 // ─────────────────────────────────────────────
 //  js/catalogue.js
 //  Loads products from API, cart, Razorpay
@@ -22,9 +23,14 @@ function getCatSVG(cat, size = 48) {
   return icons[cat] || icons.seeds;
 }
 
+// Category background colours — soft, earthy tones per type
 const CAT_BG = {
-  seeds:'#E8F5E9', pesticides:'#FFF8E1', insecticides:'#FFEBEE',
-  fertilisers:'#EFF6FF', fungicides:'#F3E8FF', herbicides:'#E8F5E9',
+  seeds:        '#E8F5E9',
+  pesticides:   '#FFF8E1',
+  insecticides: '#FFEBEE',
+  fertilisers:  '#EFF6FF',
+  fungicides:   '#F3E8FF',
+  herbicides:   '#E8F5E9',
 };
 
 // ── Get tier rate for a given qty ────────────
@@ -39,22 +45,38 @@ function buildCard(p) {
   const el = document.createElement('div');
   el.className = 'pcard';
 
-  const base     = p.tiers[0][2];
-  const disc     = p.mrp > base ? Math.round((p.mrp - base) / p.mrp * 100) : 0;
-  const lastTier = p.tiers[p.tiers.length - 1];
-  const bg       = CAT_BG[p.category] || '#f0f0ec';
+  const base      = p.tiers[0][2];
+  const disc      = p.mrp > base ? Math.round((p.mrp - base) / p.mrp * 100) : 0;
+  const lastTier  = p.tiers[p.tiers.length - 1];
+  const midTier   = p.tiers.length > 1 ? p.tiers[1] : null;
+  const bg        = CAT_BG[p.category] || '#f0f0ec';
+  const isBigDeal = disc >= 50;
 
-  // Image — real photo fills card, fallback is centered SVG
+  // Image — real photo fills card, fallback is centred SVG
   const imgArea = p.imageUrl
     ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy"
-         onerror="this.parentNode.innerHTML='<div class=cat-icon>${getCatSVG(p.category,72)}</div>'"
+         onerror="this.outerHTML='<div class=\\'cat-icon\\'>${getCatSVG(p.category, 72)}</div>'"
        />`
     : `<div class="cat-icon">${getCatSVG(p.category, 72)}</div>`;
 
+  // Ribbon: show discount if any
+  const ribbon = disc > 0
+    ? `<span class="disc-badge${isBigDeal ? ' big' : ''}">${isBigDeal ? '🔥 ' : ''}${disc}% OFF</span>`
+    : '';
+
+  // Tier chips — show start and best tier
+  const tierChips = `
+    <div class="tier-row">
+      <span class="t-lbl">Bulk Rates</span>
+      <span class="t-low">${p.tiers[0][0]}–${p.tiers[0][1] >= 9999 ? '∞' : p.tiers[0][1]}: ₹${p.tiers[0][2]}</span>
+      <span class="t-arr">→</span>
+      <span class="t-best">${lastTier[0]}+: ₹${lastTier[2]}</span>
+    </div>`;
+
   el.innerHTML = `
     <div class="pcard-img" style="background:${bg}">
+      ${ribbon}
       ${imgArea}
-      ${disc > 0 ? `<span class="disc-badge">${disc}% OFF</span>` : ''}
       <span class="stock-badge ${p.inStock ? 'in' : 'out'}">
         ${p.inStock ? '✓ In Stock' : '⚠ Out of Stock'}
       </span>
@@ -69,12 +91,7 @@ function buildCard(p) {
         ${p.mrp > base ? `<span class="price-mrp">₹${p.mrp.toLocaleString('en-IN')}</span>` : ''}
         ${disc > 0 ? `<span class="price-save">${disc}% off</span>` : ''}
       </div>
-      <div class="tier-row">
-        <span class="t-low">${p.tiers[0][0]}–${p.tiers[0][1] >= 9999 ? '∞' : p.tiers[0][1]}: ₹${p.tiers[0][2]}</span>
-        <span class="t-arr">→</span>
-        <span class="t-best">${lastTier[0]}+: ₹${lastTier[2]}</span>
-        <span class="t-lbl">Bulk rates</span>
-      </div>
+      ${tierChips}
     </div>
 
     <div class="pcard-foot">
@@ -90,8 +107,9 @@ function buildCard(p) {
       </div>
       <button class="add-btn" id="ab-${p.id}"
               onclick="tryAddToCart('${p.id}')"
-              ${!p.inStock ? 'disabled' : ''}>
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              ${!p.inStock ? 'disabled' : ''}
+              style="${isBigDeal ? 'background:var(--gold,#C8902A);' : ''}">
+        <svg viewBox="0 0 14 14" fill="none" width="13" height="13">
           <path d="M1 1H3L5 10H11L12.5 4.5H5" stroke="currentColor" stroke-width="1.4"
                 stroke-linecap="round" stroke-linejoin="round"/>
           <circle cx="6" cy="12.5" r="1.3" fill="currentColor"/>
@@ -100,6 +118,7 @@ function buildCard(p) {
         ${p.inStock ? 'Add to order' : 'Out of stock'}
       </button>
     </div>`;
+
   return el;
 }
 
@@ -112,14 +131,15 @@ function renderProducts(catFilter) {
   wrap.innerHTML = '';
 
   const catsToShow = catFilter ? [catFilter] : CATS;
+
   catsToShow.forEach(cat => {
     const items = allProducts.filter(p => p.category === cat);
     if (!items.length) return;
 
     const sec = document.createElement('div');
-    sec.className  = 'section';
+    sec.className   = 'section';
     sec.dataset.cat = cat;
-    sec.innerHTML = `
+    sec.innerHTML   = `
       <div class="sec-head">
         <div class="sec-title">
           ${getCatSVG(cat, 18)}
@@ -134,6 +154,32 @@ function renderProducts(catFilter) {
     const grid = document.getElementById('grid-' + cat);
     items.forEach(p => grid.appendChild(buildCard(p)));
   });
+}
+
+// ── Render skeleton while loading ────────────
+function renderSkeleton() {
+  const wrap = document.getElementById('productSections');
+  if (!wrap) return;
+  const html = CATS.map(cat => `
+    <div class="section">
+      <div class="sec-head">
+        <div class="sec-title" style="background:#e5e7eb;width:120px;height:14px;border-radius:4px;"></div>
+      </div>
+      <div class="prod-grid">
+        ${[1,2,3,4].map(() => `
+          <div class="skel-card">
+            <div class="skel-img skeleton"></div>
+            <div class="skel-body">
+              <div class="skel-line xs skeleton"></div>
+              <div class="skel-line lg skeleton"></div>
+              <div class="skel-line sm skeleton"></div>
+              <div class="skel-line sm skeleton"></div>
+              <div class="skel-btn skeleton"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+  wrap.innerHTML = html;
 }
 
 // ── Quantity adjust ───────────────────────────
@@ -169,11 +215,19 @@ function addToCart(pid) {
 
   const btn = document.getElementById('ab-' + pid);
   if (!btn) return;
+  const origBg = btn.style.background;
   btn.classList.add('done');
-  btn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Added ✓';
+  btn.innerHTML = `<svg viewBox="0 0 12 12" fill="none" width="13" height="13">
+    <path d="M2 6L5 9L10 3.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg> Added ✓`;
   setTimeout(() => {
     btn.classList.remove('done');
-    btn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><path d="M1 1H2.5L4 8.5H9.5L11 4H4" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="10.5" r="1" fill="white"/><circle cx="8.5" cy="10.5" r="1" fill="white"/></svg> Add to order';
+    btn.style.background = origBg;
+    btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none" width="13" height="13">
+      <path d="M1 1H3L5 10H11L12.5 4.5H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="6" cy="12.5" r="1.3" fill="currentColor"/>
+      <circle cx="10" cy="12.5" r="1.3" fill="currentColor"/>
+    </svg> Add to order`;
   }, 1800);
 
   showToast(p.name.split(' ').slice(0, 3).join(' ') + ' added');
@@ -186,15 +240,13 @@ function removeCart(pid) {
 }
 
 function updateCartBadge() {
-  const n = Object.keys(cart).length;
-  // Topbar badge
+  const n  = Object.keys(cart).length;
   const el = document.getElementById('cn');
   if (el) el.textContent = n;
-  // Mobile nav badge — show/hide based on count
   const mn = document.getElementById('mn-cn');
   if (mn) {
-    mn.textContent = n;
-    mn.style.display = n > 0 ? 'block' : 'none';
+    mn.textContent    = n;
+    mn.style.display  = n > 0 ? 'flex' : 'none';
   }
 }
 
@@ -207,7 +259,11 @@ function renderDrawer() {
 
   if (!items.length) {
     body.innerHTML = `<div class="drawer-empty">
-      <svg viewBox="0 0 44 44" fill="none"><path d="M5 5H9.5L13 28H34L37.5 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="34" r="3" fill="currentColor" opacity=".3"/><circle cx="29" cy="34" r="3" fill="currentColor" opacity=".3"/></svg>
+      <svg viewBox="0 0 44 44" fill="none">
+        <path d="M5 5H9.5L13 28H34L37.5 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="34" r="3" fill="currentColor" opacity=".3"/>
+        <circle cx="29" cy="34" r="3" fill="currentColor" opacity=".3"/>
+      </svg>
       Add products to build your bulk order.</div>`;
     foot.style.display = 'none';
     return;
@@ -218,7 +274,7 @@ function renderDrawer() {
     sub += total;
     return `<div class="di">
       <div class="di-ico">${getCatSVG(p.category, 28)}</div>
-      <div class="di-info">
+      <div class="di-info" style="flex:1;min-width:0;">
         <div class="di-name">${p.name}</div>
         <div class="di-meta">${qty} ${p.unit}(s) × ₹${rate.toLocaleString('en-IN')}</div>
         <div class="di-row">
@@ -246,12 +302,10 @@ async function checkoutRazorpay() {
     productId: p.id,
     qty,
   }));
-
   if (!items.length) return;
 
   try {
-    const data = await Orders.create(items);
-
+    const data    = await Orders.create(items);
     const options = {
       key:         data.keyId,
       amount:      data.amount,
@@ -278,10 +332,8 @@ async function checkoutRazorpay() {
         }
       },
     };
-
     const rzp = new window.Razorpay(options);
     rzp.open();
-
   } catch (err) {
     showToast(err.error || 'Could not create order. Please try again.', true);
   }
@@ -326,7 +378,7 @@ function filterCat(cat, btn) {
 function showToast(msg, isError = false) {
   const t = document.getElementById('toast');
   if (!t) return;
-  t.textContent = msg;
+  t.textContent      = msg;
   t.style.background = isError ? '#dc2626' : '#111827';
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
@@ -335,12 +387,14 @@ function showToast(msg, isError = false) {
 // ── Nav: show user info if logged in ─────────
 function updateNav() {
   const retailer = getRetailer();
-  // Update both topbar and mobile nav buttons
   ['tb-loginBtn', 'loginBtn'].forEach(id => {
     const btn = document.getElementById(id);
     if (!btn) return;
     if (retailer) {
-      btn.innerHTML = '<svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 18c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>' + (retailer.shopName?.split(' ')[0] || 'Account');
+      btn.innerHTML = `<svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+        <circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M3 18c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg> ` + (retailer.shopName?.split(' ')[0] || 'Account');
       btn.onclick = () => window.location.href = 'orders.html';
     } else {
       btn.onclick = () => window.location.href = 'login.html';
@@ -351,22 +405,23 @@ function updateNav() {
 // ── Init ──────────────────────────────────────
 async function init() {
   updateNav();
-
-  // Show loading skeleton
-  const wrap = document.getElementById('productSections');
-  if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:48px;color:#6b7280;">Loading products…</div>';
+  renderSkeleton(); // Show skeleton immediately
 
   try {
     const data  = await Products.getAll();
     allProducts = data.products;
     renderProducts(null);
   } catch {
-    if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:48px;color:#dc2626;">Could not load products. Please refresh.</div>';
+    const wrap = document.getElementById('productSections');
+    if (wrap) wrap.innerHTML = `
+      <div style="text-align:center;padding:48px;color:#dc2626;font-size:.84rem;">
+        Could not load products. Please refresh the page.
+      </div>`;
   }
 
   renderDrawer();
 
-  // If user just came back from login after clicking "Add to order"
+  // Resume pending add-to-cart after login redirect
   const pendingPid = localStorage.getItem('rs_pending_add');
   if (pendingPid && isLoggedIn()) {
     localStorage.removeItem('rs_pending_add');
