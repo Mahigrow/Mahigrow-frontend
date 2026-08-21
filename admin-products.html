@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>RythuStore — Admin · Products</title>
+<title>MahiGrow — Admin · Products</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -198,7 +198,7 @@ tr:hover td{background:#fafafa;}
 
 <nav class="nav">
   <div class="nav-inner">
-    <div class="nav-logo">Rythu<span>Store</span></div>
+    <div class="nav-logo">Mahi<span>Grow</span></div>
     <span class="nav-badge">Admin</span>
     <div class="nav-links">
       <a class="nav-link active">Products</a>
@@ -206,7 +206,9 @@ tr:hover td{background:#fafafa;}
       <a class="nav-link" onclick="location.href='index.html'">View Site</a>
     </div>
     <div class="nav-right">
-      <button class="btn-sm outline" onclick="location.href='index.html'">← Back to site</button>
+      <span class="nav-user" id="adminName" style="font-size:.78rem;color:rgba(255,255,255,.6);"></span>
+      <button class="btn-sm outline" onclick="adminLogout()">Sign Out</button>
+      <button class="btn-sm outline" onclick="location.href='index.html'">← View Site</button>
     </div>
   </div>
 </nav>
@@ -445,12 +447,50 @@ tr:hover td{background:#fafafa;}
 
 <script src="js/api.js"></script>
 <script>
-// ─────────────────────────────────────────────
-//  CONFIG — update these to match your Supabase project
-// ─────────────────────────────────────────────
-const SUPABASE_URL    = 'https://YOUR_PROJECT_REF.supabase.co';
-const SUPABASE_ANON   = 'YOUR_SUPABASE_ANON_KEY';
-const STORAGE_BUCKET  = 'product-images';   // create this bucket in Supabase Storage
+// ── ADMIN AUTH CHECK ──────────────────────────
+// Redirect to admin login if not authenticated
+(function() {
+  const token = localStorage.getItem('rs_admin_token');
+  if (!token) { window.location.href = 'admin-login.html'; }
+})();
+
+// Override http() to use admin token for all requests
+const _origHttp = http;
+async function http(method, path, body = null) {
+  const token = localStorage.getItem('rs_admin_token');
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+  if (body)  opts.body = JSON.stringify(body);
+  const res  = await fetch(API_BASE + path, opts);
+  const data = await res.json();
+  if (res.status === 401 || res.status === 403) {
+    // Admin session expired or access revoked
+    localStorage.removeItem('rs_admin_token');
+    localStorage.removeItem('rs_admin_user');
+    window.location.href = 'admin-login.html';
+    throw data;
+  }
+  if (!res.ok) throw { status: res.status, ...data };
+  return data;
+}
+
+function adminLogout() {
+  localStorage.removeItem('rs_admin_token');
+  localStorage.removeItem('rs_admin_user');
+  window.location.href = 'admin-login.html';
+}
+
+// Show admin name in nav
+window.addEventListener('DOMContentLoaded', () => {
+  try {
+    const admin = JSON.parse(localStorage.getItem('rs_admin_user') || '{}');
+    const el = document.getElementById('adminName');
+    if (el && admin.shopName) el.textContent = admin.shopName;
+  } catch {}
+});
 
 // ─────────────────────────────────────────────
 //  STATE
@@ -622,7 +662,7 @@ async function uploadToSupabase(file) {
   const formData = new FormData();
   formData.append('image', file);
 
-  const token = localStorage.getItem('rs_token');
+  const token = localStorage.getItem('rs_admin_token');
   const res = await fetch(API_BASE + '/api/upload/product-image', {
     method:  'POST',
     headers: token ? { 'Authorization': 'Bearer ' + token } : {},

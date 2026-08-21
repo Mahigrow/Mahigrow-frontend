@@ -234,7 +234,7 @@ async function checkoutRazorpay() {
       amount:      data.amount,
       currency:    'INR',
       order_id:    data.razorpayOrderId,
-      name:        'RythuStore',
+      name:        'MahiGrow',
       description: 'Bulk Agri Inputs',
       prefill:     data.prefill,
       theme:       { color: '#0a7a30' },
@@ -271,7 +271,7 @@ function orderViaWhatsApp() {
   const lines = items.map(({ p, qty, rate, total }) =>
     `${p.name} — ${qty} ${p.unit}(s) @ ₹${rate} = ₹${total.toLocaleString('en-IN')}`
   ).join('%0A');
-  window.open(`https://wa.me/919876543210?text=Hello RythuStore, bulk order:%0A%0A${lines}%0A%0APlease confirm and send payment link.`, '_blank');
+  window.open(`https://wa.me/919876543210?text=Hello MahiGrow, bulk order:%0A%0A${lines}%0A%0APlease confirm and send payment link.`, '_blank');
 }
 
 // ── Drawer open/close ─────────────────────────
