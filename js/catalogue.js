@@ -36,49 +36,66 @@ function getRate(tiers, qty) {
 
 // ── Build product card HTML ───────────────────
 function buildCard(p) {
-  const el   = document.createElement('div');
+  const el = document.createElement('div');
   el.className = 'pcard';
 
   const base = p.tiers[0][2];
   const disc = p.mrp > base ? Math.round((p.mrp - base) / p.mrp * 100) : 0;
+  const lastTier = p.tiers[p.tiers.length - 1];
+
+  // Image area — real photo or category SVG fallback
+  const imgHtml = p.imageUrl
+    ? `<img src="${p.imageUrl}" alt="${p.name}"
+          style="width:100%;height:100%;object-fit:cover;"
+          onerror="this.outerHTML='${getCatSVG(p.category,56).replace(/'/g,"\'")}'"
+       />`
+    : getCatSVG(p.category, 56);
 
   el.innerHTML = `
     <div class="pcard-img" style="background:${CAT_BG[p.category]||'#f0f0ec'}">
-      ${p.imageUrl
-        ? `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:contain;padding:12px;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-           <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">${getCatSVG(p.category, 48)}</div>`
-        : getCatSVG(p.category, 48)
-      }
-      ${disc > 0 ? `<div class="disc-badge">${disc}% OFF</div>` : ''}
-      <div class="bulk-badge">BULK</div>
-      <div class="cert-flag">${p.cert} Certified · ${p.inStock ? '✓ ' + p.stockQty + ' in stock' : '⚠ Out of stock'}</div>
+      ${imgHtml}
+      ${disc > 0 ? `<span class="disc-badge">${disc}%<br/>OFF</span>` : ''}
+      <span class="stock-badge ${p.inStock ? 'in' : 'out'}">${p.inStock ? 'In Stock' : 'Out of Stock'}</span>
     </div>
+
     <div class="pcard-body">
-      <div class="pcat-label">${p.category}</div>
+      <div class="pcat-tag">${p.category}</div>
       <div class="pname">${p.name}</div>
-      <div class="psize">${p.brand} · ${p.size}</div>
+      <div class="psize">${p.brand} &middot; ${p.size}</div>
+
       <div class="price-row">
-        <div class="price-now">₹${base.toLocaleString('en-IN')}</div>
-        ${p.mrp > base ? `<div class="price-mrp">₹${p.mrp.toLocaleString('en-IN')}</div>` : ''}
-        ${disc > 0 ? `<div class="price-save">Save ${disc}%</div>` : ''}
+        <span class="price-now">₹${base.toLocaleString('en-IN')}</span>
+        ${p.mrp > base ? `<span class="price-mrp">₹${p.mrp.toLocaleString('en-IN')}</span>` : ''}
+        ${disc > 0 ? `<span class="price-save">${disc}% off</span>` : ''}
       </div>
-      <div class="tier-chip">
-        <svg viewBox="0 0 10 10" fill="none"><path d="M1 5H9M6 2.5L9 5L6 7.5" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        ${p.tiers[0][0]}–${p.tiers[0][1]}: ₹${p.tiers[0][2]} → ${p.tiers[2][0]}+: ₹${p.tiers[2][2]}
+
+      <div class="tier-info">
+        <span class="tier-range">${p.tiers[0][0]}–${p.tiers[0][1] >= 9999 ? '∞' : p.tiers[0][1]}: ₹${p.tiers[0][2]}</span>
+        <span class="tier-sep">›</span>
+        <span class="tier-range best">${lastTier[0]}+: ₹${lastTier[2]}</span>
       </div>
     </div>
+
     <div class="pcard-foot">
       <div class="qty-row">
         <div class="qty-ctl">
           <button class="qb" onclick="qAdj('${p.id}',-${p.step})">−</button>
-          <input class="qi" id="q-${p.id}" type="number" value="${p.moq}" min="${p.moq}" step="${p.step}"/>
+          <input class="qi" id="q-${p.id}" type="number"
+                 value="${p.moq}" min="${p.moq}" step="${p.step}"
+                 inputmode="numeric"/>
           <button class="qb" onclick="qAdj('${p.id}',${p.step})">+</button>
         </div>
-        <div class="qty-unit">${p.unit}s</div>
-        <div class="moq-txt">Min ${p.moq}</div>
+        <span class="qty-lbl">${p.unit}s &middot; min ${p.moq}</span>
       </div>
-      <button class="add-btn" id="ab-${p.id}" onclick="tryAddToCart('${p.id}')" ${!p.inStock?'disabled style="background:var(--ink3)"':''}>
-        <svg viewBox="0 0 12 12" fill="none"><path d="M1 1H2.5L4 8.5H9.5L11 4H4" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="10.5" r="1" fill="white"/><circle cx="8.5" cy="10.5" r="1" fill="white"/></svg>
+      <button class="add-btn" id="ab-${p.id}"
+              onclick="tryAddToCart('${p.id}')"
+              ${!p.inStock ? 'disabled' : ''}>
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M1 1H2.5L4.5 9H10L11.5 4H4" stroke="white" stroke-width="1.3"
+                stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="5.5" cy="11.5" r="1.2" fill="white"/>
+          <circle cx="9" cy="11.5" r="1.2" fill="white"/>
+        </svg>
         ${p.inStock ? 'Add to order' : 'Out of stock'}
       </button>
     </div>`;
