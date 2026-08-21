@@ -2,336 +2,228 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MahiGrow — Retailer Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>MahiGrow — Sign In</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-text-size-adjust:100%;}
 :root{
-  --g:#0a7a30; --g2:#086826; --g3:#e6f4ec; --g4:#b8dfc4;
-  --or:#e8620a; --ink:#111827; --ink2:#374151; --ink3:#6b7280;
-  --border:#e5e7eb; --bg:#f3f4f6; --card:#ffffff;
-  --red:#dc2626; --red-bg:#fef2f2;
-  --radius:10px;
+  --g:#0a7a30;--g2:#086826;--g3:#e6f4ec;--g4:#b8dfc4;
+  --or:#e8620a;--ink:#111827;--ink2:#374151;--ink3:#6b7280;
+  --border:#e5e7eb;--bg:#f9fafb;--card:#fff;
+  --red:#dc2626;--red2:#fef2f2;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
 }
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
-button{font-family:inherit;cursor:pointer;}
-input{font-family:inherit;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
+button,input,select,textarea{font-family:inherit;cursor:pointer;}
 
-/* ── SHELL ── */
-.shell{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
-@media(max-width:860px){.shell{grid-template-columns:1fr;}.brand-panel{display:none;}}
+/* ── TOP BAR ── */
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+.logo svg{width:28px;height:28px;}
+.logo-name{font-size:1.05rem;font-weight:800;color:var(--g);letter-spacing:-.02em;}
+.logo-name span{color:var(--or);}
+.back-to-site{font-size:.76rem;font-weight:500;color:var(--ink3);text-decoration:none;display:flex;align-items:center;gap:4px;}
 
-/* ── BRAND PANEL ── */
-.brand-panel{
-  background:var(--g2);
-  display:flex;flex-direction:column;justify-content:space-between;
-  padding:48px 52px;position:relative;overflow:hidden;
-}
-.brand-panel::after{
-  content:'';position:absolute;
-  width:500px;height:500px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);
-  bottom:-120px;right:-120px;pointer-events:none;
-}
-.brand-top{position:relative;z-index:1;}
-.brand-logo{display:flex;align-items:center;gap:10px;}
-.brand-logo-icon{width:42px;height:42px;}
-.brand-name{font-size:1.5rem;font-weight:800;color:#fff;letter-spacing:-.03em;}
-.brand-name span{color:#7FD49A;}
-.brand-tagline{font-size:.7rem;color:rgba(255,255,255,.45);letter-spacing:.1em;text-transform:uppercase;margin-top:3px;}
+/* ── PAGE WRAPPER ── */
+.page{max-width:460px;margin:0 auto;padding:20px 16px calc(20px + var(--safe-bottom));}
 
-.brand-center{position:relative;z-index:1;}
-.brand-headline{font-size:2.1rem;font-weight:800;color:#fff;line-height:1.18;letter-spacing:-.03em;margin-bottom:14px;}
-.brand-headline em{color:#7FD49A;font-style:normal;}
-.brand-desc{font-size:.9rem;color:rgba(255,255,255,.6);line-height:1.7;max-width:360px;}
-
-.trust-cards{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;}
-.tc{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:13px 16px;}
-.tc-icon{width:34px;height:34px;flex-shrink:0;}
-.tc-icon svg{width:100%;height:100%;}
-.tc-text strong{display:block;font-size:.8rem;color:#fff;font-weight:600;margin-bottom:2px;}
-.tc-text span{font-size:.7rem;color:rgba(255,255,255,.5);}
-
-/* ── AUTH PANEL ── */
-.auth-panel{
-  background:var(--card);
-  display:flex;flex-direction:column;justify-content:center;
-  padding:48px 52px;overflow-y:auto;
-}
-@media(max-width:600px){.auth-panel{padding:32px 24px;}}
-
-.panel-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;}
-.mobile-brand{display:none;font-size:1.2rem;font-weight:800;color:var(--g);}
-.mobile-brand span{color:var(--or);}
-@media(max-width:860px){.mobile-brand{display:block;}}
-
-.lang-sw{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-.lang-sw button{background:none;border:none;font-size:.72rem;font-weight:600;color:var(--ink3);padding:5px 11px;cursor:pointer;transition:all .15s;}
-.lang-sw button.on{background:var(--g);color:#fff;}
-
-/* ── TAB SWITCHER ── */
-.tab-row{display:flex;background:var(--bg);border-radius:9px;padding:4px;margin-bottom:28px;}
-.tab-btn{flex:1;background:none;border:none;font-size:.88rem;font-weight:600;padding:10px;border-radius:7px;color:var(--ink3);transition:all .2s;cursor:pointer;}
-.tab-btn.active{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.09);}
-
-/* ── FORM TITLE ── */
-.form-title{font-size:1.5rem;font-weight:800;color:var(--ink);letter-spacing:-.03em;margin-bottom:4px;}
-.form-sub{font-size:.82rem;color:var(--ink3);margin-bottom:24px;line-height:1.5;}
-
-/* ── DIVIDER ── */
-
-/* ── FIELD ── */
-.field{margin-bottom:14px;}
-.field-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.field-label label{font-size:.78rem;font-weight:600;color:var(--ink);}
-.field-label .req{font-size:.68rem;color:var(--red);}
-.field-label .opt{font-size:.68rem;color:var(--ink3);}
-.field-row{position:relative;}
-.field-row svg.field-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--ink3);pointer-events:none;}
-.field-row input{
-  width:100%;padding:11px 13px 11px 38px;
-  border:1.5px solid var(--border);border-radius:8px;
-  font-size:.88rem;color:var(--ink);background:var(--bg);
-  outline:none;transition:border-color .15s,background .15s;
-}
-.field-row input.no-icon{padding-left:13px;}
-.field-row input:focus{border-color:var(--g);background:#fff;}
-.field-row input.error{border-color:var(--red);background:var(--red-bg);}
-.field-row .toggle-pw{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--ink3);cursor:pointer;padding:2px;}
-.field-row .toggle-pw svg{width:16px;height:16px;}
-
-/* phone with flag */
-.phone-wrap{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg);transition:border-color .15s;}
-.phone-wrap:focus-within{border-color:var(--g);background:#fff;}
-.phone-wrap.error{border-color:var(--red);background:var(--red-bg);}
-.phone-prefix{display:flex;align-items:center;gap:6px;padding:0 12px;background:var(--bg);border-right:1px solid var(--border);font-size:.82rem;font-weight:600;color:var(--ink2);flex-shrink:0;}
-.phone-wrap input{border:none;background:transparent;padding:11px 13px;flex:1;font-size:.88rem;color:var(--ink);outline:none;}
-
-/* GST field with verify chip */
-.gst-row{display:flex;gap:8px;}
-.gst-row input{flex:1;}
-.verify-chip{flex-shrink:0;background:var(--g3);border:1px solid var(--g4);color:var(--g2);font-size:.72rem;font-weight:600;padding:0 12px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.verify-chip:hover{background:var(--g4);}
-.verify-chip.verified{background:var(--g);color:#fff;border-color:var(--g);}
-.verify-chip.soft{background:#fff3eb;color:var(--or);border-color:#f8c89a;}
-.verify-chip:disabled{opacity:.5;cursor:not-allowed;}
-@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
-
-/* field helper */
-.field-helper{font-size:.7rem;color:var(--ink3);margin-top:4px;}
-.field-helper.error{color:var(--red);}
-
-/* two col */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-@media(max-width:440px){.two-col{grid-template-columns:1fr;}}
-
-/* section heading inside form */
-.form-section{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin:18px 0 12px;display:flex;align-items:center;gap:8px;}
-.form-section::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* ── CHECKBOX ── */
-.check-row{display:flex;align-items:flex-start;gap:9px;font-size:.76rem;color:var(--ink3);line-height:1.5;margin-bottom:14px;}
-.check-row input[type=checkbox]{width:15px;height:15px;margin-top:1px;accent-color:var(--g);flex-shrink:0;cursor:pointer;}
-.check-row a{color:var(--g);font-weight:500;cursor:pointer;}
-
-/* ── PRIMARY BTN ── */
-.btn-primary{
-  width:100%;background:var(--g);color:#fff;
-  border:none;border-radius:9px;font-weight:700;font-size:.92rem;
-  padding:13px;cursor:pointer;transition:background .15s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.btn-primary:hover{background:var(--g2);}
-.btn-primary:disabled{background:var(--border);color:var(--ink3);cursor:not-allowed;}
-.btn-primary svg{width:16px;height:16px;}
-
-/* loading spinner */
-.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none;}
-.loading .spinner{display:block;}
-.loading .btn-text{display:none;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* ── FOOTER LINK ── */
-.link-row{text-align:center;font-size:.78rem;color:var(--ink3);margin-top:16px;}
-.link-row a{color:var(--g);font-weight:600;cursor:pointer;text-decoration:none;}
-.link-row a:hover{text-decoration:underline;}
-
-/* forgot pw */
-.forgot-link{font-size:.72rem;color:var(--g);font-weight:500;cursor:pointer;text-decoration:none;}
-.forgot-link:hover{text-decoration:underline;}
-
-/* ── STRENGTH BAR ── */
-.strength-bar{height:3px;border-radius:2px;background:var(--border);margin-top:6px;overflow:hidden;}
-.strength-fill{height:100%;border-radius:2px;width:0%;transition:width .3s,background .3s;}
+/* ── TAB ROW ── */
+.tab-row{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:22px;}
+.tab-btn{flex:1;background:none;border:none;font-size:.85rem;font-weight:600;padding:9px;border-radius:7px;color:var(--ink3);transition:all .18s;}
+.tab-btn.active{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08);}
 
 /* ── SCREEN VISIBILITY ── */
 .screen{display:none;}
 .screen.active{display:block;}
 
-/* ── FORGOT PASSWORD FLOW ── */
-.back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;color:var(--ink3);font-size:.78rem;cursor:pointer;padding:0;margin-bottom:22px;transition:color .15s;}
-.back-btn:hover{color:var(--ink);}
-.back-btn svg{width:14px;height:14px;}
-.otp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:6px;}
-.obox{text-align:center;padding:11px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:1rem;font-weight:700;color:var(--g);background:var(--bg);outline:none;transition:border-color .15s;}
-.obox:focus{border-color:var(--or);background:#fff;}
-.resend-row{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
-.rtimer{font-size:.72rem;color:var(--ink3);}
-.rbtn{background:none;border:none;font-size:.72rem;color:var(--or);font-weight:600;cursor:pointer;}
-.rbtn:disabled{color:var(--ink3);cursor:default;}
+/* ── CARD ── */
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px 20px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
 
-/* ── SUCCESS ── */
-.success-wrap{text-align:center;padding:12px 0;}
-.success-icon{width:64px;height:64px;border-radius:50%;background:var(--g3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
-.success-icon svg{width:34px;height:34px;color:var(--g);}
-.success-title{font-size:1.3rem;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:6px;}
-.success-sub{font-size:.82rem;color:var(--ink3);line-height:1.65;margin-bottom:22px;}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--ink);color:#fff;font-size:.78rem;font-weight:500;padding:9px 18px;border-radius:7px;box-shadow:0 4px 16px rgba(0,0,0,.15);opacity:0;transition:all .22s;z-index:999;white-space:nowrap;}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+/* ── FORM TITLE ── */
+.form-title{font-size:1.15rem;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:3px;}
+.form-sub{font-size:.78rem;color:var(--ink3);margin-bottom:18px;line-height:1.5;}
+.form-sub strong{color:var(--g);}
 
 /* ── PROGRESS DOTS ── */
-.prog-row{display:flex;gap:6px;margin-bottom:22px;}
-.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);}
+.prog-row{display:flex;gap:5px;margin-bottom:18px;}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all .2s;}
 .pdot.done{background:var(--g);}
-.pdot.active{width:22px;border-radius:4px;background:var(--or);}
+.pdot.active{width:20px;border-radius:4px;background:var(--or);}
+
+/* ── FIELD ── */
+.field{margin-bottom:13px;}
+.field-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.field-top label{font-size:.76rem;font-weight:600;color:var(--ink);}
+.field-top .req{font-size:.67rem;color:var(--red);}
+.field-top .opt{font-size:.67rem;color:var(--ink3);}
+.field-top .link{font-size:.72rem;color:var(--g);font-weight:500;cursor:pointer;background:none;border:none;padding:0;}
+
+/* phone input */
+.phone-wrap{display:flex;border:1.5px solid var(--border);border-radius:9px;overflow:hidden;background:var(--bg);transition:border-color .15s;}
+.phone-wrap:focus-within{border-color:var(--g);background:#fff;}
+.phone-wrap.error{border-color:var(--red);}
+.phone-pre{display:flex;align-items:center;gap:5px;padding:0 12px;background:var(--bg);border-right:1px solid var(--border);font-size:.82rem;font-weight:600;color:var(--ink2);flex-shrink:0;}
+.phone-wrap input{border:none;background:transparent;padding:12px;font-size:.92rem;color:var(--ink);outline:none;flex:1;min-width:0;}
+
+/* text input */
+.text-inp{width:100%;padding:12px;border:1.5px solid var(--border);border-radius:9px;font-size:.92rem;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.text-inp:focus{border-color:var(--g);background:#fff;}
+.text-inp.error{border-color:var(--red);}
+.text-inp[style*="uppercase"]{text-transform:uppercase;}
+
+/* password field */
+.pw-wrap{position:relative;}
+.pw-wrap .text-inp{padding-right:44px;}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--ink3);padding:4px;}
+.pw-toggle svg{width:17px;height:17px;display:block;}
+
+/* two col */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* GST row */
+.gst-row{display:flex;gap:8px;align-items:flex-start;}
+.gst-row .text-inp{flex:1;}
+.verify-btn{flex-shrink:0;background:var(--g3);border:1px solid var(--g4);color:var(--g2);font-size:.72rem;font-weight:700;padding:0 13px;border-radius:8px;height:46px;white-space:nowrap;transition:all .15s;}
+.verify-btn:disabled{opacity:.5;cursor:not-allowed;}
+.verify-btn.verified{background:var(--g);color:#fff;border-color:var(--g);}
+.verify-btn.soft{background:#fff3eb;color:var(--or);border-color:#f8c89a;}
+
+/* field helper */
+.field-helper{font-size:.68rem;color:var(--ink3);margin-top:4px;line-height:1.4;}
+.field-helper.error{color:var(--red);}
+
+/* ── OTP GRID ── */
+.otp-row{display:flex;gap:7px;margin-top:6px;}
+.obox{flex:1;min-width:0;text-align:center;padding:12px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:1.1rem;font-weight:700;color:var(--g);background:var(--bg);outline:none;transition:border-color .15s;-webkit-appearance:none;}
+.obox:focus{border-color:var(--or);background:#fff;}
+.resend-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.rtimer{font-size:.72rem;color:var(--ink3);}
+.rbtn{background:none;border:none;font-size:.72rem;color:var(--or);font-weight:600;padding:0;}
+.rbtn:disabled{color:var(--ink3);}
+
+/* ── REVIEW CARD ── */
+.review-card{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:13px;margin-bottom:14px;}
+.review-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:.78rem;}
+.review-row:last-child{border-bottom:none;}
+.review-row span:first-child{color:var(--ink3);font-weight:500;}
+.review-row span:last-child{color:var(--ink);font-weight:600;text-align:right;max-width:60%;}
+
+/* ── CHECKBOX ── */
+.check-row{display:flex;align-items:flex-start;gap:9px;font-size:.75rem;color:var(--ink3);line-height:1.5;margin-bottom:13px;}
+.check-row input[type=checkbox]{width:16px;height:16px;margin-top:1px;accent-color:var(--g);flex-shrink:0;}
+.check-row a{color:var(--g);font-weight:500;text-decoration:underline;}
+
+/* ── STRENGTH BAR ── */
+.strength-bar{height:3px;border-radius:2px;background:var(--border);margin-top:6px;overflow:hidden;}
+.strength-fill{height:100%;width:0;border-radius:2px;transition:width .3s,background .3s;}
+.strength-label{font-size:.67rem;color:var(--ink3);margin-top:3px;}
+
+/* ── PRIMARY BTN ── */
+.btn-primary{width:100%;background:var(--g);color:#fff;border:none;border-radius:9px;font-weight:700;font-size:.92rem;padding:13px;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s;margin-top:4px;-webkit-tap-highlight-color:transparent;}
+.btn-primary:hover{background:var(--g2);}
+.btn-primary:active{background:var(--g2);}
+.btn-primary:disabled{background:var(--border);color:var(--ink3);cursor:not-allowed;}
+.btn-primary svg{width:15px;height:15px;flex-shrink:0;}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none;}
+.btn-primary.loading .spinner{display:block;}
+.btn-primary.loading .btn-text{display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── BACK LINK ── */
+.back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;color:var(--ink3);font-size:.76rem;padding:0;margin-bottom:16px;-webkit-tap-highlight-color:transparent;}
+.back-btn svg{width:14px;height:14px;}
+
+/* ── DIVIDER ── */
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:.72rem;color:var(--ink3);}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* ── FOOTER LINK ── */
+.link-row{text-align:center;font-size:.78rem;color:var(--ink3);margin-top:14px;}
+.link-row a{color:var(--g);font-weight:600;cursor:pointer;}
+
+/* ── SUCCESS ── */
+.success-wrap{text-align:center;padding:8px 0 4px;}
+.s-icon{width:60px;height:60px;border-radius:50%;background:var(--g3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.s-icon svg{width:32px;height:32px;color:var(--g);}
+.s-title{font-size:1.1rem;font-weight:800;color:var(--ink);margin-bottom:5px;}
+.s-sub{font-size:.78rem;color:var(--ink2);line-height:1.65;margin-bottom:18px;}
+
+/* ── ALERT ── */
+.alert{background:var(--red2);border:1px solid #fecaca;border-radius:7px;padding:10px 13px;font-size:.76rem;color:var(--red);margin-bottom:13px;display:none;}
+.alert.show{display:block;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--ink);color:#fff;font-size:.76rem;font-weight:500;padding:9px 18px;border-radius:7px;opacity:0;transition:all .22s;z-index:500;white-space:nowrap;max-width:90vw;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast.err{background:var(--red);}
 </style>
 </head>
 <body>
 
-<div class="shell">
+<!-- TOP BAR -->
+<div class="topbar">
+  <a class="logo" href="index.html">
+    <svg viewBox="0 0 28 28" fill="none">
+      <circle cx="14" cy="14" r="13" fill="#e6f4ec"/>
+      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9"/>
+      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(60 14 14)"/>
+      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(120 14 14)"/>
+      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(180 14 14)"/>
+      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(240 14 14)"/>
+      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(300 14 14)"/>
+      <circle cx="14" cy="14" r="4" fill="#0a7a30"/>
+      <circle cx="14" cy="14" r="1.8" fill="#e8a020"/>
+    </svg>
+    <span class="logo-name">Mahi<span>Grow</span></span>
+  </a>
+  <a class="back-to-site" href="index.html">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back
+  </a>
+</div>
 
-  <!-- ── BRAND PANEL ── -->
-  <div class="brand-panel">
-    <!-- top -->
-    <div class="brand-top">
-      <div class="brand-logo">
-        <svg class="brand-logo-icon" viewBox="0 0 42 42" fill="none">
-          <circle cx="21" cy="21" r="19" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
-          <ellipse cx="21" cy="9" rx="3.2" ry="8" fill="#7FD49A" opacity=".9"/>
-          <ellipse cx="21" cy="9" rx="3.2" ry="8" fill="#7FD49A" opacity=".9" transform="rotate(60 21 21)"/>
-          <ellipse cx="21" cy="9" rx="3.2" ry="8" fill="#7FD49A" opacity=".9" transform="rotate(120 21 21)"/>
-          <ellipse cx="21" cy="9" rx="3.2" ry="8" fill="#7FD49A" opacity=".9" transform="rotate(180 21 21)"/>
-          <ellipse cx="21" cy="9" rx="3.2" ry="8" fill="#7FD49A" opacity=".9" transform="rotate(240 21 21)"/>
-          <ellipse cx="21" cy="9" rx="3.2" ry="8" fill="#7FD49A" opacity=".9" transform="rotate(300 21 21)"/>
-          <circle cx="21" cy="21" r="6" fill="#0a7a30"/>
-          <circle cx="21" cy="21" r="3" fill="#e8a020"/>
-        </svg>
-        <div>
-          <div class="brand-name">Mahi<span>Grow</span></div>
-          <div class="brand-tagline">Bulk Agri Inputs · B2B Portal</div>
-        </div>
-      </div>
-    </div>
+<!-- PAGE -->
+<div class="page">
 
-    <!-- center -->
-    <div class="brand-center">
-      <div class="brand-headline">India's direct<br/>agri-input <em>trade portal.</em></div>
-      <div class="brand-desc">Seeds, pesticides, insecticides, fertilisers at bulk retailer rates. GST-ready invoices, direct from MahaGoAgro, delivered across AP & Telangana.</div>
-    </div>
-
-    <!-- trust cards -->
-    <div class="trust-cards">
-      <div class="tc">
-        <div class="tc-icon">
-          <svg viewBox="0 0 34 34" fill="none">
-            <circle cx="17" cy="17" r="15" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
-            <!-- seed icon -->
-            <ellipse cx="17" cy="10" rx="2.8" ry="6" fill="#7FD49A" opacity=".85"/>
-            <path d="M17 16 Q13 20 13 27" stroke="#7FD49A" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M17 20 Q22 17 22 12" stroke="#7FD49A" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-            <circle cx="17" cy="27" r="2.5" fill="#e8a020"/>
-          </svg>
-        </div>
-        <div class="tc-text">
-          <strong>340+ CIB Certified Products</strong>
-          <span>Seeds, pesticides, fungicides, herbicides</span>
-        </div>
-      </div>
-      <div class="tc">
-        <div class="tc-icon">
-          <svg viewBox="0 0 34 34" fill="none">
-            <circle cx="17" cy="17" r="15" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
-            <!-- invoice icon -->
-            <rect x="9" y="7" width="16" height="20" rx="2" stroke="#7FD49A" stroke-width="1.5"/>
-            <line x1="12" y1="12" x2="22" y2="12" stroke="#7FD49A" stroke-width="1.2" stroke-linecap="round"/>
-            <line x1="12" y1="15.5" x2="22" y2="15.5" stroke="#7FD49A" stroke-width="1.2" stroke-linecap="round"/>
-            <line x1="12" y1="19" x2="17" y2="19" stroke="#7FD49A" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M18 21L20 23L24 19" stroke="#e8a020" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="tc-text">
-          <strong>GST Invoice on Every Order</strong>
-          <span>Auto-generated, emailed instantly</span>
-        </div>
-      </div>
-      <div class="tc">
-        <div class="tc-icon">
-          <svg viewBox="0 0 34 34" fill="none">
-            <circle cx="17" cy="17" r="15" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
-            <!-- shield icon -->
-            <path d="M17 6L25 9.5V17C25 22 17 28 17 28C17 28 9 22 9 17V9.5L17 6Z" stroke="#7FD49A" stroke-width="1.5" stroke-linejoin="round"/>
-            <path d="M13 17L16 20L21 14" stroke="#e8a020" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="tc-text">
-          <strong>Razorpay Secure Payments</strong>
-          <span>UPI, NEFT, RTGS, Credit card</span>
-        </div>
-      </div>
-    </div>
+  <!-- TAB ROW -->
+  <div class="tab-row">
+    <button class="tab-btn active" id="tabLogin"    onclick="switchTab('login')">Sign In</button>
+    <button class="tab-btn"         id="tabRegister" onclick="switchTab('register')">Register Shop</button>
   </div>
 
-  <!-- ── AUTH PANEL ── -->
-  <div class="auth-panel">
-
-    <div class="panel-topbar">
-      <div class="mobile-brand">Mahi<span>Grow</span></div>
-      <div class="lang-sw">
-        <button class="on">EN</button>
-        <button>తె</button>
-      </div>
-    </div>
-
-    <!-- TAB ROW -->
-    <div class="tab-row">
-      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
-      <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">Register Shop</button>
-    </div>
-
-    <!-- ════ LOGIN SCREEN ════ -->
-    <div class="screen active" id="screenLogin">
+  <!-- ════ LOGIN ════ -->
+  <div class="screen active" id="screenLogin">
+    <div class="auth-card">
       <div class="form-title">Welcome back</div>
-      <div class="form-sub">Sign in with your registered phone number and password.</div>
+      <div class="form-sub">Sign in with your phone number and password.</div>
 
-      <!-- Phone -->
+      <div class="alert" id="loginAlert"></div>
+
       <div class="field">
-        <div class="field-label">
-          <label>Phone Number</label>
-          <span class="req">Required</span>
-        </div>
+        <div class="field-top"><label>Phone Number</label><span class="req">Required</span></div>
         <div class="phone-wrap" id="loginPhoneWrap">
-          <div class="phone-prefix">
+          <div class="phone-pre">
             <svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="1" fill="#fff"/><rect width="20" height="4.33" fill="#FF9933"/><rect y="4.33" width="20" height="4.33" fill="#fff"/><rect y="8.67" width="20" height="4.33" fill="#138808"/><circle cx="10" cy="6.5" r="2.2" fill="none" stroke="#000088" stroke-width=".65"/><circle cx="10" cy="6.5" r=".5" fill="#000088"/></svg>
             +91
           </div>
-          <input type="tel" id="loginPhone" placeholder="98765 43210" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/\D/,'')"/>
+          <input type="tel" id="loginPhone" placeholder="98765 43210" maxlength="10"
+                 inputmode="numeric" autocomplete="tel"
+                 oninput="this.value=this.value.replace(/\D/,'');clearAlert('loginAlert')"/>
         </div>
-        <div class="field-helper" id="loginPhoneErr"></div>
+        <div class="field-helper error" id="loginPhoneErr"></div>
       </div>
 
-      <!-- Password -->
       <div class="field">
-        <div class="field-label">
+        <div class="field-top">
           <label>Password</label>
-          <a class="forgot-link" onclick="switchTab('forgot')">Forgot password?</a>
+          <button class="link" onclick="switchTab('forgot')">Forgot password?</button>
         </div>
-        <div class="field-row">
-          <svg class="field-icon" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></svg>
-          <input type="password" id="loginPw" placeholder="Enter your password" oninput="clearErr('loginPwErr')"/>
-          <button class="toggle-pw" onclick="togglePw('loginPw',this)" type="button">
+        <div class="pw-wrap">
+          <input type="password" class="text-inp" id="loginPw" placeholder="Your password"
+                 autocomplete="current-password" oninput="clearAlert('loginAlert')"/>
+          <button class="pw-toggle" onclick="togglePw('loginPw')" type="button">
             <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
           </button>
         </div>
@@ -343,219 +235,184 @@ input{font-family:inherit;}
         <div class="spinner"></div>
       </button>
 
-      <div class="link-row" style="margin-top:18px;">
-        New retailer? <a onclick="switchTab('register')">Register your shop →</a>
-      </div>
+      <div class="link-row">New retailer? <a onclick="switchTab('register')">Register your shop →</a></div>
     </div>
+  </div>
 
-    <!-- ════ REGISTER SCREEN ════ -->
-    <div class="screen" id="screenRegister">
-
-      <!-- Step indicator -->
+  <!-- ════ REGISTER ════ -->
+  <div class="screen" id="screenRegister">
+    <div class="auth-card">
       <div class="prog-row" id="regProg">
         <div class="pdot active" id="rp1"></div>
         <div class="pdot" id="rp2"></div>
         <div class="pdot" id="rp3"></div>
       </div>
 
-      <!-- REG STEP 1: Account credentials -->
+      <!-- Step 1: Credentials -->
       <div class="screen active" id="regStep1">
-        <div class="form-title">Create your account</div>
-        <div class="form-sub">Step 1 of 3 — Set your login credentials</div>
+        <div class="form-title">Create account</div>
+        <div class="form-sub">Step 1 of 3 — Your login credentials</div>
 
-        <!-- Email -->
         <div class="field">
-          <div class="field-label">
-            <label>Email Address</label>
-            <span class="req">Required</span>
-          </div>
-          <div class="field-row">
-            <svg class="field-icon" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 5.5L8 9.5L14.5 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-            <input type="email" id="regEmail" placeholder="yourshop@gmail.com" oninput="clearErr('regEmailErr')"/>
-          </div>
+          <div class="field-top"><label>Email Address</label><span class="req">Required</span></div>
+          <input type="email" class="text-inp" id="regEmail" placeholder="yourshop@gmail.com"
+                 autocomplete="email" inputmode="email" oninput="clearErr('regEmailErr')"/>
           <div class="field-helper error" id="regEmailErr"></div>
         </div>
 
-        <!-- Phone -->
         <div class="field">
-          <div class="field-label">
-            <label>Phone Number</label>
-            <span class="req">Required</span>
-          </div>
+          <div class="field-top"><label>Phone Number</label><span class="req">Required</span></div>
           <div class="phone-wrap" id="regPhoneWrap">
-            <div class="phone-prefix">
+            <div class="phone-pre">
               <svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="1" fill="#fff"/><rect width="20" height="4.33" fill="#FF9933"/><rect y="4.33" width="20" height="4.33" fill="#fff"/><rect y="8.67" width="20" height="4.33" fill="#138808"/><circle cx="10" cy="6.5" r="2.2" fill="none" stroke="#000088" stroke-width=".65"/><circle cx="10" cy="6.5" r=".5" fill="#000088"/></svg>
               +91
             </div>
-            <input type="tel" id="regPhone" placeholder="98765 43210" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/\D/,'');clearErr('regPhoneErr')"/>
+            <input type="tel" id="regPhone" placeholder="98765 43210" maxlength="10"
+                   inputmode="numeric" autocomplete="tel"
+                   oninput="this.value=this.value.replace(/\D/,'');clearErr('regPhoneErr')"/>
           </div>
           <div class="field-helper error" id="regPhoneErr"></div>
         </div>
 
-        <!-- Password -->
         <div class="field">
-          <div class="field-label">
-            <label>Password</label>
-            <span class="req">Required · min 8 chars</span>
-          </div>
-          <div class="field-row">
-            <svg class="field-icon" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></svg>
-            <input type="password" id="regPw" placeholder="Create a strong password" oninput="pwStrength(this)"/>
-            <button class="toggle-pw" onclick="togglePw('regPw',this)" type="button">
+          <div class="field-top"><label>Password</label><span class="req">Min 8 chars</span></div>
+          <div class="pw-wrap">
+            <input type="password" class="text-inp" id="regPw" placeholder="Create a strong password"
+                   autocomplete="new-password" oninput="pwStrength(this)"/>
+            <button class="pw-toggle" onclick="togglePw('regPw')" type="button">
               <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
             </button>
           </div>
-          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
-          <div class="field-helper" id="strengthLabel">Password strength will show here</div>
+          <div class="strength-bar"><div class="strength-fill" id="sBar"></div></div>
+          <div class="strength-label" id="sLabel"></div>
           <div class="field-helper error" id="regPwErr"></div>
         </div>
 
-        <!-- Confirm password -->
         <div class="field">
-          <div class="field-label"><label>Confirm Password</label><span class="req">Required</span></div>
-          <div class="field-row">
-            <svg class="field-icon" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></svg>
-            <input type="password" id="regPwConfirm" placeholder="Re-enter your password" oninput="clearErr('regPwConfirmErr')"/>
-            <button class="toggle-pw" onclick="togglePw('regPwConfirm',this)" type="button">
+          <div class="field-top"><label>Confirm Password</label><span class="req">Required</span></div>
+          <div class="pw-wrap">
+            <input type="password" class="text-inp" id="regPwC" placeholder="Re-enter password"
+                   autocomplete="new-password" oninput="clearErr('regPwCErr')"/>
+            <button class="pw-toggle" onclick="togglePw('regPwC')" type="button">
               <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
             </button>
           </div>
-          <div class="field-helper error" id="regPwConfirmErr"></div>
+          <div class="field-helper error" id="regPwCErr"></div>
         </div>
 
         <button class="btn-primary" onclick="regStep1Next()">
           <span class="btn-text">Continue</span>
-          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8H13M9 4L13 8L9 12" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M8 4L11 7L8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div class="link-row">Already registered? <a onclick="switchTab('login')">Sign In →</a></div>
       </div>
 
-      <!-- REG STEP 2: Business details -->
+      <!-- Step 2: Business Details -->
       <div class="screen" id="regStep2">
         <button class="back-btn" onclick="goRegStep(1)">
           <svg viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Back
         </button>
         <div class="form-title">Business details</div>
-        <div class="form-sub">Step 2 of 3 — Required for GST invoicing and delivery.</div>
+        <div class="form-sub">Step 2 of 3 — Required for GST invoicing.</div>
 
-        <!-- GST -->
         <div class="field">
-          <div class="field-label">
-            <label>GST Number (GSTIN)</label>
-            <span class="req">Required</span>
-          </div>
+          <div class="field-top"><label>GSTIN</label><span class="req">Required</span></div>
           <div class="gst-row">
-            <div class="field-row" style="flex:1;">
-              <svg class="field-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><line x1="4.5" y1="5.5" x2="11.5" y2="5.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><line x1="4.5" y1="8" x2="11.5" y2="8" stroke="currentColor" stroke-width="1" stroke-linecap="round"/><line x1="4.5" y1="10.5" x2="8.5" y2="10.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
-              <input type="text" id="regGST" placeholder="37AABCU9603R1ZX" maxlength="15" style="text-transform:uppercase" oninput="onGSTInput(this)"/>
-            </div>
-            <button class="verify-chip" id="gstVerifyBtn" onclick="verifyGST()" disabled>Verify GST</button>
+            <input type="text" class="text-inp" id="regGST" placeholder="37AABCU9603R1ZX"
+                   maxlength="15" style="text-transform:uppercase"
+                   oninput="onGSTInput(this)"/>
+            <button class="verify-btn" id="gstBtn" onclick="verifyGST()" disabled>Verify</button>
           </div>
-          <div class="field-helper" id="regGSTHelper">15-character GSTIN — used only for purchase invoices</div>
+          <div class="field-helper" id="gstHelper">15-character GSTIN</div>
           <div class="field-helper error" id="regGSTErr"></div>
         </div>
 
-        <!-- Shop name -->
         <div class="field">
-          <div class="field-label"><label>Shop / Business Name</label><span class="req">Required</span></div>
-          <div class="field-row">
-            <svg class="field-icon" viewBox="0 0 16 16" fill="none"><path d="M2 7L8 3L14 7V14H2V7Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><rect x="6" y="10" width="4" height="4" rx=".6" stroke="currentColor" stroke-width="1.1"/></svg>
-            <input type="text" id="regShopName" placeholder="e.g. Rao Agri Traders" oninput="clearErr('regShopErr')"/>
-          </div>
+          <div class="field-top"><label>Shop / Business Name</label><span class="req">Required</span></div>
+          <input type="text" class="text-inp" id="regShop" placeholder="e.g. Rao Agri Traders"
+                 oninput="clearErr('regShopErr')"/>
           <div class="field-helper error" id="regShopErr"></div>
         </div>
 
-        <!-- Owner name -->
         <div class="field">
-          <div class="field-label"><label>Owner / Contact Name</label><span class="req">Required</span></div>
-          <div class="field-row">
-            <svg class="field-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-            <input type="text" id="regOwner" placeholder="e.g. Venkata Rao" oninput="clearErr('regOwnerErr')"/>
-          </div>
+          <div class="field-top"><label>Owner Name</label><span class="req">Required</span></div>
+          <input type="text" class="text-inp" id="regOwner" placeholder="e.g. Venkata Rao"
+                 oninput="clearErr('regOwnerErr')"/>
           <div class="field-helper error" id="regOwnerErr"></div>
         </div>
 
-        <!-- District + Pincode -->
         <div class="two-col">
           <div class="field">
-            <div class="field-label"><label>District</label><span class="req">Required</span></div>
-            <div class="field-row">
-              <svg class="field-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C5.52 1.5 3.5 3.52 3.5 6C3.5 9.75 8 14.5 8 14.5C8 14.5 12.5 9.75 12.5 6C12.5 3.52 10.48 1.5 8 1.5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="6" r="1.8" stroke="currentColor" stroke-width="1.2"/></svg>
-              <input type="text" id="regDistrict" placeholder="e.g. Guntur" oninput="clearErr('regDistrictErr')"/>
-            </div>
+            <div class="field-top"><label>District</label><span class="req">*</span></div>
+            <input type="text" class="text-inp" id="regDistrict" placeholder="Guntur"
+                   oninput="clearErr('regDistrictErr')"/>
             <div class="field-helper error" id="regDistrictErr"></div>
           </div>
           <div class="field">
-            <div class="field-label"><label>Pincode</label><span class="req">Required</span></div>
-            <div class="field-row">
-              <svg class="field-icon" viewBox="0 0 16 16" fill="none"><rect x="2.5" y="6" width="11" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 6V4.5A3 3 0 0 1 11 4.5V6" stroke="currentColor" stroke-width="1.3"/></svg>
-              <input type="text" id="regPincode" placeholder="522001" maxlength="6" inputmode="numeric" oninput="this.value=this.value.replace(/\D/,'');clearErr('regPincodeErr')"/>
-            </div>
-            <div class="field-helper error" id="regPincodeErr"></div>
+            <div class="field-top"><label>Pincode</label><span class="req">*</span></div>
+            <input type="text" class="text-inp" id="regPin" placeholder="522001"
+                   maxlength="6" inputmode="numeric"
+                   oninput="this.value=this.value.replace(/\D/,'');clearErr('regPinErr')"/>
+            <div class="field-helper error" id="regPinErr"></div>
           </div>
         </div>
 
-        <!-- State -->
         <div class="field">
-          <div class="field-label"><label>State</label><span class="opt">Optional</span></div>
-          <div class="field-row">
-            <svg class="field-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C5.52 1.5 3.5 3.52 3.5 6C3.5 9.75 8 14.5 8 14.5C8 14.5 12.5 9.75 12.5 6C12.5 3.52 10.48 1.5 8 1.5Z" stroke="currentColor" stroke-width="1.3"/></svg>
-            <input type="text" id="regState" placeholder="Andhra Pradesh" class="no-icon" style="padding-left:38px"/>
-          </div>
+          <div class="field-top"><label>State</label><span class="opt">Auto-filled from GST</span></div>
+          <input type="text" class="text-inp" id="regState" placeholder="Andhra Pradesh"/>
         </div>
 
         <button class="btn-primary" onclick="regStep2Next()">
           <span class="btn-text">Continue</span>
-          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8H13M9 4L13 8L9 12" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M8 4L11 7L8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
 
-      <!-- REG STEP 3: Review & submit -->
+      <!-- Step 3: Review -->
       <div class="screen" id="regStep3">
         <button class="back-btn" onclick="goRegStep(2)">
           <svg viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Back
         </button>
-        <div class="form-title">Review & submit</div>
+        <div class="form-title">Review & Submit</div>
         <div class="form-sub">Step 3 of 3 — Confirm your details below.</div>
-
-        <!-- Review card -->
-        <div id="reviewCard" style="background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:16px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px;"></div>
-
+        <div class="review-card" id="reviewCard"></div>
         <div class="check-row">
-          <input type="checkbox" id="termsCheck" onchange="document.getElementById('submitBtn').disabled=!this.checked"/>
-          <label for="termsCheck">I agree to the <a>Terms & Conditions</a> and <a>Privacy Policy</a>. I confirm that the GST number and shop details provided are accurate.</label>
+          <input type="checkbox" id="termsChk" onchange="document.getElementById('submitBtn').disabled=!this.checked"/>
+          <label for="termsChk">I agree to the <a href="#">Terms & Conditions</a> and confirm my GST details are accurate.</label>
         </div>
-
         <button class="btn-primary" id="submitBtn" onclick="doRegister()" disabled>
-          <span class="btn-text">Create Retailer Account</span>
+          <span class="btn-text">Create Account</span>
           <div class="spinner"></div>
         </button>
-        <div style="font-size:.7rem;color:var(--ink3);text-align:center;margin-top:8px;line-height:1.5;">Your account will be reviewed by our team within 1 business day.<br/>You'll receive a confirmation call on your registered mobile.</div>
+        <div style="font-size:.68rem;color:var(--ink3);text-align:center;margin-top:10px;line-height:1.5;">Your account will be reviewed and activated within 1 business day.</div>
       </div>
-
     </div>
+  </div>
 
-    <!-- ════ FORGOT PASSWORD SCREEN ════ -->
-    <div class="screen" id="screenForgot">
+  <!-- ════ FORGOT PASSWORD ════ -->
+  <div class="screen" id="screenForgot">
+    <div class="auth-card">
       <button class="back-btn" onclick="switchTab('login')">
         <svg viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Back to sign in
       </button>
 
-      <!-- Forgot Step 1: Enter phone -->
-      <div class="screen active" id="fgStep1">
+      <!-- Forgot Step 1 -->
+      <div class="screen active" id="fgS1">
         <div class="form-title">Reset password</div>
-        <div class="form-sub">Enter your registered phone number. We'll send a 6-digit OTP.</div>
+        <div class="form-sub">Enter your registered mobile number.</div>
         <div class="field">
-          <div class="field-label"><label>Phone Number</label></div>
+          <div class="field-top"><label>Phone Number</label></div>
           <div class="phone-wrap">
-            <div class="phone-prefix">
+            <div class="phone-pre">
               <svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="1" fill="#fff"/><rect width="20" height="4.33" fill="#FF9933"/><rect y="4.33" width="20" height="4.33" fill="#fff"/><rect y="8.67" width="20" height="4.33" fill="#138808"/><circle cx="10" cy="6.5" r="2.2" fill="none" stroke="#000088" stroke-width=".65"/><circle cx="10" cy="6.5" r=".5" fill="#000088"/></svg>
               +91
             </div>
-            <input type="tel" id="fgPhone" placeholder="98765 43210" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/\D/,'');document.getElementById('fgSendBtn').disabled=this.value.length!==10"/>
+            <input type="tel" id="fgPhone" placeholder="98765 43210" maxlength="10"
+                   inputmode="numeric" autocomplete="tel"
+                   oninput="this.value=this.value.replace(/\D/,'');document.getElementById('fgSendBtn').disabled=this.value.length!==10"/>
           </div>
         </div>
         <button class="btn-primary" id="fgSendBtn" onclick="fgSendOTP()" disabled>
@@ -564,14 +421,14 @@ input{font-family:inherit;}
         </button>
       </div>
 
-      <!-- Forgot Step 2: OTP -->
-      <div class="screen" id="fgStep2">
+      <!-- Forgot Step 2 -->
+      <div class="screen" id="fgS2">
         <div class="form-title">Enter OTP</div>
         <div class="form-sub">OTP sent to <strong id="fgSentTo"></strong> via SMS.</div>
         <div class="field">
-          <label style="font-size:.78rem;font-weight:600;display:block;margin-bottom:6px;">6-digit OTP</label>
-          <div class="otp-grid">
-            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,0)" onkeydown="oBack(event,this,0)"/>
+          <label style="font-size:.76rem;font-weight:600;display:block;margin-bottom:8px;">6-digit OTP</label>
+          <div class="otp-row">
+            <input class="obox" maxlength="1" type="text" inputmode="numeric" autocomplete="one-time-code" oninput="oNext(this,0)" onkeydown="oBack(event,this,0)"/>
             <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,1)" onkeydown="oBack(event,this,1)"/>
             <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,2)" onkeydown="oBack(event,this,2)"/>
             <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,3)" onkeydown="oBack(event,this,3)"/>
@@ -589,25 +446,26 @@ input{font-family:inherit;}
         </button>
       </div>
 
-      <!-- Forgot Step 3: New password -->
-      <div class="screen" id="fgStep3">
+      <!-- Forgot Step 3 -->
+      <div class="screen" id="fgS3">
         <div class="form-title">New password</div>
-        <div class="form-sub">Set a strong new password for your account.</div>
+        <div class="form-sub">Choose a strong new password.</div>
         <div class="field">
-          <div class="field-label"><label>New Password</label><span class="req">min 8 chars</span></div>
-          <div class="field-row">
-            <svg class="field-icon" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></svg>
-            <input type="password" id="fgNewPw" placeholder="New password"/>
-            <button class="toggle-pw" onclick="togglePw('fgNewPw',this)" type="button">
+          <div class="field-top"><label>New Password</label><span class="req">Min 8 chars</span></div>
+          <div class="pw-wrap">
+            <input type="password" class="text-inp" id="fgNewPw" placeholder="New password" autocomplete="new-password"/>
+            <button class="pw-toggle" onclick="togglePw('fgNewPw')" type="button">
               <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
             </button>
           </div>
         </div>
         <div class="field">
-          <div class="field-label"><label>Confirm New Password</label></div>
-          <div class="field-row">
-            <svg class="field-icon" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></svg>
-            <input type="password" id="fgConfirmPw" placeholder="Confirm new password"/>
+          <div class="field-top"><label>Confirm Password</label></div>
+          <div class="pw-wrap">
+            <input type="password" class="text-inp" id="fgCfmPw" placeholder="Confirm password" autocomplete="new-password"/>
+            <button class="pw-toggle" onclick="togglePw('fgCfmPw')" type="button">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
+            </button>
           </div>
         </div>
         <button class="btn-primary" onclick="fgSetPassword()">
@@ -616,31 +474,27 @@ input{font-family:inherit;}
         </button>
       </div>
     </div>
+  </div>
 
-    <!-- ════ SUCCESS SCREEN ════ -->
-    <div class="screen" id="screenSuccess">
+  <!-- ════ SUCCESS ════ -->
+  <div class="screen" id="screenSuccess">
+    <div class="auth-card">
       <div class="success-wrap">
-        <div class="success-icon">
-          <svg viewBox="0 0 34 34" fill="none">
-            <circle cx="17" cy="17" r="15" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M9 17L14 22L25 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+        <div class="s-icon">
+          <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.8"/><path d="M9 16L13.5 20.5L23 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="success-title" id="successTitle">Account Created!</div>
-        <div class="success-sub" id="successSub">Your retailer account is under review. Our team will call you within 1 business day to verify your GST and activate your account.</div>
-        <button class="btn-primary" onclick="goToPortal()">
-          <span class="btn-text">Go to Product Catalogue →</span>
-        </button>
+        <div class="s-title" id="successTitle">Account Created!</div>
+        <div class="s-sub" id="successSub">Your account is under review. Our team will call you within 1 business day to activate it.</div>
+        <button class="btn-primary" onclick="window.location.href='index.html'">Go to Catalogue →</button>
       </div>
     </div>
-
   </div>
-</div>
+
+</div><!-- /page -->
 
 <div class="toast" id="toast"></div>
 
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
-
 </body>
 </html>

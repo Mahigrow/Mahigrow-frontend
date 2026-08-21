@@ -169,10 +169,15 @@ function removeCart(pid) {
 
 function updateCartBadge() {
   const n = Object.keys(cart).length;
+  // Topbar badge
   const el = document.getElementById('cn');
   if (el) el.textContent = n;
+  // Mobile nav badge — show/hide based on count
   const mn = document.getElementById('mn-cn');
-  if (mn) mn.textContent = n;
+  if (mn) {
+    mn.textContent = n;
+    mn.style.display = n > 0 ? 'block' : 'none';
+  }
 }
 
 // ── Render cart drawer ────────────────────────

@@ -23,6 +23,10 @@ function clearErr(id)    { const e=$(id); if(e){ e.textContent=''; } }
 function setHelp(id, msg, color='') { const e=$(id); if(e){ e.textContent=msg; e.style.color=color; } }
 
 // ── Toast ─────────────────────────────────────
+function clearAlert(id) { const e=document.getElementById(id); if(e) e.classList.remove("show"); }
+
+function showAlert(id,msg) { const e=document.getElementById(id); if(e){e.textContent=msg;e.classList.add("show");} }
+
 function toast(msg, isError=false) {
   const t = $('toast');
   if (!t) return;
@@ -57,7 +61,7 @@ function switchTab(tab) {
 
   if (tab === 'login')    { showScreen('screenLogin'); }
   if (tab === 'register') { showScreen('screenRegister'); goRegStep(1); }
-  if (tab === 'forgot')   { showScreen('screenForgot');   showFgStep(1); }
+  if (tab === 'forgot')   { showScreen('screenForgot');   showFgStep2(1); }
 }
 
 // ── Register step nav ─────────────────────────
@@ -74,8 +78,8 @@ function goRegStep(n) {
 }
 
 // ── Forgot password step nav ──────────────────
-function showFgStep(n) {
-  ['fgStep1','fgStep2','fgStep3'].forEach((id, i) =>
+function showFgStep2(n) {
+  ['fgS1','fgS2','fgS3'].forEach((id, i) =>
     $(id)?.classList.toggle('active', i + 1 === n)
   );
 }
@@ -179,7 +183,7 @@ async function verifyGST() {
     );
 
     // Auto-fill shop name and state if empty
-    const shopInp  = $('regShopName');
+    const shopInp  = $('regShop');
     const stateInp = $('regState');
     if (shopInp  && !shopInp.value.trim()  && name)  shopInp.value  = name;
     if (stateInp && !stateInp.value.trim() && state) stateInp.value = state;
@@ -222,31 +226,31 @@ function resetGSTVerify() {
 // ─────────────────────────────────────────────
 function regStep1Next() {
   clearErr('regEmailErr'); clearErr('regPhoneErr');
-  clearErr('regPwErr');    clearErr('regPwConfirmErr');
+  clearErr('regPwErr');    clearErr('regPwCErr');
 
   const email = val('regEmail');
   const phone = val('regPhone');
   const pw    = $('regPw')?.value        || '';
-  const pwc   = $('regPwConfirm')?.value || '';
+  const pwc   = $('regPwC')?.value || '';
   let ok = true;
 
   if (!EMAIL_REGEX.test(email))   { setErr('regEmailErr',      'Valid email required'); ok = false; }
   if (!PHONE_REGEX.test(phone))   { setErr('regPhoneErr',      'Valid 10-digit mobile required'); ok = false; }
   if (pw.length < 8)              { setErr('regPwErr',         'Minimum 8 characters'); ok = false; }
-  if (pw !== pwc)                 { setErr('regPwConfirmErr',  'Passwords do not match'); ok = false; }
+  if (pw !== pwc)                 { setErr('regPwCErr',  'Passwords do not match'); ok = false; }
 
   if (ok) goRegStep(2);
 }
 
 function regStep2Next() {
   clearErr('regGSTErr');  clearErr('regShopErr');
-  clearErr('regOwnerErr'); clearErr('regDistrictErr'); clearErr('regPincodeErr');
+  clearErr('regOwnerErr'); clearErr('regDistrictErr'); clearErr('regPinErr');
 
   const gstin   = val('regGST').toUpperCase();
-  const shop    = val('regShopName');
+  const shop    = val('regShop');
   const owner   = val('regOwner');
   const district= val('regDistrict');
-  const pincode = val('regPincode');
+  const pincode = val('regPin');
   let ok = true;
 
   if (!GSTIN_REGEX.test(gstin))  { setErr('regGSTErr',      'Valid 15-character GSTIN required'); ok = false; }
@@ -254,7 +258,7 @@ function regStep2Next() {
   if (!shop)                      { setErr('regShopErr',     'Shop name is required'); ok = false; }
   if (!owner)                     { setErr('regOwnerErr',    'Owner name is required'); ok = false; }
   if (!district)                  { setErr('regDistrictErr', 'District is required'); ok = false; }
-  if (pincode.length !== 6)       { setErr('regPincodeErr',  'Valid 6-digit pincode required'); ok = false; }
+  if (pincode.length !== 6)       { setErr('regPinErr',  'Valid 6-digit pincode required'); ok = false; }
 
   if (ok) goRegStep(3);
 }
@@ -264,10 +268,10 @@ function buildReviewCard() {
     ['Email',    val('regEmail')],
     ['Phone',    '+91 ' + val('regPhone')],
     ['GST',      val('regGST').toUpperCase()],
-    ['Shop',     val('regShopName')],
+    ['Shop',     val('regShop')],
     ['Owner',    val('regOwner')],
     ['District', val('regDistrict')],
-    ['Pincode',  val('regPincode')],
+    ['Pincode',  val('regPin')],
     ['State',    val('regState') || 'Andhra Pradesh'],
   ];
   const card = $('reviewCard');
@@ -288,12 +292,12 @@ async function doRegister() {
       email:       val('regEmail').toLowerCase(),
       phone:       val('regPhone'),
       password:    $('regPw')?.value || '',
-      shopName:    val('regShopName'),
+      shopName:    val('regShop'),
       ownerName:   val('regOwner'),
       gstNumber:   val('regGST').toUpperCase(),
       gstVerified: gstVerified && !(gstApiData?.softVerified),
       district:    val('regDistrict'),
-      pincode:     val('regPincode'),
+      pincode:     val('regPin'),
       state:       val('regState') || 'Andhra Pradesh',
     });
 
@@ -323,7 +327,7 @@ async function doRegister() {
 //  LOGIN
 // ─────────────────────────────────────────────
 async function doLogin() {
-  clearErr('loginPhoneErr');
+  clearAlert('loginAlert');clearErr('loginPhoneErr');
   clearErr('loginPwErr');
 
   const phone = val('loginPhone');
@@ -346,14 +350,11 @@ async function doLogin() {
 
   } catch (err) {
     if (err.status === 403) {
-      // Account created but not yet activated by admin
-      toast('Account pending activation. Our team will call you soon.', true);
+      showAlert('loginAlert', 'Account pending activation. Our team will call you soon.');
     } else if (err.status === 401) {
-      const msg = err.error || 'Incorrect phone or password';
-      if (msg.toLowerCase().includes('password')) setErr('loginPwErr', msg);
-      else setErr('loginPhoneErr', msg);
+      showAlert('loginAlert', err.error || 'Incorrect phone number or password.');
     } else {
-      toast(err.error || 'Login failed. Check your internet connection.', true);
+      showAlert('loginAlert', err.error || 'Login failed. Check your internet connection.');
     }
   } finally {
     setLoading('loginBtn', false);
@@ -377,7 +378,7 @@ async function fgSendOTP() {
     await Auth.forgotPassword({ phone });
     const sentTo = $('fgSentTo');
     if (sentTo) sentTo.textContent = '+91 ' + phone;
-    showFgStep(2);
+    showFgStep2(2);
     startFgTimer();
 
     // Dev: auto-fill OTP for testing
@@ -410,7 +411,7 @@ function startFgTimer() {
 function fgVerifyOTP() {
   const otp = [...document.querySelectorAll('.obox')].map(b => b.value).join('');
   if (otp.length !== 6) { toast('Enter the complete 6-digit OTP', true); return; }
-  showFgStep(3);
+  showFgStep2(3);
 }
 
 async function fgSetPassword() {
@@ -427,7 +428,7 @@ async function fgSetPassword() {
     showSuccess('Password Reset!', 'Your password has been updated. You can now sign in.');
   } catch (err) {
     toast(err.error || 'Could not reset password. Try again.', true);
-    if ((err.error || '').toLowerCase().includes('otp')) showFgStep(2);
+    if ((err.error || '').toLowerCase().includes('otp')) showFgStep2(2);
   }
 }
 
