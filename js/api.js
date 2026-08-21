@@ -3,7 +3,7 @@
 //  Change API_BASE to your Railway URL in production
 // ─────────────────────────────────────────────
 
-const API_BASE = 'mahigrow-production.up.railway.app';  // production: 'https://your-api.up.railway.app'
+const API_BASE = 'https://mahigrow-production.up.railway.app';  // production: 'https://your-api.up.railway.app'
 
 // ── HTTP helper ──────────────────────────────
 async function http(method, path, body = null) {
