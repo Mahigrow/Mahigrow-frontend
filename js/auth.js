@@ -254,7 +254,7 @@ function regStep2Next() {
   let ok = true;
 
   if (!GSTIN_REGEX.test(gstin))  { setErr('regGSTErr',      'Valid 15-character GSTIN required'); ok = false; }
-  else if (!gstVerified)          { setErr('regGSTErr',      'Please verify your GST number first'); ok = false; }
+  else if (!gstVerified)          { setErr('regGSTErr',      'Click the Verify button next to your GSTIN'); ok = false; }
   if (!shop)                      { setErr('regShopErr',     'Shop name is required'); ok = false; }
   if (!owner)                     { setErr('regOwnerErr',    'Owner name is required'); ok = false; }
   if (!district)                  { setErr('regDistrictErr', 'District is required'); ok = false; }

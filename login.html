@@ -321,10 +321,10 @@ button,input,select,textarea{font-family:inherit;cursor:pointer;}
           <div class="gst-row">
             <input type="text" class="text-inp" id="regGST" placeholder="37AABCU9603R1ZX"
                    maxlength="15" style="text-transform:uppercase"
-                   oninput="onGSTInput(this)"/>
-            <button class="verify-btn" id="gstBtn" onclick="verifyGST()" disabled>Verify</button>
+                   oninput="this.value=this.value.toUpperCase();onGSTInput(this)"/>
+            <button class="verify-btn" id="gstVerifyBtn" onclick="verifyGST()" disabled>Verify</button>
           </div>
-          <div class="field-helper" id="gstHelper">15-character GSTIN</div>
+          <div class="field-helper" id="regGSTHelper">15-character GSTIN</div>
           <div class="field-helper error" id="regGSTErr"></div>
         </div>
 
