@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MahiGrow — Admin Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#0a7a30;--g2:#086826;--g3:#e6f4ec;
+  --or:#e8620a;--ink:#111827;--ink2:#374151;--ink3:#6b7280;
+  --border:#e5e7eb;--bg:#f3f4f6;--card:#fff;--red:#dc2626;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.wrap{width:100%;max-width:420px;}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:32px;}
+.logo-text{font-size:1.5rem;font-weight:800;color:var(--g);}
+.logo-text span{color:var(--or);}
+.admin-badge{background:var(--or);color:#fff;font-size:.65rem;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:.06em;text-transform:uppercase;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,.06);}
+.card-title{font-size:1.1rem;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.card-sub{font-size:.78rem;color:var(--ink3);margin-bottom:24px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:.76rem;font-weight:600;color:var(--ink);margin-bottom:5px;}
+.field input{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:.88rem;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
+.field input:focus{border-color:var(--g);background:#fff;}
+.field input.error{border-color:var(--red);}
+.err-msg{font-size:.7rem;color:var(--red);margin-top:3px;}
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:40px;}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--ink3);cursor:pointer;padding:2px;}
+.btn{width:100%;background:var(--g);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:.92rem;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;}
+.btn:hover{background:var(--g2);}
+.btn:disabled{background:var(--border);color:var(--ink3);cursor:not-allowed;}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none;}
+.btn.loading .spinner{display:block;}
+.btn.loading .btn-text{display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.alert{background:#fef2f2;border:1px solid #fecaca;border-radius:7px;padding:10px 14px;font-size:.78rem;color:var(--red);margin-bottom:14px;display:none;}
+.alert.show{display:block;}
+.back-link{text-align:center;margin-top:16px;font-size:.76rem;color:var(--ink3);}
+.back-link a{color:var(--g);font-weight:500;cursor:pointer;text-decoration:none;}
+.security-note{display:flex;align-items:flex-start;gap:8px;background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:10px 12px;font-size:.72rem;color:#92400e;margin-top:16px;line-height:1.5;}
+.security-note svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo-row">
+    <div class="logo-text">Mahi<span>Grow</span></div>
+    <span class="admin-badge">Admin Portal</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Admin Sign In</div>
+    <div class="card-sub">Restricted access — authorised personnel only.</div>
+
+    <div class="alert" id="alertBox"></div>
+
+    <div class="field">
+      <label>Phone Number</label>
+      <input type="tel" id="phone" placeholder="98765 43210" maxlength="10"
+             inputmode="numeric" oninput="this.value=this.value.replace(/\D/,'');clearAlert()"/>
+      <div class="err-msg" id="phoneErr"></div>
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <div class="pw-wrap">
+        <input type="password" id="password" placeholder="Admin password" oninput="clearAlert()"/>
+        <button class="pw-toggle" onclick="togglePw()" type="button">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+        </button>
+      </div>
+      <div class="err-msg" id="pwErr"></div>
+    </div>
+
+    <button class="btn" id="loginBtn" onclick="doAdminLogin()">
+      <span class="btn-text">Sign In to Admin</span>
+      <div class="spinner"></div>
+    </button>
+
+    <div class="security-note">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M7 1L12 3.5V7C12 10 7 13 7 13C7 13 2 10 2 7V3.5L7 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      This portal is for MahaGoAgro team only. All login attempts are logged.
+    </div>
+  </div>
+
+  <div class="back-link">
+    <a href="index.html">← Back to MahiGrow</a>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+// Redirect if already logged in as admin
+window.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('rs_admin_token');
+  if (token) window.location.href = 'admin-products.html';
+});
+
+function togglePw() {
+  const inp = document.getElementById('password');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function clearAlert() {
+  document.getElementById('alertBox').classList.remove('show');
+  document.getElementById('phoneErr').textContent = '';
+  document.getElementById('pwErr').textContent    = '';
+}
+
+function showAlert(msg) {
+  const el = document.getElementById('alertBox');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+async function doAdminLogin() {
+  clearAlert();
+  const phone = document.getElementById('phone').value.trim();
+  const pw    = document.getElementById('password').value;
+  let ok = true;
+
+  if (!/^[6-9]\d{9}$/.test(phone)) {
+    document.getElementById('phoneErr').textContent = 'Enter a valid 10-digit mobile number';
+    ok = false;
+  }
+  if (!pw) {
+    document.getElementById('pwErr').textContent = 'Password is required';
+    ok = false;
+  }
+  if (!ok) return;
+
+  const btn = document.getElementById('loginBtn');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  try {
+    // Use the same login endpoint — backend checks ADMIN_PHONES
+    const data = await http('POST', '/api/auth/admin/login', { phone, password: pw });
+
+    // Store admin token separately from retailer token
+    localStorage.setItem('rs_admin_token',    data.token);
+    localStorage.setItem('rs_admin_user',     JSON.stringify(data.admin));
+
+    window.location.href = 'admin-products.html';
+
+  } catch (err) {
+    if (err.status === 401 || err.status === 403) {
+      showAlert(err.error || 'Incorrect phone or password, or you do not have admin access.');
+    } else {
+      showAlert('Login failed. Please check your internet connection.');
+    }
+  } finally {
+    btn.classList.remove('loading'); btn.disabled = false;
+  }
+}
+
+// Allow Enter key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doAdminLogin();
+});
+</script>
+</body>
+</html>

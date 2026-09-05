@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MahiGrow — Admin · Retailers</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#0a7a30;--g2:#086826;--g3:#e6f4ec;--g4:#b8dfc4;
+  --or:#e8620a;--ink:#111827;--ink2:#374151;--ink3:#6b7280;
+  --border:#e5e7eb;--bg:#f3f4f6;--card:#fff;
+  --red:#dc2626;--red2:#fef2f2;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+
+/* NAV */
+.nav{background:var(--g2);border-bottom:3px solid var(--or);position:sticky;top:0;z-index:50;}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 20px;height:54px;display:flex;align-items:center;gap:10px;}
+.nav-logo{font-size:1rem;font-weight:800;color:#fff;}
+.nav-logo span{color:#7FD49A;}
+.nav-badge{background:var(--or);color:#fff;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.06em;}
+.nav-links{display:flex;gap:2px;margin-left:10px;}
+.nav-link{color:rgba(255,255,255,.6);font-size:.78rem;font-weight:500;padding:6px 11px;border-radius:5px;background:none;border:none;cursor:pointer;text-decoration:none;}
+.nav-link:hover,.nav-link.active{color:#fff;background:rgba(255,255,255,.1);}
+.nav-right{margin-left:auto;}
+.btn-sm{font-size:.74rem;font-weight:600;padding:6px 12px;border-radius:5px;border:1px solid rgba(255,255,255,.3);background:none;color:rgba(255,255,255,.8);cursor:pointer;}
+
+/* PAGE */
+.page{max-width:1300px;margin:0 auto;padding:24px 20px;}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px;}
+.page-title{font-size:1.1rem;font-weight:800;}
+.page-sub{font-size:.76rem;color:var(--ink3);margin-top:2px;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr);}}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px 16px;}
+.stat .n{font-size:1.5rem;font-weight:800;color:var(--ink);}
+.stat .l{font-size:.7rem;color:var(--ink3);margin-top:3px;}
+.stat.pending .n{color:var(--or);}
+.stat.active .n{color:var(--g);}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-btn{background:var(--card);border:1.5px solid var(--border);border-radius:7px;padding:7px 14px;font-size:.76rem;font-weight:600;color:var(--ink2);cursor:pointer;}
+.filter-btn.on{background:var(--g);border-color:var(--g);color:#fff;}
+.search-inp{flex:1;min-width:200px;max-width:300px;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.82rem;outline:none;}
+.search-inp:focus{border-color:var(--g);}
+
+/* TABLE */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+table{width:100%;border-collapse:collapse;min-width:800px;}
+.table-scroll{overflow-x:auto;}
+thead{background:var(--bg);}
+th{padding:10px 14px;text-align:left;font-size:.68rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);}
+td{padding:12px 14px;font-size:.8rem;color:var(--ink2);border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafafa;}
+.retailer-name{font-weight:600;color:var(--ink);}
+.retailer-shop{font-size:.7rem;color:var(--ink3);margin-top:1px;}
+.gst-code{font-size:.72rem;font-family:monospace;color:var(--ink2);}
+
+/* STATUS BADGE */
+.status{display:inline-flex;align-items:center;gap:5px;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:4px;}
+.status::before{content:'';width:6px;height:6px;border-radius:50%;}
+.status.active{background:var(--g3);color:var(--g2);}
+.status.active::before{background:var(--g);}
+.status.pending{background:#fff3e0;color:#e65100;}
+.status.pending::before{background:var(--or);}
+
+/* ACTION BUTTONS */
+.action-btns{display:flex;gap:6px;}
+.act-btn{padding:5px 11px;border-radius:5px;font-size:.72rem;font-weight:600;border:none;cursor:pointer;transition:all .15s;}
+.act-btn.activate{background:var(--g3);color:var(--g2);border:1px solid var(--g4);}
+.act-btn.activate:hover{background:var(--g);color:#fff;}
+.act-btn.deactivate{background:var(--red2);color:var(--red);border:1px solid #fecaca;}
+.act-btn.deactivate:hover{background:#fecaca;}
+.act-btn.view{background:var(--bg);color:var(--ink2);border:1px solid var(--border);}
+
+/* MODAL */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-mask.open{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border-radius:12px;width:100%;max-width:520px;box-shadow:0 20px 50px rgba(0,0,0,.2);}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.modal-hd h3{font-size:.95rem;font-weight:700;}
+.modal-hd button{background:none;border:none;font-size:1.1rem;color:var(--ink3);cursor:pointer;}
+.modal-body{padding:20px;}
+.detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.8rem;}
+.detail-row:last-child{border-bottom:none;}
+.detail-row .dk{color:var(--ink3);font-weight:500;}
+.detail-row .dv{color:var(--ink);font-weight:600;text-align:right;max-width:60%;}
+.modal-ft{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.btn-activate{background:var(--g);color:#fff;border:none;padding:9px 18px;border-radius:7px;font-weight:700;font-size:.82rem;cursor:pointer;}
+.btn-deactivate{background:var(--red);color:#fff;border:none;padding:9px 18px;border-radius:7px;font-weight:700;font-size:.82rem;cursor:pointer;}
+.btn-cancel{background:var(--bg);border:1px solid var(--border);color:var(--ink2);padding:9px 16px;border-radius:7px;font-weight:600;font-size:.82rem;cursor:pointer;}
+
+/* EMPTY */
+.empty-row td{text-align:center;padding:48px;color:var(--ink3);}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;font-size:.76rem;font-weight:500;padding:10px 16px;border-radius:7px;opacity:0;transform:translateY(10px);transition:all .22s;z-index:400;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.success{background:var(--g);}
+.toast.error{background:var(--red);}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">Mahi<span>Grow</span></div>
+    <span class="nav-badge">Admin</span>
+    <div class="nav-links">
+      <a class="nav-link" href="admin-products.html">Products</a>
+      <a class="nav-link active">Retailers</a>
+      <a class="nav-link" href="index.html">View Site</a>
+    </div>
+    <div class="nav-right">
+      <button class="btn-sm" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-head">
+    <div>
+      <div class="page-title">Retailer Accounts</div>
+      <div class="page-sub">Activate new registrations and manage existing retailers</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat pending"><div class="n" id="statPending">—</div><div class="l">Pending Activation</div></div>
+    <div class="stat active"><div class="n" id="statActive">—</div><div class="l">Active Retailers</div></div>
+    <div class="stat"><div class="n" id="statTotal">—</div><div class="l">Total Registered</div></div>
+    <div class="stat"><div class="n" id="statToday">—</div><div class="l">Registered Today</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <button class="filter-btn on" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('pending',this)">⏳ Pending</button>
+    <button class="filter-btn" onclick="setFilter('active',this)">✓ Active</button>
+    <input type="text" class="search-inp" id="searchInp" placeholder="Search name, phone, GST…" oninput="applyFilters()"/>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Retailer</th>
+            <th>Phone</th>
+            <th>GSTIN</th>
+            <th>District</th>
+            <th>Registered</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr class="empty-row"><td colspan="8">Loading retailers…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3 id="modalTitle">Retailer Details</h3>
+      <button onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-ft">
+      <button class="btn-cancel" onclick="closeModal()">Close</button>
+      <button class="btn-deactivate" id="modalDeactivateBtn" onclick="toggleFromModal(false)" style="display:none;">Deactivate</button>
+      <button class="btn-activate" id="modalActivateBtn" onclick="toggleFromModal(true)" style="display:none;">✓ Activate Account</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/api.js"></script>
+<script>
+// ── ADMIN AUTH ─────────────────────────────────
+(function() {
+  const token = localStorage.getItem('rs_admin_token');
+  if (!token) window.location.href = 'admin-login.html';
+})();
+
+function adminLogout() {
+  localStorage.removeItem('rs_admin_token');
+  localStorage.removeItem('rs_admin_user');
+  window.location.href = 'admin-login.html';
+}
+
+// Use admin token for all requests
+const _origFetch = window.fetch;
+async function adminHttp(method, path, body = null) {
+  const token = localStorage.getItem('rs_admin_token');
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res  = await fetch(API_BASE + path, opts);
+  const data = await res.json();
+  if (res.status === 401 || res.status === 403) {
+    localStorage.removeItem('rs_admin_token');
+    window.location.href = 'admin-login.html';
+    throw data;
+  }
+  if (!res.ok) throw { status: res.status, ...data };
+  return data;
+}
+
+// ── STATE ──────────────────────────────────────
+let allRetailers = [];
+let filtered     = [];
+let activeFilter = 'all';
+let selectedId   = null;
+
+// ── LOAD ───────────────────────────────────────
+async function loadRetailers() {
+  try {
+    const data = await adminHttp('GET', '/api/admin/retailers');
+    allRetailers = data.retailers;
+    updateStats();
+    applyFilters();
+  } catch (err) {
+    document.getElementById('tableBody').innerHTML =
+      '<tr class="empty-row"><td colspan="8">Failed to load. Check backend logs.</td></tr>';
+    showToast(err.error || 'Failed to load retailers', 'error');
+  }
+}
+
+function updateStats() {
+  const pending = allRetailers.filter(r => !r.isActive).length;
+  const active  = allRetailers.filter(r => r.isActive).length;
+  const today   = allRetailers.filter(r => {
+    const d = new Date(r.createdAt);
+    const t = new Date();
+    return d.toDateString() === t.toDateString();
+  }).length;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statActive').textContent  = active;
+  document.getElementById('statTotal').textContent   = allRetailers.length;
+  document.getElementById('statToday').textContent   = today;
+}
+
+// ── FILTERS ────────────────────────────────────
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.getElementById('searchInp').value.toLowerCase();
+  filtered = allRetailers.filter(r => {
+    const matchF = activeFilter === 'all' ||
+      (activeFilter === 'pending' && !r.isActive) ||
+      (activeFilter === 'active'  &&  r.isActive);
+    const matchQ = !q || [r.ownerName, r.shopName, r.phone, r.gstNumber, r.district]
+      .some(v => v?.toLowerCase().includes(q));
+    return matchF && matchQ;
+  });
+  renderTable();
+}
+
+// ── RENDER TABLE ───────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No retailers found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map((r, i) => `
+    <tr>
+      <td style="color:var(--ink3);font-size:.7rem;">${i + 1}</td>
+      <td>
+        <div class="retailer-name">${r.ownerName || '—'}</div>
+        <div class="retailer-shop">${r.shopName || '—'}</div>
+      </td>
+      <td style="font-weight:500;">+91 ${r.phone}</td>
+      <td><span class="gst-code">${r.gstNumber || '—'}</span></td>
+      <td>${r.district || '—'}, ${r.state || ''}</td>
+      <td style="font-size:.72rem;color:var(--ink3);">${formatDate(r.createdAt)}</td>
+      <td><span class="status ${r.isActive ? 'active' : 'pending'}">${r.isActive ? 'Active' : 'Pending'}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="act-btn view" onclick="openModal('${r.id}')">View</button>
+          ${!r.isActive
+            ? `<button class="act-btn activate" onclick="toggleStatus('${r.id}',true)">Activate</button>`
+            : `<button class="act-btn deactivate" onclick="toggleStatus('${r.id}',false)">Deactivate</button>`
+          }
+        </div>
+      </td>
+    </tr>`
+  ).join('');
+}
+
+// ── ACTIVATE / DEACTIVATE ──────────────────────
+async function toggleStatus(id, activate) {
+  try {
+    await adminHttp('PATCH', '/api/admin/retailers/' + id, { isActive: activate });
+    const r = allRetailers.find(x => x.id === id);
+    if (r) r.isActive = activate;
+    updateStats();
+    applyFilters();
+    showToast(
+      activate ? 'Account activated — retailer can now sign in' : 'Account deactivated',
+      activate ? 'success' : ''
+    );
+    closeModal();
+  } catch (err) {
+    showToast(err.error || 'Action failed', 'error');
+  }
+}
+
+function toggleFromModal(activate) {
+  if (selectedId) toggleStatus(selectedId, activate);
+}
+
+// ── DETAIL MODAL ───────────────────────────────
+function openModal(id) {
+  const r = allRetailers.find(x => x.id === id);
+  if (!r) return;
+  selectedId = id;
+
+  document.getElementById('modalTitle').textContent = r.shopName || r.ownerName || 'Retailer';
+  document.getElementById('modalBody').innerHTML = [
+    ['Owner Name',   r.ownerName || '—'],
+    ['Shop Name',    r.shopName  || '—'],
+    ['Phone',        '+91 ' + r.phone],
+    ['Email',        r.email || '—'],
+    ['GSTIN',        r.gstNumber || '—'],
+    ['GST Verified', r.gstVerified ? '✓ Yes' : '⚠ Pending verification'],
+    ['District',     r.district || '—'],
+    ['State',        r.state    || '—'],
+    ['Pincode',      r.pincode  || '—'],
+    ['Registered',   formatDate(r.createdAt)],
+    ['Status',       r.isActive ? '✓ Active' : '⏳ Pending activation'],
+  ].map(([k,v]) => `<div class="detail-row"><span class="dk">${k}</span><span class="dv">${v}</span></div>`).join('');
+
+  const actBtn  = document.getElementById('modalActivateBtn');
+  const deaBtn  = document.getElementById('modalDeactivateBtn');
+  actBtn.style.display = r.isActive ? 'none' : 'inline-flex';
+  deaBtn.style.display = r.isActive ? 'inline-flex' : 'none';
+
+  document.getElementById('modalMask').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalMask').classList.remove('open');
+  selectedId = null;
+}
+
+document.getElementById('modalMask').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── HELPERS ────────────────────────────────────
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast ' + type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+loadRetailers();
+</script>
+</body>
+</html>
