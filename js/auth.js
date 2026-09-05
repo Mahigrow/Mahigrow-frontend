@@ -191,22 +191,40 @@ async function verifyGST() {
     toast('GST verified: ' + (name || gstin));
 
   } catch (err) {
-    if (err.softFail) {
-      // API down — allow registration, team verifies manually
-      gstVerified     = true;
-      gstApiData      = { gstin, softVerified: true, stateName: err.stateName || '' };
-      btn.textContent = '⚠ Verify Later';
-      btn.classList.add('soft');
-      setHelp('regGSTHelper',
-        '⚠ Service unavailable — format is valid. Our team will verify manually.',
-        'var(--or)'
-      );
-      const s = $('regState');
-      if (s && !s.value && err.stateName) s.value = err.stateName;
-    } else {
-      setErr('regGSTErr', err.error || 'GST verification failed');
-      btn.textContent = 'Retry';
-      btn.disabled    = false;
+    // API failed — but if GSTIN format is valid, allow soft-pass
+    // so user isn't blocked. Team verifies manually.
+    const stateCode = gstin.substring(0, 2);
+    const stateMap = {
+      '01':'Jammu & Kashmir','02':'Himachal Pradesh','03':'Punjab','04':'Chandigarh',
+      '05':'Uttarakhand','06':'Haryana','07':'Delhi','08':'Rajasthan','09':'Uttar Pradesh',
+      '10':'Bihar','11':'Sikkim','12':'Arunachal Pradesh','13':'Nagaland','14':'Manipur',
+      '15':'Mizoram','16':'Tripura','17':'Meghalaya','18':'Assam','19':'West Bengal',
+      '20':'Jharkhand','21':'Odisha','22':'Chhattisgarh','23':'Madhya Pradesh',
+      '24':'Gujarat','26':'Dadra & Nagar Haveli','27':'Maharashtra','28':'Andhra Pradesh',
+      '29':'Karnataka','30':'Goa','31':'Lakshadweep','32':'Kerala','33':'Tamil Nadu',
+      '34':'Puducherry','35':'Andaman & Nicobar Islands','36':'Telangana',
+      '37':'Andhra Pradesh (New)','38':'Ladakh','97':'Other Territory',
+    };
+    const stateName = stateMap[stateCode] || '';
+
+    // Soft-pass: mark as verified with a warning
+    gstVerified = true;
+    gstApiData  = { gstin, softVerified: true, stateName };
+
+    btn.textContent = '✓ Format OK';
+    btn.classList.add('soft');
+    btn.disabled = true;
+
+    clearErr('regGSTErr');
+    setHelp('regGSTHelper',
+      '✓ Format valid' + (stateName ? ' · ' + stateName : '') + ' · Our team will verify on approval',
+      'var(--or)'
+    );
+
+    // Auto-fill state from GSTIN prefix
+    const stateInp = $('regState');
+    if (stateInp && !stateInp.value.trim() && stateName) {
+      stateInp.value = stateName;
     }
   }
 }
