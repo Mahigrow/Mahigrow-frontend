@@ -3,516 +3,505 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>MahiGrow — Bulk Agri Inputs</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<title>MahiGrow — Bulk Agri Inputs for Retailers</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
 :root{
-  --g:#0a7a30;--g2:#086826;--g3:#e6f4ec;--g4:#c8e6d0;
-  --or:#e8620a;--ink:#1a1a1a;--ink2:#4b5563;--ink3:#9ca3af;
-  --bg:#f5f5f3;--card:#fff;--border:#e5e7eb;
-  --red:#c0321a;--gold:#C8902A;--gold-lt:#F5D98B;
-  --parchment:#EDE8DF;--cream:#F7F3EC;
-  --sb:env(safe-area-inset-bottom,0px);
+  --g:#0a7a30;--g2:#086826;--g3:#e8f5e9;--g4:#c8e6c9;
+  --or:#e8620a;--or2:#fff3e0;
+  --red:#d32f2f;--red2:#ffebee;
+  --ink:#212121;--ink2:#424242;--ink3:#9e9e9e;
+  --bg:#f5f5f5;--card:#fff;--border:#e0e0e0;
+  --radius:8px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
-button{font-family:inherit;cursor:pointer;border:none;background:none;}
-a{text-decoration:none;color:inherit;}
-img{display:block;max-width:100%;}
+button,input,select{font-family:inherit;}
+a{color:inherit;text-decoration:none;}
 
-/* ── TOPBAR ── */
-.topbar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.05);}
-.tb{max-width:1280px;margin:0 auto;padding:0 14px;height:54px;display:flex;align-items:center;gap:10px;}
+/* ══════════════════════════════
+   TOPBAR
+══════════════════════════════ */
+.topbar{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 2px 4px rgba(0,0,0,.08);}
+.tb{max-width:1280px;margin:0 auto;padding:0 14px;height:56px;display:flex;align-items:center;gap:10px;}
+
+/* logo */
 .logo{display:flex;align-items:center;gap:8px;flex-shrink:0;text-decoration:none;}
-.logo svg{width:28px;height:28px;}
-.logo-name{font-size:1.05rem;font-weight:800;color:var(--g);letter-spacing:-.02em;}
-.logo-name span{color:var(--or);}
-.tb-search{flex:1;min-width:0;}
-.tb-search form{display:flex;height:36px;border:1.5px solid var(--g);border-radius:8px;overflow:hidden;}
-.tb-search input{flex:1;border:none;outline:none;padding:0 10px;font-size:.82rem;color:var(--ink);min-width:0;}
-.tb-search button{background:var(--g);color:#fff;font-weight:600;font-size:.76rem;padding:0 12px;white-space:nowrap;}
-.tb-actions{display:flex;gap:6px;flex-shrink:0;}
-.btn-signin{border:1.5px solid var(--g);color:var(--g);font-weight:600;font-size:.76rem;padding:6px 12px;border-radius:7px;white-space:nowrap;}
-.btn-order{display:flex;align-items:center;gap:5px;background:var(--g);color:#fff;font-weight:600;font-size:.76rem;padding:7px 12px;border-radius:7px;white-space:nowrap;}
-.btn-order svg{width:14px;height:14px;}
-.cart-n{background:#fff;color:var(--g);border-radius:50%;width:16px;height:16px;font-size:.58rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.logo-icon{width:32px;height:32px;}
+.logo-name{font-size:1.1rem;font-weight:800;color:var(--g);letter-spacing:-.02em;white-space:nowrap;}
+.logo-name em{color:var(--or);font-style:normal;}
 
-/* ── CATEGORY NAV ── */
-.catnav{background:#fff;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
-.catnav::-webkit-scrollbar{display:none;}
-.cnav-inner{display:flex;padding:0 14px;max-width:1280px;margin:0 auto;}
-.cnav-btn{display:flex;align-items:center;gap:5px;color:var(--ink3);font-size:.74rem;font-weight:500;padding:9px 12px;border-bottom:2.5px solid transparent;white-space:nowrap;flex-shrink:0;}
+/* search */
+.tb-search{flex:1;min-width:0;max-width:500px;}
+.tb-search form{display:flex;border:2px solid var(--g);border-radius:8px;overflow:hidden;height:40px;}
+.tb-search input{flex:1;border:none;outline:none;padding:0 12px;font-size:.85rem;min-width:0;background:#fff;}
+.tb-search button{background:var(--g);border:none;padding:0 16px;color:#fff;font-weight:700;font-size:.8rem;flex-shrink:0;}
+
+/* right actions */
+.tb-right{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;}
+.btn-login{background:none;border:1.5px solid var(--g);color:var(--g);font-weight:600;font-size:.76rem;padding:6px 13px;border-radius:7px;white-space:nowrap;}
+.btn-cart{display:flex;align-items:center;gap:5px;background:var(--g);color:#fff;font-weight:700;font-size:.78rem;padding:7px 13px;border-radius:7px;border:none;position:relative;white-space:nowrap;}
+.btn-cart svg{width:16px;height:16px;}
+.cart-n{background:#fff;color:var(--g);font-size:.62rem;font-weight:800;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;}
+
+/* ══════════════════════════════
+   CATEGORY NAV BAR
+══════════════════════════════ */
+.catnav{background:#fff;border-bottom:1px solid var(--border);}
+.catnav-inner{max-width:1280px;margin:0 auto;padding:0 14px;display:flex;overflow-x:auto;scrollbar-width:none;gap:2px;}
+.catnav-inner::-webkit-scrollbar{display:none;}
+.cnav-btn{display:flex;align-items:center;gap:5px;background:none;border:none;color:var(--ink3);font-size:.78rem;font-weight:500;padding:9px 12px;border-bottom:2.5px solid transparent;white-space:nowrap;flex-shrink:0;}
 .cnav-btn.on{color:var(--g);border-bottom-color:var(--g);font-weight:700;}
+.cnav-btn svg{width:14px;height:14px;}
 
-/* ── HERO ── */
-.hero{background:linear-gradient(145deg,#065C20 0%,var(--g) 55%,#18A84E 100%);padding:20px 14px 18px;}
+/* ══════════════════════════════
+   HERO BANNER
+══════════════════════════════ */
+.hero{background:linear-gradient(120deg,#004d1a 0%,var(--g2) 50%,#1b8a3e 100%);padding:22px 14px 20px;}
 .hero-inner{max-width:1280px;margin:0 auto;}
-.hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,5vw,2.6rem);font-weight:700;color:#fff;line-height:1.2;letter-spacing:-.01em;margin-bottom:7px;}
-.hero h1 em{color:#7FD49A;font-style:normal;}
-.hero p{font-size:.82rem;color:rgba(255,255,255,.72);line-height:1.6;margin-bottom:14px;max-width:36ch;}
-.hero-btns{display:flex;gap:8px;}
-.hbtn-w{background:#fff;color:var(--g);font-weight:700;font-size:.82rem;padding:10px 18px;border-radius:7px;}
-.hbtn-o{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.4);font-weight:600;font-size:.82rem;padding:9px 16px;border-radius:7px;}
-.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;}
-@media(max-width:480px){.hero-stats{grid-template-columns:repeat(2,1fr);}}
-.hs{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px;text-align:center;}
-.hs-n{font-size:1.2rem;font-weight:800;color:#fff;line-height:1;}
-.hs-l{font-size:.58rem;color:rgba(255,255,255,.55);margin-top:2px;letter-spacing:.03em;}
+.hero h1{font-size:clamp(1.35rem,4vw,2.2rem);font-weight:800;color:#fff;line-height:1.2;letter-spacing:-.02em;margin-bottom:6px;}
+.hero h1 em{color:#69f0ae;font-style:normal;}
+.hero p{font-size:.82rem;color:rgba(255,255,255,.72);max-width:44ch;line-height:1.65;margin-bottom:14px;}
+.hero-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.hbtn-w{background:#fff;color:var(--g2);border:none;font-weight:700;font-size:.82rem;padding:9px 18px;border-radius:7px;}
+.hbtn-o{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.4);font-weight:600;font-size:.82rem;padding:8px 16px;border-radius:7px;}
+/* stats row — hidden on mobile */
+.hero-stats{display:none;margin-top:18px;gap:10px;}
+@media(min-width:600px){.hero-stats{display:flex;}}
+.hstat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:10px 18px;text-align:center;}
+.hstat .n{font-size:1.3rem;font-weight:800;color:#fff;}
+.hstat .l{font-size:.62rem;color:rgba(255,255,255,.6);margin-top:2px;letter-spacing:.04em;}
 
-/* ── TRUST ── */
+/* ══════════════════════════════
+   TRUST STRIP
+══════════════════════════════ */
 .trust{background:#fff;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
 .trust::-webkit-scrollbar{display:none;}
-.trust-inner{display:flex;max-width:1280px;margin:0 auto;}
-.ti{display:flex;align-items:center;gap:7px;padding:10px 16px;border-right:1px solid var(--border);flex-shrink:0;}
-.ti:last-child{border:none;}
-.ti svg{width:16px;height:16px;color:var(--g);flex-shrink:0;}
-.ti-t{font-size:.72rem;font-weight:600;color:var(--ink);}
-.ti-s{font-size:.62rem;color:var(--ink3);}
+.trust-inner{max-width:1280px;margin:0 auto;display:flex;min-width:max-content;}
+.titem{display:flex;align-items:center;gap:8px;padding:11px 18px;border-right:1px solid var(--border);flex-shrink:0;}
+.titem:last-child{border-right:none;}
+.titem svg{width:18px;height:18px;color:var(--g);flex-shrink:0;}
+.titem .tt{font-size:.74rem;font-weight:600;color:var(--ink);white-space:nowrap;}
+.titem .ts{font-size:.64rem;color:var(--ink3);white-space:nowrap;}
 
-/* ── MAIN ── */
+/* ══════════════════════════════
+   MAIN
+══════════════════════════════ */
 .main{max-width:1280px;margin:0 auto;padding:14px 14px 80px;}
 @media(min-width:900px){.main{padding-bottom:20px;}}
 
-/* ── CAT GRID ── */
+/* ══════════════════════════════
+   CATEGORY ICON GRID
+══════════════════════════════ */
 .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
-@media(min-width:560px){.cat-grid{grid-template-columns:repeat(6,1fr);}}
-.cat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 6px;text-align:center;-webkit-tap-highlight-color:transparent;cursor:pointer;transition:box-shadow .15s;}
-.cat-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);}
-.cat-ic{width:38px;height:38px;margin:0 auto 6px;}
-.cat-ic svg{width:100%;height:100%;}
-.cat-nm{font-size:.7rem;font-weight:600;color:var(--ink);}
-.cat-ct{font-size:.58rem;color:var(--ink3);margin-top:1px;}
+@media(min-width:500px){.cat-grid{grid-template-columns:repeat(4,1fr);}}
+@media(min-width:700px){.cat-grid{grid-template-columns:repeat(6,1fr);gap:10px;}}
+.cat-tile{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 6px 10px;text-align:center;cursor:pointer;transition:border-color .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent;}
+.cat-tile:active{transform:scale(.97);}
+@media(hover:hover){.cat-tile:hover{border-color:var(--g);box-shadow:0 4px 12px rgba(10,122,48,.12);}}
+.cat-tile .icon{width:44px;height:44px;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;}
+.cat-tile .icon svg{width:44px;height:44px;}
+.cat-tile .nm{font-size:.72rem;font-weight:600;color:var(--ink);line-height:1.2;}
+.cat-tile .ct{font-size:.6rem;color:var(--ink3);margin-top:2px;}
 
-/* ── BRANDS ── */
-.brands-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;margin-bottom:20px;}
-.brands-row::-webkit-scrollbar{display:none;}
-.brand-pill{flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-size:.7rem;font-weight:600;color:var(--ink2);}
-
-/* ── SECTION ── */
-.section{margin-bottom:28px;}
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-.sec-title{font-size:.92rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;text-transform:capitalize;}
+/* ══════════════════════════════
+   SECTION HEADER
+══════════════════════════════ */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sec-title{font-size:.92rem;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;}
 .sec-title svg{width:16px;height:16px;color:var(--g);}
-.sec-sub{font-size:.6rem;color:var(--ink3);background:var(--g3);padding:2px 8px;border-radius:20px;margin-left:4px;font-weight:500;}
-.view-all{font-size:.7rem;font-weight:600;color:var(--g);border:1px solid var(--g4);border-radius:6px;padding:4px 10px;}
+.view-all{font-size:.72rem;font-weight:600;color:var(--g);background:none;border:1px solid var(--g4);border-radius:5px;padding:4px 10px;white-space:nowrap;}
 
-/* ── PRODUCT GRID ── */
-.prod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
-@media(min-width:560px){.prod-grid{grid-template-columns:repeat(3,1fr);}}
-@media(min-width:900px){.prod-grid{grid-template-columns:repeat(4,1fr);gap:14px;}}
-@media(min-width:1200px){.prod-grid{grid-template-columns:repeat(5,1fr);}}
+/* ══════════════════════════════
+   HORIZONTAL PRODUCT ROW (BigHaat style)
+══════════════════════════════ */
+.h-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.h-scroll::-webkit-scrollbar{display:none;}
 
-/* ═══════════════════════════════════════════
-   PRODUCT CARD — Beautiful redesign
-═══════════════════════════════════════════ */
+/* ══════════════════════════════
+   PRODUCT CARD
+══════════════════════════════ */
 .pcard{
   background:#fff;
-  border:1px solid rgba(10,122,48,.14);
-  border-radius:14px;
+  border:1px solid var(--border);
+  border-radius:10px;
   overflow:hidden;
   display:flex;
   flex-direction:column;
-  position:relative;
-  transition:transform .18s ease, box-shadow .18s ease;
-}
-@media(hover:hover){
-  .pcard:hover{
-    transform:translateY(-3px);
-    box-shadow:0 10px 28px rgba(10,122,48,.13);
-  }
-}
-
-/* Ribbon */
-.disc-badge{
-  position:absolute;
-  top:10px; left:-2px;
-  background:var(--red);
-  color:#fff;
-  font-size:.6rem;
-  font-weight:700;
-  letter-spacing:.03em;
-  padding:3px 9px 3px 7px;
-  border-radius:0 4px 4px 0;
-  z-index:2;
-  box-shadow:1px 1px 4px rgba(0,0,0,.18);
-}
-.disc-badge.big{ background:#9B1C1C; font-size:.65rem; }
-
-/* Image area */
-.pcard-img{
-  position:relative;
-  aspect-ratio:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-.pcard-img img{
-  width:100%; height:100%;
-  object-fit:contain;
-  padding:12px;
-}
-.cat-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
-
-/* In-stock badge */
-.stock-badge{
-  position:absolute;
-  bottom:7px; right:7px;
-  font-size:.6rem;
-  font-weight:600;
-  padding:2px 8px;
-  border-radius:20px;
-}
-.stock-badge.in{background:#e8f5e1;color:#166534;border:1px solid #b0d9a0;}
-.stock-badge.out{background:#fee2e2;color:#9b1c1c;border:1px solid #fca5a5;}
-
-/* Card body */
-.pcard-body{
-  padding:10px 11px 6px;
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  gap:3px;
-}
-.pcat-tag{
-  font-size:.58rem;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.07em;
-  color:var(--g);
-}
-.pname{
-  font-family:'Playfair Display', serif;
-  font-size:.82rem;
-  font-weight:700;
-  color:#1A2E0F;
-  line-height:1.3;
-  min-height:2.3em;
-}
-.psize{font-size:.63rem;color:var(--ink3);margin-top:1px;}
-
-/* Price row */
-.price-row{
-  display:flex;
-  align-items:baseline;
-  gap:5px;
-  flex-wrap:wrap;
-  margin-top:5px;
-}
-.price-now{font-size:.95rem;font-weight:700;color:#1A2E0F;}
-.price-mrp{font-size:.68rem;color:var(--ink3);text-decoration:line-through;}
-.price-save{
-  font-size:.6rem;font-weight:700;
-  color:var(--red);
-  background:#FEE2E2;
-  padding:1px 6px;
-  border-radius:20px;
-}
-
-/* Tier row */
-.tier-row{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:4px;
-  margin-top:6px;
-}
-.t-lbl{
-  font-size:.58rem;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.06em;
-  color:var(--gold);
-  width:100%;
-}
-.t-low, .t-best{
-  background:var(--parchment);
-  border:1px solid var(--gold-lt);
-  border-radius:5px;
-  padding:2px 7px;
-  font-size:.62rem;
-  color:var(--ink2);
-  line-height:1.5;
-}
-.t-best{color:#1A2E0F;font-weight:700;}
-.t-arr{font-size:.65rem;color:var(--ink3);}
-
-/* Card footer */
-.pcard-foot{
-  padding:7px 11px 11px;
-  border-top:1px solid var(--parchment);
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
-.qty-row{display:flex;align-items:center;gap:6px;}
-.qty-ctl{
-  display:flex;
-  align-items:center;
-  border:1.5px solid #C5DEB8;
-  border-radius:7px;
-  overflow:hidden;
   flex-shrink:0;
+  /* fixed width in horizontal scroll */
+  width:168px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:box-shadow .15s;
 }
-.qb{
-  width:28px;height:28px;
-  background:#e8f5e1;
-  font-size:.9rem;font-weight:700;
-  color:var(--g);
-  transition:background .12s;
+/* In grid mode — full width */
+.pcard.grid-card{width:auto;flex-shrink:1;}
+@media(hover:hover){.pcard:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);border-color:var(--g4);}}
+
+/* IMAGE */
+.pcard-img{
+  position:relative;height:140px;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;flex-shrink:0;
 }
-.qb:hover{background:#C8E6B8;}
+.pcard-img img{width:100%;height:100%;object-fit:contain;padding:10px;display:block;}
+.pcard-img .icon-wrap{width:70px;height:70px;display:flex;align-items:center;justify-content:center;}
+.pcard-img .icon-wrap svg{width:70px;height:70px;}
+.disc-tag{
+  position:absolute;top:6px;left:6px;
+  background:var(--red);color:#fff;
+  font-size:.6rem;font-weight:800;
+  padding:2px 6px;border-radius:4px;
+}
+.stock-tag{
+  position:absolute;bottom:5px;left:5px;
+  font-size:.58rem;font-weight:700;
+  padding:2px 6px;border-radius:3px;
+}
+.stock-tag.in{background:#E8F5E9;color:#2E7D32;}
+.stock-tag.out{background:#FFEBEE;color:#C62828;}
+.cert-tag{
+  position:absolute;top:6px;right:6px;
+  background:rgba(10,122,48,.85);color:#fff;
+  font-size:.52rem;font-weight:700;
+  padding:2px 5px;border-radius:3px;
+}
+
+/* BODY */
+.pcard-body{padding:8px 10px 4px;flex:1;display:flex;flex-direction:column;gap:2px;}
+.pcat{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g);}
+.pname{
+  font-size:.76rem;font-weight:600;color:var(--ink);line-height:1.35;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:2.05em;
+}
+.pbrand{font-size:.62rem;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* price */
+.price-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:4px;}
+.p-now{font-size:.92rem;font-weight:800;color:var(--ink);}
+.p-mrp{font-size:.66rem;color:var(--ink3);text-decoration:line-through;}
+.p-save{font-size:.58rem;font-weight:700;color:var(--red);background:var(--red2);padding:1px 4px;border-radius:3px;}
+
+/* tier */
+.tier-row{
+  display:flex;align-items:center;gap:3px;
+  background:var(--g3);border-radius:5px;
+  padding:4px 7px;margin-top:5px;
+}
+.tier-row .t1{font-size:.6rem;color:var(--ink3);}
+.tier-row .tarr{font-size:.6rem;color:var(--g4);}
+.tier-row .t2{font-size:.6rem;color:var(--g2);font-weight:700;}
+.tier-row .bulk-lbl{font-size:.56rem;color:var(--g);margin-left:auto;font-weight:600;}
+
+/* FOOTER */
+.pcard-foot{padding:7px 10px 10px;border-top:1px solid var(--bg);display:flex;flex-direction:column;gap:6px;}
+.qty-row{display:flex;align-items:center;gap:6px;}
+.qty-ctl{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:6px;overflow:hidden;background:#fff;}
+.qb{width:28px;height:30px;background:#fafafa;border:none;font-size:1rem;font-weight:500;color:var(--ink2);display:flex;align-items:center;justify-content:center;}
+.qb:active{background:var(--bg);}
 .qi{
-  width:38px;height:28px;
-  border:none;
-  border-left:1px solid #C5DEB8;
-  border-right:1px solid #C5DEB8;
-  text-align:center;
-  font-size:.78rem;font-weight:700;
-  color:#1A2E0F;
-  background:#fff;
-  outline:none;
+  width:36px;height:30px;border:none;
+  border-left:1px solid var(--border);border-right:1px solid var(--border);
+  text-align:center;font-size:.76rem;font-weight:700;
+  color:var(--ink);background:#fff;outline:none;
+  -moz-appearance:textfield;
 }
+.qi::-webkit-inner-spin-button,.qi::-webkit-outer-spin-button{-webkit-appearance:none;}
 .qty-lbl{font-size:.58rem;color:var(--ink3);line-height:1.4;}
 .add-btn{
-  width:100%;
-  background:var(--g);
-  color:#fff;
-  padding:8px 10px;
-  border-radius:8px;
-  font-weight:600;
-  font-size:.75rem;
+  width:100%;background:var(--g);color:#fff;border:none;
+  padding:9px;border-radius:7px;font-weight:600;font-size:.76rem;
   display:flex;align-items:center;justify-content:center;gap:5px;
-  transition:background .15s, transform .1s;
   -webkit-tap-highlight-color:transparent;
 }
-.add-btn:hover{background:#086826;}
-.add-btn:active{transform:scale(.97);}
+.add-btn:active{background:var(--g2);}
+.add-btn:disabled{background:#bdbdbd;cursor:not-allowed;}
 .add-btn.done{background:var(--or);}
-.add-btn:disabled{background:var(--ink3);cursor:not-allowed;}
 .add-btn svg{width:12px;height:12px;flex-shrink:0;}
 
-/* ── CART DRAWER ── */
-.d-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;}
-.d-mask.open{opacity:1;pointer-events:all;}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,100vw);background:#fff;z-index:201;transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;box-shadow:-6px 0 24px rgba(0,0,0,.12);}
-.drawer.open{transform:translateX(0);}
-.d-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--g);color:#fff;flex-shrink:0;}
-.d-hd h3{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;}
-.d-hd button{color:rgba(255,255,255,.8);font-size:1.1rem;}
-.d-body{flex:1;overflow-y:auto;padding:12px 14px;-webkit-overflow-scrolling:touch;}
-.drawer-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:var(--ink3);font-size:.78rem;gap:10px;padding:32px;}
-.drawer-empty svg{width:44px;height:44px;opacity:.18;}
-.di{background:#f8f8f6;border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;display:flex;gap:9px;}
-.di-ico{width:40px;height:40px;background:#fff;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.di-name{font-size:.74rem;font-weight:600;color:var(--ink);line-height:1.3;}
-.di-meta{font-size:.63rem;color:var(--ink3);margin-top:2px;}
-.di-row{display:flex;justify-content:space-between;align-items:center;margin-top:5px;}
-.di-price{font-size:.8rem;font-weight:700;}
-.di-rm{font-size:.62rem;color:var(--red);text-decoration:underline;}
-.d-foot{padding:12px 14px;padding-bottom:calc(12px + var(--sb));border-top:1px solid var(--border);flex-shrink:0;}
-.d-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--ink2);padding:3px 0;}
-.d-row span:last-child{font-weight:600;}
-.d-total{display:flex;justify-content:space-between;font-size:.92rem;font-weight:700;padding-top:8px;margin-top:6px;border-top:2px solid var(--border);}
-.d-total span:last-child{color:var(--g);}
-.d-note{font-size:.62rem;color:var(--ink3);margin:7px 0;line-height:1.5;}
-.pay-btn{width:100%;background:var(--g);color:#fff;padding:12px;border-radius:9px;font-weight:700;font-size:.84rem;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:7px;}
-.wa-btn{width:100%;background:#F0FFF4;color:#166534;border:1.5px solid #BBF7D0;border-radius:9px;padding:10px;font-weight:600;font-size:.78rem;display:flex;align-items:center;justify-content:center;gap:6px;}
-.secure{font-size:.6rem;color:var(--ink3);text-align:center;margin-top:6px;}
+/* ══════════════════════════════
+   BRAND STRIP
+══════════════════════════════ */
+.brand-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;margin-bottom:20px;}
+.brand-strip::-webkit-scrollbar{display:none;}
+.brand-pill{flex-shrink:0;background:#fff;border:1px solid var(--border);border-radius:7px;padding:7px 14px;font-size:.72rem;font-weight:700;color:var(--ink2);}
 
-/* ── FAQ ── */
-.faq-sec{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;}
-.faq-sec h2{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:12px;color:#1A2E0F;}
+/* ══════════════════════════════
+   SECTION DIVIDER
+══════════════════════════════ */
+.section{margin-bottom:24px;}
+
+/* ══════════════════════════════
+   PRODUCT GRID (for "View All" filtered state)
+══════════════════════════════ */
+.prod-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+@media(min-width:540px){.prod-grid{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:800px){.prod-grid{grid-template-columns:repeat(4,1fr);}}
+@media(min-width:1100px){.prod-grid{grid-template-columns:repeat(5,1fr);}}
+
+/* ══════════════════════════════
+   DRAWER
+══════════════════════════════ */
+.drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;}
+.drawer-mask.open{opacity:1;pointer-events:all;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,100vw);background:#fff;z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .24s ease;}
+.drawer.open{transform:translateX(0);}
+.drw-hd{background:var(--g);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.drw-hd h3{font-size:.9rem;font-weight:700;}
+.drw-hd button{background:none;border:none;color:rgba(255,255,255,.8);font-size:1.2rem;}
+.drw-body{flex:1;overflow-y:auto;padding:12px 14px;}
+.drw-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--ink3);font-size:.8rem;gap:10px;padding:32px;}
+.drw-empty svg{width:44px;height:44px;opacity:.2;}
+.di{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;display:flex;gap:8px;}
+.di-ico{width:40px;height:40px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.di-ico svg{width:26px;height:26px;}
+.di-name{font-size:.74rem;font-weight:600;line-height:1.3;}
+.di-meta{font-size:.64rem;color:var(--ink3);margin-top:2px;}
+.di-row{display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+.di-price{font-size:.8rem;font-weight:700;}
+.di-rm{background:none;border:none;font-size:.64rem;color:var(--red);text-decoration:underline;}
+.drw-foot{padding:12px 14px;border-top:1px solid var(--border);padding-bottom:calc(12px + var(--safe-bottom));}
+.df-row{display:flex;justify-content:space-between;font-size:.74rem;color:var(--ink2);padding:2px 0;}
+.df-row span:last-child{font-weight:600;}
+.df-total{display:flex;justify-content:space-between;font-size:.92rem;font-weight:700;border-top:1px solid var(--border);padding-top:7px;margin:5px 0 8px;}
+.df-total span:last-child{color:var(--g);}
+.df-note{font-size:.64rem;color:var(--ink3);margin-bottom:8px;}
+.pay-btn{width:100%;background:var(--g);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:7px;}
+.pay-btn svg{width:14px;height:14px;}
+.wa-btn{width:100%;background:#E8F5E9;color:#1B5E20;border:1.5px solid #A5D6A7;border-radius:8px;padding:10px;font-weight:600;font-size:.8rem;display:flex;align-items:center;justify-content:center;gap:6px;}
+.secure{font-size:.62rem;color:var(--ink3);text-align:center;margin-top:6px;}
+
+/* ══════════════════════════════
+   FAQ
+══════════════════════════════ */
+.faq-section{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;}
+.faq-section h2{font-size:.88rem;font-weight:700;margin-bottom:12px;}
 details.faq{border-bottom:1px solid var(--border);padding:10px 0;}
 details.faq:last-child{border-bottom:none;}
-details.faq summary{cursor:pointer;font-weight:600;font-size:.78rem;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+details.faq summary{cursor:pointer;font-weight:600;font-size:.78rem;color:var(--ink);list-style:none;display:flex;justify-content:space-between;align-items:center;-webkit-tap-highlight-color:transparent;}
 details.faq summary::-webkit-details-marker{display:none;}
-details.faq summary::after{content:'+';font-size:1.1rem;color:var(--g);flex-shrink:0;}
+details.faq summary::after{content:'+';font-size:1rem;color:var(--g);font-weight:700;flex-shrink:0;}
 details.faq[open] summary::after{content:'−';}
-details.faq p{font-size:.74rem;color:var(--ink2);margin-top:7px;line-height:1.65;}
+details.faq p{font-size:.76rem;color:var(--ink2);margin-top:7px;line-height:1.65;}
 
-/* ── FOOTER ── */
-footer{background:var(--g2);color:#E9F5EC;padding:24px 14px 12px;}
-.foot-wrap{max-width:1280px;margin:0 auto;}
+/* ══════════════════════════════
+   FOOTER
+══════════════════════════════ */
+footer{background:#1B5E20;color:rgba(255,255,255,.75);padding:24px 14px 12px;}
+.foot-inner{max-width:1280px;margin:0 auto;}
 .foot-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
-@media(min-width:640px){.foot-grid{grid-template-columns:1.4fr 1fr 1fr 1fr;}}
-.f-logo{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:5px;}
-.f-logo span{color:#7FD49A;}
-.f-desc{font-size:.7rem;color:rgba(255,255,255,.5);line-height:1.6;}
-.f-h{font-size:.74rem;font-weight:700;color:#fff;margin-bottom:8px;}
-.f-links{display:flex;flex-direction:column;gap:6px;}
-.f-links a{font-size:.68rem;color:rgba(255,255,255,.5);}
-.f-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:10px;font-size:.65rem;color:rgba(255,255,255,.3);text-align:center;}
+@media(min-width:700px){.foot-grid{grid-template-columns:1.5fr 1fr 1fr 1fr;}}
+.foot-logo{font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:6px;}
+.foot-logo em{color:#69f0ae;font-style:normal;}
+.foot-desc{font-size:.7rem;line-height:1.6;}
+.foot-h{font-size:.76rem;font-weight:700;color:#fff;margin-bottom:8px;}
+.foot-links a{display:block;font-size:.7rem;color:rgba(255,255,255,.55);margin-bottom:5px;cursor:pointer;}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:12px;font-size:.68rem;color:rgba(255,255,255,.35);text-align:center;}
 
-/* ── MOBILE BOTTOM NAV ── */
-.mob-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);z-index:90;display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:var(--sb);}
-@media(min-width:900px){.mob-nav{display:none;}}
-.mn-btn{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--ink3);font-size:.58rem;font-weight:500;padding:7px 4px;-webkit-tap-highlight-color:transparent;position:relative;}
+/* ══════════════════════════════
+   MOBILE BOTTOM NAV
+══════════════════════════════ */
+.mob-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#fff;border-top:2px solid var(--border);
+  z-index:90;display:grid;grid-template-columns:repeat(4,1fr);
+  padding-bottom:var(--safe-bottom);
+}
+.mn-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;background:none;border:none;
+  font-size:.58rem;font-weight:500;color:var(--ink3);
+  padding:8px 4px;min-height:52px;
+  -webkit-tap-highlight-color:transparent;position:relative;
+}
 .mn-btn.on{color:var(--g);}
-.mn-btn svg{width:20px;height:20px;}
-.mn-cart-badge{position:absolute;top:4px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:.5rem;font-weight:800;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;}
+.mn-btn.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--g);border-radius:0 0 2px 2px;}
+.mn-btn svg{width:22px;height:22px;}
+.mn-cart-n{
+  position:absolute;top:4px;right:calc(50% - 20px);
+  background:var(--or);color:#fff;
+  font-size:.52rem;font-weight:800;
+  border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;
+  display:none;
+}
+@media(min-width:900px){.mob-nav{display:none;}.main{padding-bottom:20px;}}
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:calc(62px + var(--sb));left:50%;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;font-size:.74rem;font-weight:500;padding:8px 16px;border-radius:7px;opacity:0;transition:all .2s;z-index:500;white-space:nowrap;max-width:88vw;text-overflow:ellipsis;overflow:hidden;}
+/* ══════════════════════════════
+   TOAST
+══════════════════════════════ */
+.toast{
+  position:fixed;bottom:calc(60px + var(--safe-bottom));left:50%;
+  transform:translateX(-50%) translateY(30px);
+  background:#212121;color:#fff;font-size:.76rem;font-weight:500;
+  padding:9px 18px;border-radius:7px;opacity:0;transition:all .22s;
+  z-index:500;white-space:nowrap;max-width:90vw;pointer-events:none;
+}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-@media(min-width:900px){.toast{bottom:18px;}}
-
-/* ── SKELETON LOADER ── */
-.skeleton{animation:shimmer 1.4s infinite linear;background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.skel-card{border-radius:14px;overflow:hidden;background:#fff;border:1px solid var(--border);}
-.skel-img{height:160px;}.skel-body{padding:12px;display:flex;flex-direction:column;gap:8px;}
-.skel-line{height:10px;border-radius:4px;}.skel-line.sm{width:60%;}.skel-line.lg{width:85%;}.skel-line.xs{width:40%;}
-.skel-btn{height:32px;border-radius:8px;margin-top:4px;}
+@media(min-width:900px){.toast{bottom:20px;}}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
+<!-- ══ TOPBAR ══ -->
 <header class="topbar">
   <div class="tb">
     <a class="logo" href="index.html">
-      <svg viewBox="0 0 28 28" fill="none">
-        <circle cx="14" cy="14" r="13" fill="#e6f4ec"/>
-        <ellipse cx="14" cy="6" rx="2.5" ry="6.5" fill="#0a7a30" opacity=".9"/>
-        <ellipse cx="14" cy="6" rx="2.5" ry="6.5" fill="#0a7a30" opacity=".9" transform="rotate(60 14 14)"/>
-        <ellipse cx="14" cy="6" rx="2.5" ry="6.5" fill="#0a7a30" opacity=".9" transform="rotate(120 14 14)"/>
-        <ellipse cx="14" cy="6" rx="2.5" ry="6.5" fill="#0a7a30" opacity=".9" transform="rotate(180 14 14)"/>
-        <ellipse cx="14" cy="6" rx="2.5" ry="6.5" fill="#0a7a30" opacity=".9" transform="rotate(240 14 14)"/>
-        <ellipse cx="14" cy="6" rx="2.5" ry="6.5" fill="#0a7a30" opacity=".9" transform="rotate(300 14 14)"/>
-        <circle cx="14" cy="14" r="4" fill="#0a7a30"/>
-        <circle cx="14" cy="14" r="1.8" fill="#e8a020"/>
+      <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="15" fill="#e8f5e9"/>
+        <ellipse cx="16" cy="8" rx="2.8" ry="7" fill="#0a7a30" opacity=".9"/>
+        <ellipse cx="16" cy="8" rx="2.8" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(60 16 16)"/>
+        <ellipse cx="16" cy="8" rx="2.8" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(120 16 16)"/>
+        <ellipse cx="16" cy="8" rx="2.8" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(180 16 16)"/>
+        <ellipse cx="16" cy="8" rx="2.8" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(240 16 16)"/>
+        <ellipse cx="16" cy="8" rx="2.8" ry="7" fill="#0a7a30" opacity=".9" transform="rotate(300 16 16)"/>
+        <circle cx="16" cy="16" r="5" fill="#0a7a30"/>
+        <circle cx="16" cy="16" r="2.2" fill="#e8620a"/>
       </svg>
-      <span class="logo-name">Mahi<span>Grow</span></span>
+      <span class="logo-name">Mahi<em>Grow</em></span>
     </a>
+
     <div class="tb-search">
       <form onsubmit="return false;">
-        <input type="text" placeholder="Search seeds, pesticides…" aria-label="Search"/>
+        <input type="text" id="searchInp" placeholder="Search seeds, pesticides, fertilisers…" oninput="applyFilters()"/>
         <button type="submit">Search</button>
       </form>
     </div>
-    <div class="tb-actions">
-      <button class="btn-signin" id="tb-loginBtn" onclick="window.location.href='login.html'">Sign In</button>
-      <button class="btn-order" onclick="openDrawer()">
-        <svg viewBox="0 0 14 14" fill="none"><path d="M1 1H2.5L4 9H10.5L12 4H4" stroke="white" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="11.5" r="1" fill="white"/><circle cx="9" cy="11.5" r="1" fill="white"/></svg>
+
+    <div class="tb-right">
+      <button class="btn-login" id="tb-loginBtn" onclick="window.location.href='login.html'">Sign In</button>
+      <button class="btn-cart" onclick="openDrawer()">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M1 1H3L5 11H13L15 5H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="13.5" r="1.5" fill="currentColor"/><circle cx="12" cy="13.5" r="1.5" fill="currentColor"/></svg>
         Order <span class="cart-n" id="cn">0</span>
       </button>
     </div>
   </div>
 </header>
 
-<!-- CATEGORY NAV -->
+<!-- ══ CATEGORY NAV ══ -->
 <div class="catnav">
-  <div class="cnav-inner">
+  <div class="catnav-inner">
     <button class="cnav-btn on" onclick="filterAll(this)">
-      <svg viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="4" height="4" rx=".8" stroke="currentColor" stroke-width="1.1"/><rect x="7" y="1" width="4" height="4" rx=".8" stroke="currentColor" stroke-width="1.1"/><rect x="1" y="7" width="4" height="4" rx=".8" stroke="currentColor" stroke-width="1.1"/><rect x="7" y="7" width="4" height="4" rx=".8" stroke="currentColor" stroke-width="1.1"/></svg>
-      All
+      <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+      All Products
     </button>
     <button class="cnav-btn" onclick="filterCat('seeds',this)">🌱 Seeds</button>
     <button class="cnav-btn" onclick="filterCat('pesticides',this)">🧪 Pesticides</button>
     <button class="cnav-btn" onclick="filterCat('insecticides',this)">🐛 Insecticides</button>
-    <button class="cnav-btn" onclick="filterCat('fertilisers',this)">🌿 Fertilisers</button>
+    <button class="cnav-btn" onclick="filterCat('fertilisers',this)">💧 Fertilisers</button>
     <button class="cnav-btn" onclick="filterCat('fungicides',this)">🛡️ Fungicides</button>
-    <button class="cnav-btn" onclick="filterCat('herbicides',this)">🍃 Herbicides</button>
+    <button class="cnav-btn" onclick="filterCat('herbicides',this)">🌿 Herbicides</button>
   </div>
 </div>
 
-<!-- HERO -->
+<!-- ══ HERO ══ -->
 <div class="hero">
   <div class="hero-inner">
     <h1>Agri inputs priced<br/>for the <em>trade.</em></h1>
-    <p>Seeds, pesticides, fertilisers &amp; more at bulk retailer rates. GST invoice, fast delivery.</p>
-    <div class="hero-btns">
+    <p>Seeds, pesticides, fertilisers &amp; more at bulk retailer rates. GST invoice on every order, fast delivery.</p>
+    <div class="hero-actions">
       <button class="hbtn-w" onclick="document.getElementById('cat-section').scrollIntoView({behavior:'smooth'})">Browse Catalogue</button>
       <button class="hbtn-o" onclick="openDrawer()">View Order</button>
     </div>
     <div class="hero-stats">
-      <div class="hs"><div class="hs-n">340+</div><div class="hs-l">Products</div></div>
-      <div class="hs"><div class="hs-n">100%</div><div class="hs-l">CIB Certified</div></div>
-      <div class="hs"><div class="hs-n">2–4d</div><div class="hs-l">Delivery</div></div>
-      <div class="hs"><div class="hs-n">₹0</div><div class="hs-l">Platform Fee</div></div>
+      <div class="hstat"><div class="n">340+</div><div class="l">Products</div></div>
+      <div class="hstat"><div class="n">100%</div><div class="l">CIB Certified</div></div>
+      <div class="hstat"><div class="n">GST</div><div class="l">Invoice Included</div></div>
+      <div class="hstat"><div class="n">₹0</div><div class="l">Platform Fee</div></div>
     </div>
   </div>
 </div>
 
-<!-- TRUST STRIP -->
+<!-- ══ TRUST STRIP ══ -->
 <div class="trust">
   <div class="trust-inner">
-    <div class="ti">
-      <svg viewBox="0 0 16 16" fill="none"><path d="M8 1L13 3.5V8C13 11.5 8 15 8 15C8 15 3 11.5 3 8V3.5L8 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 8L7 9.5L10.5 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div><div class="ti-t">CIB Certified</div><div class="ti-s">Verified brands</div></div>
+    <div class="titem">
+      <svg viewBox="0 0 18 18" fill="none"><path d="M9 1L15 3.5V8C15 12 9 17 9 17C9 17 3 12 3 8V3.5L9 1Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 8.5L8 10.5L12 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><div class="tt">CIB Certified</div><div class="ts">Verified brands only</div></div>
     </div>
-    <div class="ti">
-      <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="1" y1="6" x2="15" y2="6" stroke="currentColor" stroke-width="1.2"/></svg>
-      <div><div class="ti-t">GST Invoice</div><div class="ti-s">Every order</div></div>
+    <div class="titem">
+      <svg viewBox="0 0 18 18" fill="none"><rect x="1" y="2" width="16" height="13" rx="2" stroke="currentColor" stroke-width="1.3"/><line x1="1" y1="6" x2="17" y2="6" stroke="currentColor" stroke-width="1.2"/><line x1="4" y1="10" x2="8" y2="10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <div><div class="tt">GST Invoice</div><div class="ts">Every order</div></div>
     </div>
-    <div class="ti">
-      <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="5" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 5V4a3 3 0 0 1 6 0v1" stroke="currentColor" stroke-width="1.2"/></svg>
-      <div><div class="ti-t">Bulk Pricing</div><div class="ti-s">Tiered rates</div></div>
+    <div class="titem">
+      <svg viewBox="0 0 18 18" fill="none"><path d="M3 7H15M3 7L5 4H13L15 7M3 7V14C3 15.1 3.9 16 5 16H13C14.1 16 15 15.1 15 14V7" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      <div><div class="tt">Bulk Pricing</div><div class="ts">Tiered rates per carton</div></div>
     </div>
-    <div class="ti">
-      <svg viewBox="0 0 16 16" fill="none"><path d="M8 1v4M8 11v4M1 8h4M11 8h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.2"/></svg>
-      <div><div class="ti-t">Fast Delivery</div><div class="ti-s">2–4 days</div></div>
+    <div class="titem">
+      <svg viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.3"/><path d="M9 5V9L12 11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <div><div class="tt">Fast Delivery</div><div class="ts">2–4 business days</div></div>
+    </div>
+    <div class="titem">
+      <svg viewBox="0 0 18 18" fill="none"><path d="M9 1.5L11 6H16L12 9.5L13.5 14.5L9 11.5L4.5 14.5L6 9.5L2 6H7L9 1.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      <div><div class="tt">Top Brands</div><div class="ts">Bayer, Syngenta, FMC &amp; more</div></div>
     </div>
   </div>
 </div>
 
-<!-- MAIN -->
+<!-- ══ MAIN CONTENT ══ -->
 <div class="main" id="cat-section">
 
   <!-- Category tiles -->
-  <div class="cat-grid">
-    <div class="cat-card" onclick="filterCat('seeds',null)">
-      <div class="cat-ic"><svg viewBox="0 0 38 38" fill="none"><ellipse cx="19" cy="10" rx="4" ry="8" fill="#0a7a30" opacity=".85"/><path d="M19 18 Q14 24 14 34" stroke="#086826" stroke-width="2.5" stroke-linecap="round"/><path d="M19 24 Q26 21 27 14" stroke="#0a7a30" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="19" cy="34" r="3" fill="#e8a020"/></svg></div>
-      <div class="cat-nm">Seeds</div><div class="cat-ct">86 items</div>
+  <div class="sec-hd" style="margin-bottom:10px;">
+    <div class="sec-title">Shop by Category</div>
+  </div>
+  <div class="cat-grid" style="margin-bottom:20px;">
+    <div class="cat-tile" onclick="filterCat('seeds',null)">
+      <div class="icon"><svg viewBox="0 0 44 44" fill="none"><ellipse cx="22" cy="11" rx="5" ry="9" fill="#0a7a30" opacity=".85"/><path d="M22 20 Q17 28 17 40" stroke="#086826" stroke-width="3" stroke-linecap="round"/><path d="M22 28 Q30 24 31 16" stroke="#0a7a30" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="40" r="4" fill="#e8620a"/></svg></div>
+      <div class="nm">Seeds</div><div class="ct">86 products</div>
     </div>
-    <div class="cat-card" onclick="filterCat('pesticides',null)">
-      <div class="cat-ic"><svg viewBox="0 0 38 38" fill="none"><rect x="12" y="14" width="12" height="18" rx="3" fill="#FDF3DC" stroke="#e8a020" stroke-width="1.8"/><rect x="14" y="7" width="8" height="8" rx="2" fill="#e8a020" opacity=".6"/><line x1="15" y1="21" x2="21" y2="21" stroke="#e8a020" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <div class="cat-nm">Pesticides</div><div class="cat-ct">74 items</div>
+    <div class="cat-tile" onclick="filterCat('pesticides',null)">
+      <div class="icon"><svg viewBox="0 0 44 44" fill="none"><rect x="14" y="16" width="16" height="24" rx="4" fill="#FDF3DC" stroke="#e8a020" stroke-width="2.2"/><rect x="17" y="9" width="10" height="9" rx="2.5" fill="#e8a020" opacity=".65"/><rect x="15" y="6" width="14" height="5" rx="2" fill="#e8a020"/><circle cx="34" cy="14" r="8" fill="#c0321a" opacity=".9"/><line x1="34" y1="10" x2="34" y2="15" stroke="white" stroke-width="2.5" stroke-linecap="round"/><circle cx="34" cy="18" r="1.4" fill="white"/></svg></div>
+      <div class="nm">Pesticides</div><div class="ct">74 products</div>
     </div>
-    <div class="cat-card" onclick="filterCat('insecticides',null)">
-      <div class="cat-ic"><svg viewBox="0 0 38 38" fill="none"><ellipse cx="16" cy="24" rx="5.5" ry="7" fill="#c0321a" opacity=".75"/><circle cx="16" cy="13" r="5.5" fill="#c0321a" opacity=".85"/><line x1="14" y1="9.5" x2="11" y2="7" stroke="#c0321a" stroke-width="1.6" stroke-linecap="round"/><line x1="18" y1="9.5" x2="21" y2="7" stroke="#c0321a" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-      <div class="cat-nm">Insecticides</div><div class="cat-ct">58 items</div>
+    <div class="cat-tile" onclick="filterCat('insecticides',null)">
+      <div class="icon"><svg viewBox="0 0 44 44" fill="none"><ellipse cx="20" cy="30" rx="6" ry="8" fill="#c0321a" opacity=".75"/><circle cx="20" cy="16" r="6" fill="#c0321a" opacity=".85"/><line x1="17" y1="11" x2="13" y2="7" stroke="#c0321a" stroke-width="2" stroke-linecap="round"/><line x1="23" y1="11" x2="27" y2="7" stroke="#c0321a" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="25" x2="8" y2="23" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><line x1="14" y1="30" x2="8" y2="30" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><line x1="26" y1="25" x2="32" y2="23" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><line x1="26" y1="30" x2="32" y2="30" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><circle cx="34" cy="12" r="8" fill="white" stroke="#0a7a30" stroke-width="2.2"/><line x1="30" y1="8" x2="38" y2="16" stroke="#0a7a30" stroke-width="2.8" stroke-linecap="round"/><line x1="38" y1="8" x2="30" y2="16" stroke="#0a7a30" stroke-width="2.8" stroke-linecap="round"/></svg></div>
+      <div class="nm">Insecticides</div><div class="ct">58 products</div>
     </div>
-    <div class="cat-card" onclick="filterCat('fertilisers',null)">
-      <div class="cat-ic"><svg viewBox="0 0 38 38" fill="none"><rect x="7" y="22" width="22" height="12" rx="3" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="1.8"/><path d="M11 22 L14 11 L24 11 L27 22" stroke="#1D4ED8" stroke-width="1.8" stroke-linejoin="round" fill="none"/><text x="19" y="32" text-anchor="middle" font-size="6" fill="#1D4ED8" font-weight="800" font-family="sans-serif">NPK</text></svg></div>
-      <div class="cat-nm">Fertilisers</div><div class="cat-ct">62 items</div>
+    <div class="cat-tile" onclick="filterCat('fertilisers',null)">
+      <div class="icon"><svg viewBox="0 0 44 44" fill="none"><rect x="8" y="26" width="28" height="14" rx="4" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2"/><path d="M13 26 L17 13 L27 13 L31 26" stroke="#1D4ED8" stroke-width="2.2" stroke-linejoin="round" fill="none"/><path d="M17.5 13 Q22 9 26.5 13" stroke="#1D4ED8" stroke-width="2" fill="none" stroke-linecap="round"/><text x="22" y="37" text-anchor="middle" font-size="7" fill="#1D4ED8" font-weight="800" font-family="sans-serif" opacity=".75">NPK</text></svg></div>
+      <div class="nm">Fertilisers</div><div class="ct">62 products</div>
     </div>
-    <div class="cat-card" onclick="filterCat('fungicides',null)">
-      <div class="cat-ic"><svg viewBox="0 0 38 38" fill="none"><path d="M19 3L32 8V18C32 28 19 35 19 35C19 35 6 28 6 18V8L19 3Z" fill="#EDE9FE" stroke="#6D28D9" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 19L16.5 23L26 14" stroke="#6D28D9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="cat-nm">Fungicides</div><div class="cat-ct">41 items</div>
+    <div class="cat-tile" onclick="filterCat('fungicides',null)">
+      <div class="icon"><svg viewBox="0 0 44 44" fill="none"><path d="M22 4L36 9V20C36 31 22 40 22 40C22 40 8 31 8 20V9L22 4Z" fill="#EDE9FE" stroke="#6D28D9" stroke-width="2.2" stroke-linejoin="round"/><path d="M15 22L19.5 26.5L29 17" stroke="#6D28D9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nm">Fungicides</div><div class="ct">41 products</div>
     </div>
-    <div class="cat-card" onclick="filterCat('herbicides',null)">
-      <div class="cat-ic"><svg viewBox="0 0 38 38" fill="none"><path d="M19 35L19 18" stroke="#0a7a30" stroke-width="2.5" stroke-linecap="round"/><path d="M19 26 Q12 20 12 10 Q19 11 19 19" fill="#0a7a30" opacity=".6"/><path d="M19 21 Q26 15 27 8 Q19 9 19 16" fill="#0a7a30" opacity=".45"/></svg></div>
-      <div class="cat-nm">Herbicides</div><div class="cat-ct">38 items</div>
+    <div class="cat-tile" onclick="filterCat('herbicides',null)">
+      <div class="icon"><svg viewBox="0 0 44 44" fill="none"><path d="M22 40 L22 20" stroke="#0a7a30" stroke-width="3" stroke-linecap="round"/><path d="M22 30 Q14 24 14 12 Q22 13 22 22" fill="#0a7a30" opacity=".6"/><path d="M22 24 Q30 18 31 8 Q22 9 22 18" fill="#0a7a30" opacity=".45"/><path d="M16 17 L22 11 L28 17" stroke="#0a7a30" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nm">Herbicides</div><div class="ct">38 products</div>
     </div>
   </div>
 
   <!-- Brands -->
-  <div class="brands-row">
-    <span class="brand-pill">Bayer CropScience</span>
-    <span class="brand-pill">Syngenta India</span>
-    <span class="brand-pill">FMC India</span>
-    <span class="brand-pill">IFFCO</span>
-    <span class="brand-pill">UPL Limited</span>
-    <span class="brand-pill">Dhanuka Agritech</span>
-    <span class="brand-pill">Indofil</span>
-    <span class="brand-pill">Pioneer Seeds</span>
-    <span class="brand-pill">Rasi Seeds</span>
-    <span class="brand-pill">HPM Agro</span>
+  <div class="sec-hd" style="margin-bottom:8px;"><div class="sec-title">Top Brands</div></div>
+  <div class="brand-strip" style="margin-bottom:24px;">
+    <div class="brand-pill">Bayer</div>
+    <div class="brand-pill">Syngenta</div>
+    <div class="brand-pill">FMC India</div>
+    <div class="brand-pill">IFFCO</div>
+    <div class="brand-pill">UPL</div>
+    <div class="brand-pill">Dhanuka</div>
+    <div class="brand-pill">Indofil</div>
+    <div class="brand-pill">Pioneer</div>
+    <div class="brand-pill">Rasi Seeds</div>
+    <div class="brand-pill">Crystal Crop</div>
+    <div class="brand-pill">Tata Rallis</div>
+    <div class="brand-pill">Coromandel</div>
   </div>
 
-  <!-- Products rendered by JS -->
+  <!-- Product sections rendered by JS -->
   <div id="productSections"></div>
 
   <!-- FAQ -->
-  <div class="faq-sec">
+  <div class="faq-section">
     <h2>Frequently Asked Questions</h2>
     <details class="faq" open>
       <summary>What is the minimum order quantity?</summary>
-      <p>Each product has its own MOQ — typically 1 carton (e.g. 12 bottles, 10 bags, 50 sachets). The MOQ is shown on each product card. Tier pricing activates automatically as quantity increases.</p>
+      <p>Each product has its own MOQ — typically 1 carton (e.g. 12 bottles, 10 bags, 50 sachets). MOQ and the carton step are shown on each product card. Tier pricing activates automatically as quantity increases.</p>
     </details>
     <details class="faq">
       <summary>How does bulk tier pricing work?</summary>
@@ -520,69 +509,45 @@ footer{background:var(--g2);color:#E9F5EC;padding:24px 14px 12px;}
     </details>
     <details class="faq">
       <summary>How fast is delivery?</summary>
-      <p>Orders placed before 5 PM are dispatched the same day. Delivery takes 2–4 working days. You'll receive a tracking link on WhatsApp once dispatched.</p>
+      <p>Orders placed before 5 PM are dispatched same day. Delivery takes 2–4 working days. You'll receive a tracking link on WhatsApp once dispatched.</p>
     </details>
     <details class="faq">
       <summary>Do I get a GST invoice?</summary>
-      <p>Yes. A GST-compliant purchase invoice is generated after payment and sent to your registered email. Ensure your GSTIN is entered correctly at registration.</p>
+      <p>Yes. A GST-compliant purchase invoice is generated after payment and sent to your registered email.</p>
     </details>
     <details class="faq">
       <summary>Can I order via WhatsApp?</summary>
-      <p>Yes. Click "Order via WhatsApp" in the order drawer — it pre-fills your order details and sends them to our team. We'll send a payment link within 30 minutes.</p>
+      <p>Yes. Click "Order via WhatsApp" in the order drawer — it pre-fills your order details and sends them to our team. We'll send a Razorpay payment link within 30 minutes.</p>
     </details>
   </div>
-
 </div>
 
-<!-- FOOTER -->
+<!-- ══ FOOTER ══ -->
 <footer>
-  <div class="foot-wrap">
+  <div class="foot-inner">
     <div class="foot-grid">
       <div>
-        <div class="f-logo">Mahi<span>Grow</span></div>
-        <p class="f-desc">MahaGoAgro's B2B retailer supply portal. Certified agri inputs at trade prices. GST invoice on every order.</p>
+        <div class="foot-logo">Mahi<em>Grow</em></div>
+        <p class="foot-desc">MahiGrow's B2B retailer supply portal. Certified agri inputs at trade prices with GST invoice on every order.</p>
       </div>
       <div>
-        <div class="f-h">Catalogue</div>
-        <div class="f-links"><a>Seeds</a><a>Pesticides</a><a>Insecticides</a><a>Fertilisers</a><a>Fungicides</a></div>
+        <div class="foot-h">Catalogue</div>
+        <div class="foot-links"><a onclick="filterCat('seeds',null)">Seeds</a><a onclick="filterCat('pesticides',null)">Pesticides</a><a onclick="filterCat('insecticides',null)">Insecticides</a><a onclick="filterCat('fertilisers',null)">Fertilisers</a><a onclick="filterCat('fungicides',null)">Fungicides</a></div>
       </div>
       <div>
-        <div class="f-h">Retailer</div>
-        <div class="f-links"><a href="orders.html">My Orders</a><a>GST Invoices</a><a>Track Delivery</a><a>Returns Policy</a></div>
+        <div class="foot-h">Retailer</div>
+        <div class="foot-links"><a href="orders.html">My Orders</a><a href="login.html">Sign In</a><a href="login.html">Register</a></div>
       </div>
       <div>
-        <div class="f-h">Contact</div>
-        <div class="f-links"><a>+91 98765 43210</a><a>WhatsApp Orders</a><a>Mon–Sat, 9am–6pm</a></div>
+        <div class="foot-h">Contact</div>
+        <div class="foot-links"><a>+91 98765 43210</a><a>WhatsApp Orders</a><a href="admin-login.html">Admin</a></div>
       </div>
     </div>
-    <div class="f-bottom">© 2026 MahaGoAgro · MahiGrow. All rights reserved.</div>
+    <div class="foot-bottom">© 2026 MahaGoAgro · MahiGrow. All rights reserved.</div>
   </div>
 </footer>
 
-<!-- CART DRAWER -->
-<div class="d-mask" id="drawerMask" onclick="closeDrawer()"></div>
-<div class="drawer" id="drawer">
-  <div class="d-hd"><h3>Bulk Order</h3><button onclick="closeDrawer()">✕</button></div>
-  <div class="d-body" id="drawerBody"></div>
-  <div class="d-foot" id="drawerFoot" style="display:none;">
-    <div class="d-row"><span>Subtotal (ex-GST)</span><span id="dfSub">₹0</span></div>
-    <div class="d-row"><span>GST (~12%)</span><span id="dfGst">₹0</span></div>
-    <div class="d-row"><span>Delivery</span><span style="color:var(--g)">Free</span></div>
-    <div class="d-total"><span>Total payable</span><span id="dfTotal">₹0</span></div>
-    <div class="d-note">GST invoice sent to your email after payment.</div>
-    <button class="pay-btn" onclick="checkoutRazorpay()">
-      <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="white" stroke-width="1.3"/><line x1="1" y1="6" x2="13" y2="6" stroke="white" stroke-width="1.3"/></svg>
-      Pay with Razorpay
-    </button>
-    <button class="wa-btn" onclick="orderViaWhatsApp()">
-      <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6.5" stroke="#166534" stroke-width="1.1"/><path d="M4 10C4.5 10.5 5.5 11 7 10.5C8 10 9 9 9.5 8C10 7 9.5 5.5 8 5" stroke="#166534" stroke-width="1" stroke-linecap="round"/><path d="M4 10L3.5 11.5L5 11" stroke="#166534" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Order via WhatsApp
-    </button>
-    <div class="secure">Secured by Razorpay · GST invoice on every order</div>
-  </div>
-</div>
-
-<!-- MOBILE BOTTOM NAV -->
+<!-- ══ MOBILE BOTTOM NAV ══ -->
 <nav class="mob-nav">
   <button class="mn-btn on" onclick="window.scrollTo({top:0,behavior:'smooth'})">
     <svg viewBox="0 0 20 20" fill="none"><path d="M3 10L10 4L17 10V18H13V13H7V18H3V10Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
@@ -596,12 +561,31 @@ footer{background:var(--g2);color:#E9F5EC;padding:24px 14px 12px;}
     <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/><path d="M3 18c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
     Sign In
   </button>
-  <button class="mn-btn" onclick="openDrawer()" style="position:relative;">
-    <span class="mn-cart-badge" id="mn-cn" style="display:none">0</span>
+  <button class="mn-btn" onclick="openDrawer()">
+    <span class="mn-cart-n" id="mn-cn">0</span>
     <svg viewBox="0 0 20 20" fill="none"><path d="M2 2H4.5L6.5 13H16L18 7H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="16.5" r="1.5" fill="currentColor"/><circle cx="14.5" cy="16.5" r="1.5" fill="currentColor"/></svg>
     Order
   </button>
 </nav>
+
+<!-- ══ CART DRAWER ══ -->
+<div class="drawer-mask" id="drawerMask" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drw-hd"><h3>Bulk Order</h3><button onclick="closeDrawer()">✕</button></div>
+  <div class="drw-body" id="drawerBody"></div>
+  <div class="drw-foot" id="drawerFoot" style="display:none;">
+    <div class="df-row"><span>Subtotal (ex-GST)</span><span id="dfSub">₹0</span></div>
+    <div class="df-row"><span>GST (~12%)</span><span id="dfGst">₹0</span></div>
+    <div class="df-total"><span>Total payable</span><span id="dfTotal">₹0</span></div>
+    <div class="df-note">GST invoice emailed after payment. Free delivery.</div>
+    <button class="pay-btn" onclick="checkoutRazorpay()">
+      <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><line x1="1" y1="6" x2="13" y2="6" stroke="currentColor" stroke-width="1.3"/></svg>
+      Pay with Razorpay
+    </button>
+    <button class="wa-btn" onclick="orderViaWhatsApp()">Order via WhatsApp</button>
+    <div class="secure">Secured by Razorpay · GST invoice on every order</div>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 

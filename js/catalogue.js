@@ -1,188 +1,198 @@
-
 // ─────────────────────────────────────────────
-//  js/catalogue.js
-//  Loads products from API, cart, Razorpay
-//  Requires: api.js loaded before this
+//  js/catalogue.js  —  MahiGrow Bulk Portal
 // ─────────────────────────────────────────────
 
-let allProducts  = [];
-let cart         = {};
-let activeCat    = null;
-
-// ── SVG icons per category ───────────────────
-function getCatSVG(cat, size = 48) {
-  const s = size;
-  const icons = {
-    seeds:        `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="12" rx="5" ry="10" fill="#0a7a30" opacity=".85"/><path d="M24 22 Q18 30 18 42" stroke="#086826" stroke-width="3" stroke-linecap="round"/><path d="M24 30 Q32 26 33 18" stroke="#0a7a30" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="24" cy="42" r="4" fill="#e8a020"/></svg>`,
-    pesticides:   `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><rect x="16" y="18" width="16" height="24" rx="4" fill="#FDF3DC" stroke="#e8a020" stroke-width="2"/><rect x="19" y="10" width="10" height="10" rx="2.5" fill="#e8a020" opacity=".65"/><rect x="17" y="7" width="14" height="5" rx="2" fill="#e8a020"/><line x1="20" y1="27" x2="28" y2="27" stroke="#e8a020" stroke-width="1.8" stroke-linecap="round"/><circle cx="36" cy="16" r="8" fill="#c0321a" opacity=".9"/><line x1="36" y1="12" x2="36" y2="17.5" stroke="white" stroke-width="2.5" stroke-linecap="round"/><circle cx="36" cy="19.5" r="1.5" fill="white"/></svg>`,
-    insecticides: `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><ellipse cx="22" cy="32" rx="7" ry="9" fill="#c0321a" opacity=".75"/><circle cx="22" cy="18" r="7" fill="#c0321a" opacity=".85"/><line x1="19" y1="13" x2="15" y2="9" stroke="#c0321a" stroke-width="2" stroke-linecap="round"/><line x1="25" y1="13" x2="29" y2="9" stroke="#c0321a" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="27" x2="9" y2="25" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><line x1="29" y1="27" x2="35" y2="25" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><circle cx="36" cy="13" r="9" fill="white" stroke="#0a7a30" stroke-width="2.2"/><line x1="32" y1="9" x2="40" y2="17" stroke="#0a7a30" stroke-width="2.8" stroke-linecap="round"/><line x1="40" y1="9" x2="32" y2="17" stroke="#0a7a30" stroke-width="2.8" stroke-linecap="round"/></svg>`,
-    fertilisers:  `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><rect x="10" y="28" width="28" height="16" rx="4" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2"/><path d="M15 28 L19 14 L29 14 L33 28" stroke="#1D4ED8" stroke-width="2.2" stroke-linejoin="round" fill="none"/><path d="M19.5 14 Q24 10 28.5 14" stroke="#1D4ED8" stroke-width="2" fill="none" stroke-linecap="round"/><text x="24" y="40" text-anchor="middle" font-size="7" fill="#1D4ED8" font-weight="800" font-family="sans-serif" opacity=".75">NPK</text></svg>`,
-    fungicides:   `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><path d="M24 4L40 10V22C40 34 24 44 24 44C24 44 8 34 8 22V10L24 4Z" fill="#EDE9FE" stroke="#6D28D9" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 24L21 29L32 18" stroke="#6D28D9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    herbicides:   `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><path d="M24 44 L24 22" stroke="#0a7a30" stroke-width="3" stroke-linecap="round"/><path d="M24 32 Q16 26 16 14 Q24 15 24 24" fill="#0a7a30" opacity=".6"/><path d="M24 26 Q32 20 33 10 Q24 11 24 20" fill="#0a7a30" opacity=".45"/><path d="M18 18 L24 12 L30 18" stroke="#0a7a30" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  };
-  return icons[cat] || icons.seeds;
-}
-
-// Category background colours — soft, earthy tones per type
-const CAT_BG = {
-  seeds:        '#E8F5E9',
-  pesticides:   '#FFF8E1',
-  insecticides: '#FFEBEE',
-  fertilisers:  '#EFF6FF',
-  fungicides:   '#F3E8FF',
-  herbicides:   '#E8F5E9',
+// ── CATEGORY SVG ICONS ───────────────────────
+const CAT_SVG = {
+  seeds:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><ellipse cx="32" cy="15" rx="7" ry="13" fill="#0a7a30" opacity=".85"/><path d="M32 28 Q24 40 24 58" stroke="#086826" stroke-width="3.5" stroke-linecap="round"/><path d="M32 42 Q44 36 45 22" stroke="#0a7a30" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="24" cy="40" rx="6" ry="11" fill="#0a7a30" opacity=".55" transform="rotate(-28 24 40)"/><ellipse cx="42" cy="44" rx="6" ry="11" fill="#0a7a30" opacity=".55" transform="rotate(28 42 44)"/><circle cx="32" cy="58" r="6" fill="#e8a020"/></svg>`,
+  pesticides:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><rect x="20" y="22" width="24" height="36" rx="6" fill="#FDF3DC" stroke="#e8a020" stroke-width="2.5"/><rect x="24" y="12" width="16" height="13" rx="3.5" fill="#e8a020" opacity=".65"/><rect x="22" y="8" width="20" height="7" rx="3" fill="#e8a020"/><line x1="26" y1="33" x2="38" y2="33" stroke="#e8a020" stroke-width="2" stroke-linecap="round"/><line x1="26" y1="41" x2="38" y2="41" stroke="#e8a020" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="20" r="12" fill="#c0321a" opacity=".9"/><line x1="50" y1="14" x2="50" y2="21" stroke="white" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="25" r="2" fill="white"/></svg>`,
+  insecticides:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><ellipse cx="29" cy="46" rx="9" ry="13" fill="#c0321a" opacity=".75"/><circle cx="29" cy="23" r="10" fill="#c0321a" opacity=".85"/><line x1="24" y1="16" x2="18" y2="10" stroke="#c0321a" stroke-width="2.5" stroke-linecap="round"/><line x1="34" y1="16" x2="40" y2="10" stroke="#c0321a" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="38" x2="12" y2="35" stroke="#c0321a" stroke-width="2.2" stroke-linecap="round"/><line x1="20" y1="46" x2="12" y2="46" stroke="#c0321a" stroke-width="2.2" stroke-linecap="round"/><line x1="38" y1="38" x2="46" y2="35" stroke="#c0321a" stroke-width="2.2" stroke-linecap="round"/><line x1="38" y1="46" x2="46" y2="46" stroke="#c0321a" stroke-width="2.2" stroke-linecap="round"/><circle cx="50" cy="18" r="12" fill="white" stroke="#0a7a30" stroke-width="3"/><line x1="44" y1="12" x2="56" y2="24" stroke="#0a7a30" stroke-width="4" stroke-linecap="round"/><line x1="56" y1="12" x2="44" y2="24" stroke="#0a7a30" stroke-width="4" stroke-linecap="round"/></svg>`,
+  fertilisers:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><rect x="12" y="38" width="40" height="22" rx="6" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2.5"/><path d="M19 38 L25 18 L39 18 L45 38" stroke="#1D4ED8" stroke-width="2.8" stroke-linejoin="round" fill="none"/><path d="M25.5 18 Q32 12 38.5 18" stroke="#1D4ED8" stroke-width="2.5" fill="none" stroke-linecap="round"/><text x="32" y="54" text-anchor="middle" font-size="10" fill="#1D4ED8" font-weight="800" font-family="sans-serif" opacity=".75">NPK</text></svg>`,
+  fungicides:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><path d="M32 4L54 12V28C54 46 32 60 32 60C32 60 10 46 10 28V12L32 4Z" fill="#EDE9FE" stroke="#6D28D9" stroke-width="3" stroke-linejoin="round"/><path d="M20 30L27 37L44 22" stroke="#6D28D9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  herbicides:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><path d="M32 60 L32 28" stroke="#0a7a30" stroke-width="4" stroke-linecap="round"/><path d="M32 44 Q20 36 20 18 Q32 20 32 32" fill="#0a7a30" opacity=".6"/><path d="M32 36 Q44 28 46 12 Q32 14 32 28" fill="#0a7a30" opacity=".45"/><path d="M22 24 L32 14 L42 24" stroke="#0a7a30" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 };
 
-// ── Get tier rate for a given qty ────────────
+const CAT_BG = {
+  seeds:'#E8F5E9', pesticides:'#FFF8E1',
+  insecticides:'#FFEBEE', fertilisers:'#E3F2FD',
+  fungicides:'#F3E8FF', herbicides:'#E8F5E9',
+};
+
+const CATS = ['seeds','pesticides','insecticides','fertilisers','fungicides','herbicides'];
+
+// ── STATE ─────────────────────────────────────
+let allProducts = [];
+let cart        = {};
+let activeCat   = null;
+
+// ── HELPERS ───────────────────────────────────
 function getRate(tiers, qty) {
-  for (let i = tiers.length - 1; i >= 0; i--)
-    if (qty >= tiers[i][0]) return tiers[i][2];
-  return tiers[0][2];
+  let rate = tiers[0][2];
+  for (const [min, max, price] of tiers) {
+    if (qty >= min && qty <= max) { rate = price; break; }
+    if (qty >= min) rate = price;
+  }
+  return rate;
 }
 
-// ── Build product card HTML ───────────────────
-function buildCard(p) {
-  const el = document.createElement('div');
-  el.className = 'pcard';
+// ── BUILD CARD ────────────────────────────────
+function buildCard(p, gridMode = false) {
+  const el       = document.createElement('div');
+  el.className   = 'pcard' + (gridMode ? ' grid-card' : '');
+  el.style.cursor = 'pointer';
 
-  const base      = p.tiers[0][2];
-  const disc      = p.mrp > base ? Math.round((p.mrp - base) / p.mrp * 100) : 0;
-  const lastTier  = p.tiers[p.tiers.length - 1];
-  const midTier   = p.tiers.length > 1 ? p.tiers[1] : null;
-  const bg        = CAT_BG[p.category] || '#f0f0ec';
-  const isBigDeal = disc >= 50;
+  const base     = p.tiers[0][2];
+  const lastTier = p.tiers[p.tiers.length - 1];
+  const disc     = p.mrp > base ? Math.round((p.mrp - base) / p.mrp * 100) : 0;
 
-  // Image — real photo fills card, fallback is centred SVG
-  const imgArea = p.imageUrl
+  // Click → product detail (but not on footer controls)
+  el.onclick = (e) => {
+    if (e.target.closest('.pcard-foot')) return;
+    window.location.href = 'product.html?id=' + p.id;
+  };
+
+  const imgHtml = p.imageUrl
     ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy"
-         onerror="this.outerHTML='<div class=\\'cat-icon\\'>${getCatSVG(p.category, 72)}</div>'"
+         onerror="this.parentNode.innerHTML='<div class=icon-wrap>${CAT_SVG[p.category] || CAT_SVG.seeds}</div>'"
        />`
-    : `<div class="cat-icon">${getCatSVG(p.category, 72)}</div>`;
-
-  // Ribbon: show discount if any
-  const ribbon = disc > 0
-    ? `<span class="disc-badge${isBigDeal ? ' big' : ''}">${isBigDeal ? '🔥 ' : ''}${disc}% OFF</span>`
-    : '';
-
-  // Tier chips — show start and best tier
-  const tierChips = `
-    <div class="tier-row">
-      <span class="t-lbl">Bulk Rates</span>
-      <span class="t-low">${p.tiers[0][0]}–${p.tiers[0][1] >= 9999 ? '∞' : p.tiers[0][1]}: ₹${p.tiers[0][2]}</span>
-      <span class="t-arr">→</span>
-      <span class="t-best">${lastTier[0]}+: ₹${lastTier[2]}</span>
-    </div>`;
+    : `<div class="icon-wrap">${CAT_SVG[p.category] || CAT_SVG.seeds}</div>`;
 
   el.innerHTML = `
-    <div class="pcard-img" style="background:${bg}">
-      ${ribbon}
-      ${imgArea}
-      <span class="stock-badge ${p.inStock ? 'in' : 'out'}">
-        ${p.inStock ? '✓ In Stock' : '⚠ Out of Stock'}
-      </span>
+    <div class="pcard-img" style="background:${CAT_BG[p.category] || '#f5f5f5'}">
+      ${imgHtml}
+      ${disc > 0 ? `<span class="disc-tag">${disc}% OFF</span>` : ''}
+      <span class="stock-tag ${p.inStock ? 'in' : 'out'}">${p.inStock ? 'In Stock' : 'Out of Stock'}</span>
+      <span class="cert-tag">${p.cert}</span>
     </div>
-
     <div class="pcard-body">
-      <div class="pcat-tag">${p.category}</div>
+      <div class="pcat">${p.category}</div>
       <div class="pname">${p.name}</div>
-      <div class="psize">${p.brand} · ${p.size}</div>
+      <div class="pbrand">${p.brand} · ${p.size}</div>
       <div class="price-row">
-        <span class="price-now">₹${base.toLocaleString('en-IN')}</span>
-        ${p.mrp > base ? `<span class="price-mrp">₹${p.mrp.toLocaleString('en-IN')}</span>` : ''}
-        ${disc > 0 ? `<span class="price-save">${disc}% off</span>` : ''}
+        <span class="p-now">₹${base.toLocaleString('en-IN')}</span>
+        ${p.mrp > base ? `<span class="p-mrp">₹${p.mrp.toLocaleString('en-IN')}</span>` : ''}
+        ${disc > 0 ? `<span class="p-save">${disc}% off</span>` : ''}
       </div>
-      ${tierChips}
+      <div class="tier-row">
+        <span class="t1">${p.tiers[0][0]}–${p.tiers[0][1] >= 9999 ? '∞' : p.tiers[0][1]}: ₹${p.tiers[0][2]}</span>
+        <span class="tarr">→</span>
+        <span class="t2">${lastTier[0]}+: ₹${lastTier[2]}</span>
+        <span class="bulk-lbl">BULK</span>
+      </div>
     </div>
-
     <div class="pcard-foot">
       <div class="qty-row">
         <div class="qty-ctl">
           <button class="qb" onclick="qAdj('${p.id}',-${p.step})">−</button>
           <input class="qi" id="q-${p.id}" type="number"
-                 value="${p.moq}" min="${p.moq}" step="${p.step}"
-                 inputmode="numeric"/>
+                 value="${p.moq}" min="${p.moq}" step="${p.step}" inputmode="numeric"/>
           <button class="qb" onclick="qAdj('${p.id}',${p.step})">+</button>
         </div>
         <span class="qty-lbl">${p.unit}s<br/>min ${p.moq}</span>
       </div>
       <button class="add-btn" id="ab-${p.id}"
               onclick="tryAddToCart('${p.id}')"
-              ${!p.inStock ? 'disabled' : ''}
-              style="${isBigDeal ? 'background:var(--gold,#C8902A);' : ''}">
-        <svg viewBox="0 0 14 14" fill="none" width="13" height="13">
-          <path d="M1 1H3L5 10H11L12.5 4.5H5" stroke="currentColor" stroke-width="1.4"
-                stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="6" cy="12.5" r="1.3" fill="currentColor"/>
-          <circle cx="10" cy="12.5" r="1.3" fill="currentColor"/>
+              ${!p.inStock ? 'disabled' : ''}>
+        <svg viewBox="0 0 14 14" fill="none">
+          <path d="M1 1H2.5L4.5 9.5H11L12.5 4.5H4.5" stroke="currentColor"
+                stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="5.5" cy="12" r="1.3" fill="currentColor"/>
+          <circle cx="9.5" cy="12" r="1.3" fill="currentColor"/>
         </svg>
         ${p.inStock ? 'Add to order' : 'Out of stock'}
       </button>
     </div>`;
-
   return el;
 }
 
-// ── Render sections ───────────────────────────
-const CATS = ['seeds','pesticides','insecticides','fertilisers','fungicides','herbicides'];
-
+// ── RENDER SECTIONS ───────────────────────────
 function renderProducts(catFilter) {
   const wrap = document.getElementById('productSections');
   if (!wrap) return;
   wrap.innerHTML = '';
 
-  const catsToShow = catFilter ? [catFilter] : CATS;
-
-  catsToShow.forEach(cat => {
-    const items = allProducts.filter(p => p.category === cat);
-    if (!items.length) return;
-
-    const sec = document.createElement('div');
-    sec.className   = 'section';
-    sec.dataset.cat = cat;
-    sec.innerHTML   = `
-      <div class="sec-head">
-        <div class="sec-title">
-          ${getCatSVG(cat, 18)}
-          ${cat.charAt(0).toUpperCase() + cat.slice(1)}
-          <span class="sec-sub">Bulk pricing · MOQ applies</span>
-        </div>
-        <button class="view-all" onclick="filterCat('${cat}',null)">View All →</button>
-      </div>
-      <div class="prod-grid" id="grid-${cat}"></div>`;
+  if (catFilter) {
+    // Grid mode for filtered single category
+    const items = allProducts.filter(p => p.category === catFilter);
+    if (!items.length) {
+      wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#9e9e9e;">No products found.</div>';
+      return;
+    }
+    const sec    = document.createElement('div');
+    sec.className = 'section';
+    const head   = document.createElement('div');
+    head.className = 'sec-hd';
+    const cat = catFilter.charAt(0).toUpperCase() + catFilter.slice(1);
+    head.innerHTML = `
+      <div class="sec-title">${cat}</div>
+      <button class="view-all" onclick="filterAll(null)">← All Products</button>`;
+    sec.appendChild(head);
+    const grid = document.createElement('div');
+    grid.className = 'prod-grid';
+    items.forEach(p => grid.appendChild(buildCard(p, true)));
+    sec.appendChild(grid);
     wrap.appendChild(sec);
+  } else {
+    // Horizontal scroll rows per category (BigHaat style)
+    const q = (document.getElementById('searchInp')?.value || '').toLowerCase();
+    CATS.forEach(cat => {
+      let items = allProducts.filter(p => p.category === cat);
+      if (q) items = items.filter(p =>
+        p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
+      );
+      if (!items.length) return;
 
-    const grid = document.getElementById('grid-' + cat);
-    items.forEach(p => grid.appendChild(buildCard(p)));
-  });
+      const sec = document.createElement('div');
+      sec.className = 'section';
+
+      const catLabel = cat.charAt(0).toUpperCase() + cat.slice(1);
+      const head = document.createElement('div');
+      head.className = 'sec-hd';
+      head.innerHTML = `
+        <div class="sec-title">
+          <span style="font-size:1rem;">${getCatEmoji(cat)}</span>
+          ${catLabel}
+          <span style="font-size:.68rem;color:#9e9e9e;font-weight:400;margin-left:4px;">${items.length} products</span>
+        </div>
+        <button class="view-all" onclick="filterCat('${cat}',null)">View All →</button>`;
+      sec.appendChild(head);
+
+      // Horizontal scroll row
+      const row = document.createElement('div');
+      row.className = 'h-scroll';
+      items.forEach(p => row.appendChild(buildCard(p, false)));
+      sec.appendChild(row);
+      wrap.appendChild(sec);
+    });
+  }
 }
 
-// ── Render skeleton while loading ────────────
-function renderSkeleton() {
-  const wrap = document.getElementById('productSections');
-  if (!wrap) return;
-  const html = CATS.map(cat => `
-    <div class="section">
-      <div class="sec-head">
-        <div class="sec-title" style="background:#e5e7eb;width:120px;height:14px;border-radius:4px;"></div>
-      </div>
-      <div class="prod-grid">
-        ${[1,2,3,4].map(() => `
-          <div class="skel-card">
-            <div class="skel-img skeleton"></div>
-            <div class="skel-body">
-              <div class="skel-line xs skeleton"></div>
-              <div class="skel-line lg skeleton"></div>
-              <div class="skel-line sm skeleton"></div>
-              <div class="skel-line sm skeleton"></div>
-              <div class="skel-btn skeleton"></div>
-            </div>
-          </div>`).join('')}
-      </div>
-    </div>`).join('');
-  wrap.innerHTML = html;
+function getCatEmoji(cat) {
+  return {seeds:'🌱',pesticides:'🧪',insecticides:'🐛',fertilisers:'💧',fungicides:'🛡️',herbicides:'🌿'}[cat] || '📦';
 }
 
-// ── Quantity adjust ───────────────────────────
+// ── FILTER ────────────────────────────────────
+function filterAll(btn) {
+  activeCat = null;
+  document.querySelectorAll('.cnav-btn').forEach(b => b.classList.remove('on'));
+  document.querySelector('.cnav-btn').classList.add('on');
+  renderProducts(null);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function filterCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('.cnav-btn').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  renderProducts(cat);
+  setTimeout(() => document.getElementById('cat-section')?.scrollIntoView({behavior:'smooth'}), 50);
+}
+
+function applyFilters() {
+  renderProducts(activeCat);
+}
+
+// ── QTY ───────────────────────────────────────
 function qAdj(pid, delta) {
   const p   = allProducts.find(x => x.id === pid);
   const inp = document.getElementById('q-' + pid);
@@ -190,12 +200,12 @@ function qAdj(pid, delta) {
   inp.value = Math.max(p.moq, (parseInt(inp.value) || p.moq) + delta);
 }
 
-// ── Add to cart with login gate ───────────────
+// ── CART ──────────────────────────────────────
 function tryAddToCart(pid) {
   if (!isLoggedIn()) {
     localStorage.setItem('rs_pending_add', pid);
     localStorage.setItem('rs_redirect', window.location.href);
-    window.location.href = '/login.html';
+    window.location.href = 'login.html';
     return;
   }
   addToCart(pid);
@@ -204,33 +214,23 @@ function tryAddToCart(pid) {
 function addToCart(pid) {
   const p   = allProducts.find(x => x.id === pid);
   const inp = document.getElementById('q-' + pid);
-  if (!p || !inp) return;
-
-  const qty  = Math.max(p.moq, parseInt(inp.value) || p.moq);
+  if (!p) return;
+  const qty  = Math.max(p.moq, parseInt(inp?.value) || p.moq);
   const rate = getRate(p.tiers, qty);
   cart[pid]  = { p, qty, rate, total: rate * qty };
-
   updateCartBadge();
   renderDrawer();
 
   const btn = document.getElementById('ab-' + pid);
-  if (!btn) return;
-  const origBg = btn.style.background;
-  btn.classList.add('done');
-  btn.innerHTML = `<svg viewBox="0 0 12 12" fill="none" width="13" height="13">
-    <path d="M2 6L5 9L10 3.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg> Added ✓`;
-  setTimeout(() => {
-    btn.classList.remove('done');
-    btn.style.background = origBg;
-    btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none" width="13" height="13">
-      <path d="M1 1H3L5 10H11L12.5 4.5H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="6" cy="12.5" r="1.3" fill="currentColor"/>
-      <circle cx="10" cy="12.5" r="1.3" fill="currentColor"/>
-    </svg> Add to order`;
-  }, 1800);
-
-  showToast(p.name.split(' ').slice(0, 3).join(' ') + ' added');
+  if (btn) {
+    btn.classList.add('done');
+    btn.innerHTML = '✓ Added';
+    setTimeout(() => {
+      btn.classList.remove('done');
+      btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none"><path d="M1 1H2.5L4.5 9.5H11L12.5 4.5H4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5.5" cy="12" r="1.3" fill="currentColor"/><circle cx="9.5" cy="12" r="1.3" fill="currentColor"/></svg> Add to order`;
+    }, 1800);
+  }
+  showToast(p.name.split(' ').slice(0,3).join(' ') + ' added');
 }
 
 function removeCart(pid) {
@@ -240,17 +240,17 @@ function removeCart(pid) {
 }
 
 function updateCartBadge() {
-  const n  = Object.keys(cart).length;
+  const n = Object.keys(cart).length;
   const el = document.getElementById('cn');
   if (el) el.textContent = n;
   const mn = document.getElementById('mn-cn');
-  if (mn) {
-    mn.textContent    = n;
-    mn.style.display  = n > 0 ? 'flex' : 'none';
-  }
+  if (mn) { mn.textContent = n; mn.style.display = n > 0 ? 'block' : 'none'; }
 }
 
-// ── Render cart drawer ────────────────────────
+// ── DRAWER ────────────────────────────────────
+function openDrawer()  { document.getElementById('drawer')?.classList.add('open'); document.getElementById('drawerMask')?.classList.add('open'); }
+function closeDrawer() { document.getElementById('drawer')?.classList.remove('open'); document.getElementById('drawerMask')?.classList.remove('open'); }
+
 function renderDrawer() {
   const items = Object.entries(cart);
   const body  = document.getElementById('drawerBody');
@@ -258,23 +258,19 @@ function renderDrawer() {
   if (!body || !foot) return;
 
   if (!items.length) {
-    body.innerHTML = `<div class="drawer-empty">
-      <svg viewBox="0 0 44 44" fill="none">
-        <path d="M5 5H9.5L13 28H34L37.5 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="17" cy="34" r="3" fill="currentColor" opacity=".3"/>
-        <circle cx="29" cy="34" r="3" fill="currentColor" opacity=".3"/>
-      </svg>
+    body.innerHTML = `<div class="drw-empty">
+      <svg viewBox="0 0 44 44" fill="none"><path d="M5 5H9L13 28H34L37 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="34" r="3" fill="currentColor" opacity=".3"/><circle cx="29" cy="34" r="3" fill="currentColor" opacity=".3"/></svg>
       Add products to build your bulk order.</div>`;
     foot.style.display = 'none';
     return;
   }
 
   let sub = 0;
-  body.innerHTML = items.map(([pid, { p, qty, rate, total }]) => {
+  body.innerHTML = items.map(([pid, {p, qty, rate, total}]) => {
     sub += total;
     return `<div class="di">
-      <div class="di-ico">${getCatSVG(p.category, 28)}</div>
-      <div class="di-info" style="flex:1;min-width:0;">
+      <div class="di-ico">${CAT_SVG[p.category] ? `<svg viewBox="0 0 64 64" width="28" height="28">${CAT_SVG[p.category].replace(/<svg[^>]*>/,'').replace('</svg>','')}</svg>` : '📦'}</div>
+      <div style="flex:1">
         <div class="di-name">${p.name}</div>
         <div class="di-meta">${qty} ${p.unit}(s) × ₹${rate.toLocaleString('en-IN')}</div>
         <div class="di-row">
@@ -287,25 +283,18 @@ function renderDrawer() {
 
   const gst   = Math.round(sub * 0.12);
   const grand = sub + gst;
-  const dSub   = document.getElementById('dfSub');
-  const dGst   = document.getElementById('dfGst');
-  const dTotal = document.getElementById('dfTotal');
-  if (dSub)   dSub.textContent   = '₹' + sub.toLocaleString('en-IN');
-  if (dGst)   dGst.textContent   = '₹' + gst.toLocaleString('en-IN');
-  if (dTotal) dTotal.textContent = '₹' + grand.toLocaleString('en-IN');
+  document.getElementById('dfSub').textContent   = '₹' + sub.toLocaleString('en-IN');
+  document.getElementById('dfGst').textContent   = '₹' + gst.toLocaleString('en-IN');
+  document.getElementById('dfTotal').textContent = '₹' + grand.toLocaleString('en-IN');
   foot.style.display = 'block';
 }
 
-// ── Razorpay checkout ─────────────────────────
+// ── CHECKOUT ──────────────────────────────────
 async function checkoutRazorpay() {
-  const items = Object.values(cart).map(({ p, qty }) => ({
-    productId: p.id,
-    qty,
-  }));
+  const items = Object.values(cart).map(({p, qty}) => ({productId: p.id, qty}));
   if (!items.length) return;
-
   try {
-    const data    = await Orders.create(items);
+    const data = await Orders.create(items);
     const options = {
       key:         data.keyId,
       amount:      data.amount,
@@ -315,7 +304,7 @@ async function checkoutRazorpay() {
       description: 'Bulk Agri Inputs',
       prefill:     data.prefill,
       theme:       { color: '#0a7a30' },
-      handler: async function (response) {
+      handler: async (response) => {
         try {
           await Orders.verifyPayment({
             razorpayOrderId:   response.razorpay_order_id,
@@ -326,10 +315,8 @@ async function checkoutRazorpay() {
           updateCartBadge();
           renderDrawer();
           closeDrawer();
-          showToast('Payment confirmed! GST invoice will be emailed shortly.');
-        } catch {
-          showToast('Payment recorded but verification pending. Contact support if needed.', true);
-        }
+          showToast('Payment confirmed! Invoice will be emailed shortly.');
+        } catch { showToast('Payment pending verification. Contact support if needed.', true); }
       },
     };
     const rzp = new window.Razorpay(options);
@@ -339,62 +326,21 @@ async function checkoutRazorpay() {
   }
 }
 
-// ── WhatsApp order fallback ───────────────────
 function orderViaWhatsApp() {
-  const items = Object.values(cart);
-  if (!items.length) return;
-  const lines = items.map(({ p, qty, rate, total }) =>
+  const lines = Object.values(cart).map(({p, qty, rate, total}) =>
     `${p.name} — ${qty} ${p.unit}(s) @ ₹${rate} = ₹${total.toLocaleString('en-IN')}`
   ).join('%0A');
-  window.open(`https://wa.me/919876543210?text=Hello MahiGrow, bulk order:%0A%0A${lines}%0A%0APlease confirm and send payment link.`, '_blank');
+  window.open(`https://wa.me/919876543210?text=Hello MahiGrow, bulk order:%0A%0A${lines}%0A%0APlease confirm.`, '_blank');
 }
 
-// ── Drawer open/close ─────────────────────────
-function openDrawer()  {
-  document.getElementById('drawer')?.classList.add('open');
-  document.getElementById('drawerMask')?.classList.add('open');
-}
-function closeDrawer() {
-  document.getElementById('drawer')?.classList.remove('open');
-  document.getElementById('drawerMask')?.classList.remove('open');
-}
-
-// ── Category filter ───────────────────────────
-function filterAll(btn) {
-  activeCat = null;
-  document.querySelectorAll('.cnav-btn').forEach(b => b.classList.remove('on'));
-  btn?.classList.add('on');
-  renderProducts(null);
-}
-function filterCat(cat, btn) {
-  activeCat = cat;
-  document.querySelectorAll('.cnav-btn').forEach(b => b.classList.remove('on'));
-  btn?.classList.add('on');
-  renderProducts(cat);
-  setTimeout(() => document.getElementById('cat-section')?.scrollIntoView({ behavior: 'smooth' }), 50);
-}
-
-// ── Toast ─────────────────────────────────────
-function showToast(msg, isError = false) {
-  const t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent      = msg;
-  t.style.background = isError ? '#dc2626' : '#111827';
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ── Nav: show user info if logged in ─────────
+// ── NAV ───────────────────────────────────────
 function updateNav() {
   const retailer = getRetailer();
   ['tb-loginBtn', 'loginBtn'].forEach(id => {
     const btn = document.getElementById(id);
     if (!btn) return;
     if (retailer) {
-      btn.innerHTML = `<svg viewBox="0 0 20 20" fill="none" width="14" height="14">
-        <circle cx="10" cy="7" r="3.5" stroke="currentColor" stroke-width="1.3"/>
-        <path d="M3 18c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-      </svg> ` + (retailer.shopName?.split(' ')[0] || 'Account');
+      btn.textContent = retailer.shopName?.split(' ')[0] || 'Account';
       btn.onclick = () => window.location.href = 'orders.html';
     } else {
       btn.onclick = () => window.location.href = 'login.html';
@@ -402,30 +348,39 @@ function updateNav() {
   });
 }
 
-// ── Init ──────────────────────────────────────
+// ── TOAST ─────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.background = isError ? '#d32f2f' : '#212121';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ──────────────────────────────────────
 async function init() {
   updateNav();
-  renderSkeleton(); // Show skeleton immediately
+  updateCartBadge();
+
+  const wrap = document.getElementById('productSections');
+  if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#9e9e9e;font-size:.85rem;">Loading products…</div>';
 
   try {
     const data  = await Products.getAll();
     allProducts = data.products;
     renderProducts(null);
   } catch {
-    const wrap = document.getElementById('productSections');
-    if (wrap) wrap.innerHTML = `
-      <div style="text-align:center;padding:48px;color:#dc2626;font-size:.84rem;">
-        Could not load products. Please refresh the page.
-      </div>`;
+    if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#d32f2f;font-size:.82rem;">Could not load products. Please refresh.</div>';
   }
 
   renderDrawer();
 
-  // Resume pending add-to-cart after login redirect
+  // Handle pending add after login
   const pendingPid = localStorage.getItem('rs_pending_add');
   if (pendingPid && isLoggedIn()) {
     localStorage.removeItem('rs_pending_add');
-    setTimeout(() => addToCart(pendingPid), 800);
+    setTimeout(() => addToCart(pendingPid), 600);
   }
 }
 
