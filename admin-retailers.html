@@ -237,9 +237,12 @@ async function loadRetailers() {
     updateStats();
     applyFilters();
   } catch (err) {
+    const msg = err.error || err.message || 'Failed to load retailers';
+    const status = err.status ? ' (Status: ' + err.status + ')' : '';
     document.getElementById('tableBody').innerHTML =
-      '<tr class="empty-row"><td colspan="8">Failed to load. Check backend logs.</td></tr>';
-    showToast(err.error || 'Failed to load retailers', 'error');
+      '<tr class="empty-row"><td colspan="8">Error: ' + msg + status + '</td></tr>';
+    showToast(msg + status, 'error');
+    console.error('Load retailers error:', err);
   }
 }
 
