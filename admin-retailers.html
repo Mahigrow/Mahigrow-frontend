@@ -232,7 +232,7 @@ let selectedId   = null;
 // ── LOAD ───────────────────────────────────────
 async function loadRetailers() {
   try {
-    const data = await adminHttp('GET', '/api/admin/retailers');
+    const data = await adminHttp('GET', '/api/auth/admin/retailers');
     allRetailers = data.retailers;
     updateStats();
     applyFilters();
@@ -316,7 +316,7 @@ function renderTable() {
 // ── ACTIVATE / DEACTIVATE ──────────────────────
 async function toggleStatus(id, activate) {
   try {
-    await adminHttp('PATCH', '/api/admin/retailers/' + id, { isActive: activate });
+    await adminHttp('PATCH', '/api/auth/admin/retailers/' + id, { isActive: activate });
     const r = allRetailers.find(x => x.id === id);
     if (r) r.isActive = activate;
     updateStats();
