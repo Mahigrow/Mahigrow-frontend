@@ -448,6 +448,11 @@ tr:hover td{background:#fafafa;}
 
 <script src="js/api.js"></script>
 <script>
+// ── SUPABASE CONFIG ──────────────────────────
+// Get anon key from: Supabase Dashboard → Settings → API → anon public key
+window.SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+</script>
+<script>
 // ── ADMIN AUTH CHECK ──────────────────────────
 // Redirect to admin login if not authenticated
 (function() {
@@ -652,39 +657,51 @@ function removeImage(e) {
 
 // Upload to Supabase Storage — called just before saving the product
 async function uploadToSupabase(file) {
-  // Upload via backend — avoids exposing Supabase keys in browser
   const prog  = document.getElementById('uploadProg');
   const fill  = document.getElementById('uploadFill');
   const label = document.getElementById('uploadLabel');
   prog.style.display = 'block';
-  fill.style.width   = '40%';
+  fill.style.width   = '20%';
   label.textContent  = 'Uploading image…';
 
-  const formData = new FormData();
-  formData.append('image', file);
+  // Build unique filename
+  const mimeToExt = {'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif'};
+  const ext      = mimeToExt[file.type] || 'jpg';
+  const fileName = 'products/' + Date.now() + '-' + Math.random().toString(36).substring(2,8) + '.' + ext;
 
-  const token = localStorage.getItem('rs_admin_token');
-  const res = await fetch(API_BASE + '/api/upload/product-image', {
-    method:  'POST',
-    headers: token ? { 'Authorization': 'Bearer ' + token } : {},
-    body:    formData,
-    // Note: do NOT set Content-Type — browser sets it with boundary automatically
-  });
+  fill.style.width = '50%';
 
-  fill.style.width  = '100%';
+  // Upload directly to Supabase Storage using service key
+  const SUPABASE_URL      = 'https://jpqftunnersfumfgcbqm.supabase.co';
+  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
+
+  const res = await fetch(
+    SUPABASE_URL + '/storage/v1/object/product-images/' + fileName,
+    {
+      method:  'POST',
+      headers: {
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type':  file.type,
+        'x-upsert':      'true',
+      },
+      body: file,
+    }
+  );
+
+  fill.style.width = '100%';
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     prog.style.display = 'none';
     fill.style.width   = '0%';
-    throw new Error(err.error || 'Upload failed');
+    throw new Error(err.message || err.error || 'Upload failed — check Supabase bucket is public');
   }
 
-  const data = await res.json();
   label.textContent = 'Upload complete ✓';
-  setTimeout(() => { prog.style.display = 'none'; fill.style.width = '0%'; }, 1200);
+  setTimeout(() => { prog.style.display = 'none'; fill.style.width = '0%'; }, 1000);
 
-  return data.url;
+  // Return public URL
+  return SUPABASE_URL + '/storage/v1/object/public/product-images/' + fileName;
 }
 
 // ─────────────────────────────────────────────
