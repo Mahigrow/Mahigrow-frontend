@@ -825,16 +825,17 @@ async function saveProduct() {
   btn.classList.add('loading'); btn.disabled = true;
 
   try {
-    // ── Step 1: Upload image to Supabase if a new file was selected ──
+    // ── Step 1: Upload image if a new file was selected ──
     let imageUrl = uploadedUrl;
     if (selectedFile) {
       try {
         imageUrl = await uploadToSupabase(selectedFile);
       } catch (uploadErr) {
+        // Show warning but DON'T block — save product without image
+        console.warn('Image upload failed:', uploadErr.message);
         document.getElementById('eImg').textContent =
-          'Image upload failed: ' + (uploadErr.message || 'Try again');
-        btn.classList.remove('loading'); btn.disabled = false;
-        return;
+          '⚠ Image upload failed — product will be saved without image. (' + (uploadErr.message || 'Try again') + ')';
+        imageUrl = null; // save without image
       }
     }
 
