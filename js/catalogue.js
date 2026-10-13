@@ -52,9 +52,7 @@ function buildCard(p, gridMode = false) {
   };
 
   const imgHtml = p.imageUrl
-    ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy"
-         onerror="this.parentNode.innerHTML='<div class=icon-wrap>${CAT_SVG[p.category] || CAT_SVG.seeds}</div>'"
-       />`
+    ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=icon-wrap>${CAT_SVG[p.category] || CAT_SVG.seeds}</div>'">`
     : `<div class="icon-wrap">${CAT_SVG[p.category] || CAT_SVG.seeds}</div>`;
 
   el.innerHTML = `
