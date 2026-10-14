@@ -289,9 +289,9 @@ function renderDrawer() {
   foot.style.display = 'block';
 }
 
-// ── CHECKOUT ──────────────────────────────────
-async function checkoutRazorpay() {
-  const items = Object.values(cart).map(({p, qty}) => ({productId: p.id, qty}));
+// ── CHECKOUT — Cash on Delivery ───────────────
+function checkoutCOD() {
+  const items = Object.values(cart);
   if (!items.length) return;
 
   // Login gate
@@ -301,38 +301,34 @@ async function checkoutRazorpay() {
     return;
   }
 
-  try {
-    const data = await Orders.create(items);
-    const options = {
-      key:         data.keyId,
-      amount:      data.amount,
-      currency:    'INR',
-      order_id:    data.razorpayOrderId,
-      name:        'MahiGrow',
-      description: 'Bulk Agri Inputs',
-      prefill:     data.prefill,
-      theme:       { color: '#0a7a30' },
-      handler: async (response) => {
-        try {
-          await Orders.verifyPayment({
-            razorpayOrderId:   response.razorpay_order_id,
-            razorpayPaymentId: response.razorpay_payment_id,
-            razorpaySignature: response.razorpay_signature,
-          });
-          cart = {};
-          updateCartBadge();
-          renderDrawer();
-          closeDrawer();
-          showToast('Payment confirmed! Invoice will be emailed shortly.');
-        } catch { showToast('Payment pending verification. Contact support if needed.', true); }
-      },
-    };
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  } catch (err) {
-    console.error('Razorpay error:', err);
-    showToast(err.error || err.message || 'Could not create order. Please try again.', true);
-  }
+  // Build order summary
+  const retailer = getRetailer();
+  const lines = items.map(({p, qty, rate, total}) =>
+    `• ${p.name} — ${qty} ${p.unit}(s) × ₹${rate} = ₹${total.toLocaleString('en-IN')}`
+  ).join('%0A');
+
+  const sub   = items.reduce((s, {total}) => s + total, 0);
+  const gst   = Math.round(sub * 0.12);
+  const grand = sub + gst;
+
+  const msg = `Hello MahiGrow Team,%0A%0A` +
+    `*New Bulk Order — Cash on Delivery*%0A%0A` +
+    `*Retailer:* ${retailer?.shopName || 'N/A'}%0A` +
+    `*Phone:* ${retailer?.phone || 'N/A'}%0A%0A` +
+    `*Items:*%0A${lines}%0A%0A` +
+    `*Subtotal:* ₹${sub.toLocaleString('en-IN')}%0A` +
+    `*GST (12%):* ₹${gst.toLocaleString('en-IN')}%0A` +
+    `*Total Payable:* ₹${grand.toLocaleString('en-IN')}%0A%0A` +
+    `Please confirm and arrange delivery. Thank you!`;
+
+  window.open('https://wa.me/919876543210?text=' + msg, '_blank');
+
+  // Clear cart after placing order
+  cart = {};
+  updateCartBadge();
+  renderDrawer();
+  closeDrawer();
+  showToast('Order sent via WhatsApp! Our team will confirm shortly.');
 }
 
 function orderViaWhatsApp() {

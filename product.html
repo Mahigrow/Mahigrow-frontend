@@ -592,6 +592,8 @@ function addToOrder() {
   const cart  = JSON.parse(localStorage.getItem('mg_cart') || '{}');
   cart[product.id] = { p: product, qty, rate, total: rate * qty };
   localStorage.setItem('mg_cart', JSON.stringify(cart));
+  // Sync to sessionStorage for catalogue.js compatibility
+  sessionStorage.setItem('mg_cart', JSON.stringify(cart));
 
   const n = Object.keys(cart).length;
   document.getElementById('cn').textContent = n;

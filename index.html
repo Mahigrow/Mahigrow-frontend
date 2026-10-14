@@ -271,9 +271,11 @@ a{color:inherit;text-decoration:none;}
 .df-total{display:flex;justify-content:space-between;font-size:.92rem;font-weight:700;border-top:1px solid var(--border);padding-top:7px;margin:5px 0 8px;}
 .df-total span:last-child{color:var(--g);}
 .df-note{font-size:.64rem;color:var(--ink3);margin-bottom:8px;}
-.pay-btn{width:100%;background:var(--g);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:7px;}
-.pay-btn svg{width:14px;height:14px;}
+.pay-btn{width:100%;background:var(--g);color:#fff;border:none;padding:13px;border-radius:8px;font-weight:700;font-size:.86rem;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:8px;letter-spacing:.01em;}
+.pay-btn svg{width:15px;height:15px;}
+.pay-btn:active{background:var(--g2);}
 .wa-btn{width:100%;background:#E8F5E9;color:#1B5E20;border:1.5px solid #A5D6A7;border-radius:8px;padding:10px;font-weight:600;font-size:.8rem;display:flex;align-items:center;justify-content:center;gap:6px;}
+.wa-btn:active{background:#C8E6C9;}
 .secure{font-size:.62rem;color:var(--ink3);text-align:center;margin-top:6px;}
 
 /* ══════════════════════════════
@@ -578,18 +580,20 @@ footer{background:#1B5E20;color:rgba(255,255,255,.75);padding:24px 14px 12px;}
     <div class="df-row"><span>GST (~12%)</span><span id="dfGst">₹0</span></div>
     <div class="df-total"><span>Total payable</span><span id="dfTotal">₹0</span></div>
     <div class="df-note">GST invoice emailed after payment. Free delivery.</div>
-    <button class="pay-btn" onclick="checkoutRazorpay()">
-      <svg viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><line x1="1" y1="6" x2="13" y2="6" stroke="currentColor" stroke-width="1.3"/></svg>
-      Pay with Razorpay
+    <button class="pay-btn" onclick="checkoutCOD()">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M1 3h12v9a1 1 0 01-1 1H2a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.3"/><path d="M1 6h12" stroke="currentColor" stroke-width="1.3"/><circle cx="5" cy="9.5" r="1" fill="currentColor"/><circle cx="9" cy="9.5" r="1" fill="currentColor"/></svg>
+      Place Order (Cash on Delivery)
     </button>
-    <button class="wa-btn" onclick="orderViaWhatsApp()">Order via WhatsApp</button>
-    <div class="secure">Secured by Razorpay · GST invoice on every order</div>
+    <button class="wa-btn" onclick="orderViaWhatsApp()">
+      <svg viewBox="0 0 14 14" fill="none" width="14" height="14"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 7.5c.5 1 1.5 2 3 2 .8 0 1.5-.3 2-.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M9.5 6.5c-.5-1-1.5-2-3-2-.8 0-1.5.3-2 .8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Order via WhatsApp Instead
+    </button>
+    <div class="secure">Cash on Delivery · GST invoice on every order · Free delivery</div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="js/api.js"></script>
 <script src="js/catalogue.js"></script>
 </body>
