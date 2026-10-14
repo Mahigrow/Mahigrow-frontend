@@ -52,7 +52,9 @@ function buildCard(p, gridMode = false) {
   };
 
   const imgHtml = p.imageUrl
-    ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=icon-wrap>${CAT_SVG[p.category] || CAT_SVG.seeds}</div>'">`
+    ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy"
+         onerror="this.parentNode.innerHTML='<div class=icon-wrap>${CAT_SVG[p.category] || CAT_SVG.seeds}</div>'"
+       />`
     : `<div class="icon-wrap">${CAT_SVG[p.category] || CAT_SVG.seeds}</div>`;
 
   el.innerHTML = `
@@ -291,6 +293,14 @@ function renderDrawer() {
 async function checkoutRazorpay() {
   const items = Object.values(cart).map(({p, qty}) => ({productId: p.id, qty}));
   if (!items.length) return;
+
+  // Login gate
+  if (!isLoggedIn()) {
+    localStorage.setItem('rs_redirect', window.location.href);
+    window.location.href = 'login.html';
+    return;
+  }
+
   try {
     const data = await Orders.create(items);
     const options = {
@@ -320,7 +330,8 @@ async function checkoutRazorpay() {
     const rzp = new window.Razorpay(options);
     rzp.open();
   } catch (err) {
-    showToast(err.error || 'Could not create order. Please try again.', true);
+    console.error('Razorpay error:', err);
+    showToast(err.error || err.message || 'Could not create order. Please try again.', true);
   }
 }
 
