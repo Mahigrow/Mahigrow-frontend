@@ -393,9 +393,18 @@ async function fgSendOTP() {
 
   setLoading('fgSendBtn', true);
   try {
-    await Auth.forgotPassword({ phone });
+    const result = await Auth.forgotPassword({ phone });
     const sentTo = $('fgSentTo');
-    if (sentTo) sentTo.textContent = '+91 ' + phone;
+    const sentMsg = $('fgSentMsg');
+
+    // Show where OTP was sent — email or SMS
+    if (result.channel === 'email' && result.sentTo) {
+      if (sentTo) sentTo.textContent = result.sentTo;
+      if (sentMsg) sentMsg.innerHTML = 'OTP sent to your email: <strong>' + result.sentTo + '</strong>';
+    } else {
+      if (sentTo) sentTo.textContent = '+91 ' + phone;
+      if (sentMsg) sentMsg.innerHTML = 'OTP sent to <strong>+91 ' + phone + '</strong> via SMS';
+    }
     showFgStep2(2);
     startFgTimer();
 

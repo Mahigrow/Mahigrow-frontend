@@ -596,5 +596,18 @@ footer{background:#1B5E20;color:rgba(255,255,255,.75);padding:24px 14px 12px;}
 
 <script src="js/api.js"></script>
 <script src="js/catalogue.js"></script>
+<script>
+// Global handler for broken product images — no inline onerror needed
+document.addEventListener('error', function(e) {
+  const img = e.target;
+  if (img.tagName === 'IMG' && img.classList.contains('pcard-real-img')) {
+    img.style.display = 'none';
+    const fallback = img.nextElementSibling;
+    if (fallback && fallback.classList.contains('icon-wrap')) {
+      fallback.style.display = 'flex';
+    }
+  }
+}, true);
+</script>
 </body>
 </html>
