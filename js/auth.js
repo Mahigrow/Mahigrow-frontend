@@ -445,7 +445,7 @@ async function fgSetPassword() {
   const phone = $('fgPhone')?.value.trim() || '';
   const otp   = [...document.querySelectorAll('.obox')].map(b => b.value).join('');
   const pw    = $('fgNewPw')?.value    || '';
-  const pwc   = $('fgConfirmPw')?.value || '';
+  const pwc   = $('fgCfmPw')?.value || '';
 
   if (pw.length < 8) { toast('Password must be at least 8 characters', true); return; }
   if (pw !== pwc)     { toast('Passwords do not match', true); return; }
