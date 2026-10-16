@@ -51,10 +51,9 @@ function buildCard(p, gridMode = false) {
     window.location.href = 'product.html?id=' + p.id;
   };
 
+  // No onerror inline — handled by afterRender() below
   const imgHtml = p.imageUrl
-    ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy"
-         onerror="this.parentNode.innerHTML='<div class=icon-wrap>${CAT_SVG[p.category] || CAT_SVG.seeds}</div>'"
-       />`
+    ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy" class="pcard-img-real" data-pid="${p.id}" style="width:100%;height:100%;object-fit:contain;padding:8px;display:block;"/>`
     : `<div class="icon-wrap">${CAT_SVG[p.category] || CAT_SVG.seeds}</div>`;
 
   el.innerHTML = `
@@ -132,6 +131,7 @@ function renderProducts(catFilter) {
     items.forEach(p => grid.appendChild(buildCard(p, true)));
     sec.appendChild(grid);
     wrap.appendChild(sec);
+    requestAnimationFrame(fixBrokenImages);
   } else {
     // Horizontal scroll rows per category (BigHaat style)
     const q = (document.getElementById('searchInp')?.value || '').toLowerCase();
@@ -165,6 +165,27 @@ function renderProducts(catFilter) {
       wrap.appendChild(sec);
     });
   }
+}
+
+// ── Handle broken product images without inline onerror ──────
+// Called once after any render — replaces broken <img> with SVG
+function fixBrokenImages() {
+  document.querySelectorAll('.pcard-img-real').forEach(img => {
+    if (img.dataset.errorHandled) return;
+    img.dataset.errorHandled = '1';
+    img.addEventListener('error', function() {
+      const cat     = img.closest('.pcard-img')?.style.background ? '' : '';
+      const imgBox  = img.parentNode;
+      img.remove();
+      // Find the category from the card
+      const catTag  = imgBox.closest('.pcard')?.querySelector('.pcat');
+      const catName = catTag ? catTag.textContent.trim().toLowerCase() : 'seeds';
+      const div     = document.createElement('div');
+      div.className = 'icon-wrap';
+      div.innerHTML = CAT_SVG[catName] || CAT_SVG.seeds;
+      imgBox.insertBefore(div, imgBox.firstChild);
+    });
+  });
 }
 
 function getCatEmoji(cat) {
