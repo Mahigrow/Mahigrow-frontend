@@ -3,498 +3,298 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<title>MahiGrow — Sign In</title>
+<title>MahiGrow — My Orders</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{-webkit-text-size-adjust:100%;}
 :root{
-  --g:#0a7a30;--g2:#086826;--g3:#e6f4ec;--g4:#b8dfc4;
-  --or:#e8620a;--ink:#111827;--ink2:#374151;--ink3:#6b7280;
-  --border:#e5e7eb;--bg:#f9fafb;--card:#fff;
-  --red:#dc2626;--red2:#fef2f2;
+  --g:#0a7a30;--g2:#086826;--g3:#e8f5e9;--g4:#c8e6c9;
+  --or:#e8620a;--ink:#212121;--ink2:#424242;--ink3:#9e9e9e;
+  --border:#e0e0e0;--bg:#f5f5f5;--card:#fff;--red:#d32f2f;
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
-button,input,select,textarea{font-family:inherit;cursor:pointer;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;}
 
-/* ── TOP BAR ── */
-.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
-.logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
-.logo svg{width:28px;height:28px;}
-.logo-name{font-size:1.05rem;font-weight:800;color:var(--g);letter-spacing:-.02em;}
-.logo-name span{color:var(--or);}
-.back-to-site{font-size:.76rem;font-weight:500;color:var(--ink3);text-decoration:none;display:flex;align-items:center;gap:4px;}
+/* TOPBAR */
+.topbar{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.tb{max-width:900px;margin:0 auto;padding:0 14px;height:52px;display:flex;align-items:center;gap:10px;}
+.logo{display:flex;align-items:center;gap:7px;text-decoration:none;}
+.logo svg{width:26px;height:26px;}
+.logo-name{font-size:.95rem;font-weight:800;color:var(--g);}
+.logo-name em{color:var(--or);font-style:normal;}
+.tb-right{margin-left:auto;display:flex;gap:8px;}
+.btn-home{background:none;border:1px solid var(--border);color:var(--ink2);font-size:.76rem;font-weight:500;padding:6px 12px;border-radius:6px;}
 
-/* ── PAGE WRAPPER ── */
-.page{max-width:460px;margin:0 auto;padding:20px 16px calc(20px + var(--safe-bottom));}
+/* PAGE */
+.page{max-width:900px;margin:0 auto;padding:16px 14px 40px;}
+.page-title{font-size:1.1rem;font-weight:800;margin-bottom:4px;}
+.page-sub{font-size:.76rem;color:var(--ink3);margin-bottom:18px;}
 
-/* ── TAB ROW ── */
-.tab-row{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:22px;}
-.tab-btn{flex:1;background:none;border:none;font-size:.85rem;font-weight:600;padding:9px;border-radius:7px;color:var(--ink3);transition:all .18s;}
-.tab-btn.active{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+/* STATUS FILTER */
+.status-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:18px;padding-bottom:2px;}
+.status-tabs::-webkit-scrollbar{display:none;}
+.stab{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.74rem;font-weight:600;color:var(--ink3);white-space:nowrap;}
+.stab.on{background:var(--g);border-color:var(--g);color:#fff;}
 
-/* ── SCREEN VISIBILITY ── */
-.screen{display:none;}
-.screen.active{display:block;}
+/* ORDER CARD */
+.order-card{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+.order-hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.order-id{font-size:.7rem;color:var(--ink3);}
+.order-id strong{color:var(--ink);font-weight:600;}
+.order-date{font-size:.7rem;color:var(--ink3);}
 
-/* ── CARD ── */
-.auth-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px 20px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+/* STATUS BADGE */
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;}
+.status-badge::before{content:'';width:6px;height:6px;border-radius:50%;}
+.s-PLACED{background:#E3F2FD;color:#1565C0;}
+.s-PLACED::before{background:#1565C0;}
+.s-PACKING{background:#FFF8E1;color:#E65100;}
+.s-PACKING::before{background:#E65100;}
+.s-OUT_FOR_DELIVERY{background:#E8F5E9;color:#1B5E20;}
+.s-OUT_FOR_DELIVERY::before{background:#2E7D32;}
+.s-DELIVERED{background:#E8F5E9;color:#1B5E20;}
+.s-DELIVERED::before{background:var(--g);}
+.s-CANCELLED{background:#FFEBEE;color:#B71C1C;}
+.s-CANCELLED::before{background:var(--red);}
 
-/* ── FORM TITLE ── */
-.form-title{font-size:1.15rem;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:3px;}
-.form-sub{font-size:.78rem;color:var(--ink3);margin-bottom:18px;line-height:1.5;}
-.form-sub strong{color:var(--g);}
+/* TRACKING TIMELINE */
+.tracking{padding:16px;}
+.track-steps{display:flex;justify-content:space-between;position:relative;margin-bottom:16px;}
+.track-steps::before{content:'';position:absolute;top:16px;left:10%;right:10%;height:2px;background:var(--border);z-index:0;}
+.track-line{position:absolute;top:16px;left:10%;height:2px;background:var(--g);z-index:1;transition:width .4s ease;}
+.track-step{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2;flex:1;}
+.step-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .3s;}
+.step-dot.done{background:var(--g);border-color:var(--g);}
+.step-dot.active{background:#fff;border-color:var(--g);box-shadow:0 0 0 3px rgba(10,122,48,.15);}
+.step-dot.done svg,.step-dot.active svg{display:none;}
+.step-dot.done::after{content:'✓';color:#fff;font-weight:700;font-size:.8rem;}
+.step-dot.active::after{content:'';width:10px;height:10px;background:var(--g);border-radius:50%;display:block;}
+.step-lbl{font-size:.6rem;font-weight:600;color:var(--ink3);text-align:center;line-height:1.3;max-width:60px;}
+.step-lbl.done,.step-lbl.active{color:var(--g);}
 
-/* ── PROGRESS DOTS ── */
-.prog-row{display:flex;gap:5px;margin-bottom:18px;}
-.pdot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all .2s;}
-.pdot.done{background:var(--g);}
-.pdot.active{width:20px;border-radius:4px;background:var(--or);}
+/* ORDER ITEMS */
+.order-items{border-top:1px solid var(--border);padding:12px 16px;}
+.order-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg);}
+.order-item:last-child{border-bottom:none;}
+.item-img{width:40px;height:40px;border-radius:6px;background:var(--bg);border:1px solid var(--border);object-fit:contain;padding:4px;flex-shrink:0;}
+.item-name{font-size:.78rem;font-weight:600;color:var(--ink);flex:1;}
+.item-meta{font-size:.68rem;color:var(--ink3);margin-top:2px;}
+.item-total{font-size:.82rem;font-weight:700;color:var(--ink);text-align:right;flex-shrink:0;}
 
-/* ── FIELD ── */
-.field{margin-bottom:13px;}
-.field-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
-.field-top label{font-size:.76rem;font-weight:600;color:var(--ink);}
-.field-top .req{font-size:.67rem;color:var(--red);}
-.field-top .opt{font-size:.67rem;color:var(--ink3);}
-.field-top .link{font-size:.72rem;color:var(--g);font-weight:500;cursor:pointer;background:none;border:none;padding:0;}
+/* ORDER FOOTER */
+.order-ft{padding:12px 16px;background:var(--bg);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.order-total-row{font-size:.78rem;color:var(--ink2);}
+.order-total-row strong{font-size:.92rem;font-weight:800;color:var(--ink);}
+.order-ft-right{display:flex;gap:6px;}
+.btn-reorder{background:var(--g3);border:1px solid var(--g4);color:var(--g2);font-size:.72rem;font-weight:600;padding:6px 12px;border-radius:6px;}
 
-/* phone input */
-.phone-wrap{display:flex;border:1.5px solid var(--border);border-radius:9px;overflow:hidden;background:var(--bg);transition:border-color .15s;}
-.phone-wrap:focus-within{border-color:var(--g);background:#fff;}
-.phone-wrap.error{border-color:var(--red);}
-.phone-pre{display:flex;align-items:center;gap:5px;padding:0 12px;background:var(--bg);border-right:1px solid var(--border);font-size:.82rem;font-weight:600;color:var(--ink2);flex-shrink:0;}
-.phone-wrap input{border:none;background:transparent;padding:12px;font-size:.92rem;color:var(--ink);outline:none;flex:1;min-width:0;}
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-state svg{width:60px;height:60px;opacity:.2;margin:0 auto 14px;display:block;}
+.empty-state h2{font-size:1rem;font-weight:700;margin-bottom:6px;}
+.empty-state p{font-size:.8rem;color:var(--ink3);margin-bottom:20px;}
+.btn-shop{display:inline-block;background:var(--g);color:#fff;padding:11px 22px;border-radius:8px;font-weight:700;font-size:.84rem;text-decoration:none;}
 
-/* text input */
-.text-inp{width:100%;padding:12px;border:1.5px solid var(--border);border-radius:9px;font-size:.92rem;color:var(--ink);background:var(--bg);outline:none;transition:border-color .15s;}
-.text-inp:focus{border-color:var(--g);background:#fff;}
-.text-inp.error{border-color:var(--red);}
-.text-inp[style*="uppercase"]{text-transform:uppercase;}
-
-/* password field */
-.pw-wrap{position:relative;}
-.pw-wrap .text-inp{padding-right:44px;}
-.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--ink3);padding:4px;}
-.pw-toggle svg{width:17px;height:17px;display:block;}
-
-/* two col */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-
-/* GST row */
-.gst-row{display:flex;gap:8px;align-items:flex-start;}
-.gst-row .text-inp{flex:1;}
-.verify-btn{flex-shrink:0;background:var(--g3);border:1px solid var(--g4);color:var(--g2);font-size:.72rem;font-weight:700;padding:0 13px;border-radius:8px;height:46px;white-space:nowrap;transition:all .15s;}
-.verify-btn:disabled{opacity:.5;cursor:not-allowed;}
-.verify-btn.verified{background:var(--g);color:#fff;border-color:var(--g);}
-.verify-btn.soft{background:#fff3eb;color:var(--or);border-color:#f8c89a;}
-
-/* field helper */
-.field-helper{font-size:.68rem;color:var(--ink3);margin-top:4px;line-height:1.4;}
-.field-helper.error{color:var(--red);}
-
-/* ── OTP GRID ── */
-.otp-row{display:flex;gap:7px;margin-top:6px;}
-.obox{flex:1;min-width:0;text-align:center;padding:12px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:1.1rem;font-weight:700;color:var(--g);background:var(--bg);outline:none;transition:border-color .15s;-webkit-appearance:none;}
-.obox:focus{border-color:var(--or);background:#fff;}
-.resend-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
-.rtimer{font-size:.72rem;color:var(--ink3);}
-.rbtn{background:none;border:none;font-size:.72rem;color:var(--or);font-weight:600;padding:0;}
-.rbtn:disabled{color:var(--ink3);}
-
-/* ── REVIEW CARD ── */
-.review-card{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:13px;margin-bottom:14px;}
-.review-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:.78rem;}
-.review-row:last-child{border-bottom:none;}
-.review-row span:first-child{color:var(--ink3);font-weight:500;}
-.review-row span:last-child{color:var(--ink);font-weight:600;text-align:right;max-width:60%;}
-
-/* ── CHECKBOX ── */
-.check-row{display:flex;align-items:flex-start;gap:9px;font-size:.75rem;color:var(--ink3);line-height:1.5;margin-bottom:13px;}
-.check-row input[type=checkbox]{width:16px;height:16px;margin-top:1px;accent-color:var(--g);flex-shrink:0;}
-.check-row a{color:var(--g);font-weight:500;text-decoration:underline;}
-
-/* ── STRENGTH BAR ── */
-.strength-bar{height:3px;border-radius:2px;background:var(--border);margin-top:6px;overflow:hidden;}
-.strength-fill{height:100%;width:0;border-radius:2px;transition:width .3s,background .3s;}
-.strength-label{font-size:.67rem;color:var(--ink3);margin-top:3px;}
-
-/* ── PRIMARY BTN ── */
-.btn-primary{width:100%;background:var(--g);color:#fff;border:none;border-radius:9px;font-weight:700;font-size:.92rem;padding:13px;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s;margin-top:4px;-webkit-tap-highlight-color:transparent;}
-.btn-primary:hover{background:var(--g2);}
-.btn-primary:active{background:var(--g2);}
-.btn-primary:disabled{background:var(--border);color:var(--ink3);cursor:not-allowed;}
-.btn-primary svg{width:15px;height:15px;flex-shrink:0;}
-.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none;}
-.btn-primary.loading .spinner{display:block;}
-.btn-primary.loading .btn-text{display:none;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* ── BACK LINK ── */
-.back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;color:var(--ink3);font-size:.76rem;padding:0;margin-bottom:16px;-webkit-tap-highlight-color:transparent;}
-.back-btn svg{width:14px;height:14px;}
-
-/* ── DIVIDER ── */
-.divider{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:.72rem;color:var(--ink3);}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* ── FOOTER LINK ── */
-.link-row{text-align:center;font-size:.78rem;color:var(--ink3);margin-top:14px;}
-.link-row a{color:var(--g);font-weight:600;cursor:pointer;}
-
-/* ── SUCCESS ── */
-.success-wrap{text-align:center;padding:8px 0 4px;}
-.s-icon{width:60px;height:60px;border-radius:50%;background:var(--g3);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
-.s-icon svg{width:32px;height:32px;color:var(--g);}
-.s-title{font-size:1.1rem;font-weight:800;color:var(--ink);margin-bottom:5px;}
-.s-sub{font-size:.78rem;color:var(--ink2);line-height:1.65;margin-bottom:18px;}
-
-/* ── ALERT ── */
-.alert{background:var(--red2);border:1px solid #fecaca;border-radius:7px;padding:10px 13px;font-size:.76rem;color:var(--red);margin-bottom:13px;display:none;}
-.alert.show{display:block;}
-
-/* ── TOAST ── */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--ink);color:#fff;font-size:.76rem;font-weight:500;padding:9px 18px;border-radius:7px;opacity:0;transition:all .22s;z-index:500;white-space:nowrap;max-width:90vw;}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
-.toast.err{background:var(--red);}
+/* LOADING */
+.skel{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
 <div class="topbar">
-  <a class="logo" href="index.html">
-    <svg viewBox="0 0 28 28" fill="none">
-      <circle cx="14" cy="14" r="13" fill="#e6f4ec"/>
-      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9"/>
-      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(60 14 14)"/>
-      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(120 14 14)"/>
-      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(180 14 14)"/>
-      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(240 14 14)"/>
-      <ellipse cx="14" cy="7" rx="2.5" ry="6" fill="#0a7a30" opacity=".9" transform="rotate(300 14 14)"/>
-      <circle cx="14" cy="14" r="4" fill="#0a7a30"/>
-      <circle cx="14" cy="14" r="1.8" fill="#e8a020"/>
-    </svg>
-    <span class="logo-name">Mahi<span>Grow</span></span>
-  </a>
-  <a class="back-to-site" href="index.html">
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Back
-  </a>
+  <div class="tb">
+    <a class="logo" href="index.html">
+      <svg viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" fill="#e8f5e9"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(60 13 13)"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(120 13 13)"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(180 13 13)"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(240 13 13)"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(300 13 13)"/><circle cx="13" cy="13" r="3.5" fill="#0a7a30"/><circle cx="13" cy="13" r="1.5" fill="#e8620a"/></svg>
+      <span class="logo-name">Mahi<em>Grow</em></span>
+    </a>
+    <div class="tb-right">
+      <button class="btn-home" onclick="window.location.href='index.html'">← Catalogue</button>
+    </div>
+  </div>
 </div>
 
-<!-- PAGE -->
 <div class="page">
+  <div class="page-title">My Orders</div>
+  <div class="page-sub">Track your bulk orders</div>
 
-  <!-- TAB ROW -->
-  <div class="tab-row">
-    <button class="tab-btn active" id="tabLogin"    onclick="switchTab('login')">Sign In</button>
-    <button class="tab-btn"         id="tabRegister" onclick="switchTab('register')">Register Shop</button>
+  <!-- Status filter tabs -->
+  <div class="status-tabs">
+    <button class="stab on" onclick="filterStatus('ALL',this)">All Orders</button>
+    <button class="stab" onclick="filterStatus('PLACED',this)">Order Placed</button>
+    <button class="stab" onclick="filterStatus('PACKING',this)">Packing</button>
+    <button class="stab" onclick="filterStatus('OUT_FOR_DELIVERY',this)">Out for Delivery</button>
+    <button class="stab" onclick="filterStatus('DELIVERED',this)">Delivered</button>
+    <button class="stab" onclick="filterStatus('CANCELLED',this)">Cancelled</button>
   </div>
 
-  <!-- ════ LOGIN ════ -->
-  <div class="screen active" id="screenLogin">
-    <div class="auth-card">
-      <div class="form-title">Welcome back</div>
-      <div class="form-sub">Sign in with your phone number and password.</div>
-
-      <div class="alert" id="loginAlert"></div>
-
-      <div class="field">
-        <div class="field-top"><label>Phone Number</label><span class="req">Required</span></div>
-        <div class="phone-wrap" id="loginPhoneWrap">
-          <div class="phone-pre">
-            <svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="1" fill="#fff"/><rect width="20" height="4.33" fill="#FF9933"/><rect y="4.33" width="20" height="4.33" fill="#fff"/><rect y="8.67" width="20" height="4.33" fill="#138808"/><circle cx="10" cy="6.5" r="2.2" fill="none" stroke="#000088" stroke-width=".65"/><circle cx="10" cy="6.5" r=".5" fill="#000088"/></svg>
-            +91
-          </div>
-          <input type="tel" id="loginPhone" placeholder="98765 43210" maxlength="10"
-                 inputmode="numeric" autocomplete="tel"
-                 oninput="this.value=this.value.replace(/\D/,'');clearAlert('loginAlert')"/>
-        </div>
-        <div class="field-helper error" id="loginPhoneErr"></div>
-      </div>
-
-      <div class="field">
-        <div class="field-top">
-          <label>Password</label>
-          <button class="link" onclick="switchTab('forgot')">Forgot password?</button>
-        </div>
-        <div class="pw-wrap">
-          <input type="password" class="text-inp" id="loginPw" placeholder="Your password"
-                 autocomplete="current-password" oninput="clearAlert('loginAlert')"/>
-          <button class="pw-toggle" onclick="togglePw('loginPw')" type="button">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
-          </button>
-        </div>
-        <div class="field-helper error" id="loginPwErr"></div>
-      </div>
-
-      <button class="btn-primary" id="loginBtn" onclick="doLogin()">
-        <span class="btn-text">Sign In</span>
-        <div class="spinner"></div>
-      </button>
-
-      <div class="link-row">New retailer? <a onclick="switchTab('register')">Register your shop →</a></div>
+  <div id="ordersWrap">
+    <!-- Skeleton loading -->
+    <div class="order-card">
+      <div class="order-hd"><div class="skel" style="height:14px;width:200px;"></div><div class="skel" style="height:22px;width:100px;border-radius:20px;"></div></div>
+      <div class="tracking"><div class="skel" style="height:60px;border-radius:8px;"></div></div>
+      <div class="order-items"><div class="skel" style="height:50px;border-radius:6px;"></div></div>
     </div>
   </div>
-
-  <!-- ════ REGISTER ════ -->
-  <div class="screen" id="screenRegister">
-    <div class="auth-card">
-      <div class="prog-row" id="regProg">
-        <div class="pdot active" id="rp1"></div>
-        <div class="pdot" id="rp2"></div>
-        <div class="pdot" id="rp3"></div>
-      </div>
-
-      <!-- Step 1: Credentials -->
-      <div class="screen active" id="regStep1">
-        <div class="form-title">Create account</div>
-        <div class="form-sub">Step 1 of 3 — Your login credentials</div>
-
-        <div class="field">
-          <div class="field-top"><label>Email Address</label><span class="req">Required</span></div>
-          <input type="email" class="text-inp" id="regEmail" placeholder="yourshop@gmail.com"
-                 autocomplete="email" inputmode="email" oninput="clearErr('regEmailErr')"/>
-          <div class="field-helper error" id="regEmailErr"></div>
-        </div>
-
-        <div class="field">
-          <div class="field-top"><label>Phone Number</label><span class="req">Required</span></div>
-          <div class="phone-wrap" id="regPhoneWrap">
-            <div class="phone-pre">
-              <svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="1" fill="#fff"/><rect width="20" height="4.33" fill="#FF9933"/><rect y="4.33" width="20" height="4.33" fill="#fff"/><rect y="8.67" width="20" height="4.33" fill="#138808"/><circle cx="10" cy="6.5" r="2.2" fill="none" stroke="#000088" stroke-width=".65"/><circle cx="10" cy="6.5" r=".5" fill="#000088"/></svg>
-              +91
-            </div>
-            <input type="tel" id="regPhone" placeholder="98765 43210" maxlength="10"
-                   inputmode="numeric" autocomplete="tel"
-                   oninput="this.value=this.value.replace(/\D/,'');clearErr('regPhoneErr')"/>
-          </div>
-          <div class="field-helper error" id="regPhoneErr"></div>
-        </div>
-
-        <div class="field">
-          <div class="field-top"><label>Password</label><span class="req">Min 8 chars</span></div>
-          <div class="pw-wrap">
-            <input type="password" class="text-inp" id="regPw" placeholder="Create a strong password"
-                   autocomplete="new-password" oninput="pwStrength(this)"/>
-            <button class="pw-toggle" onclick="togglePw('regPw')" type="button">
-              <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
-            </button>
-          </div>
-          <div class="strength-bar"><div class="strength-fill" id="sBar"></div></div>
-          <div class="strength-label" id="sLabel"></div>
-          <div class="field-helper error" id="regPwErr"></div>
-        </div>
-
-        <div class="field">
-          <div class="field-top"><label>Confirm Password</label><span class="req">Required</span></div>
-          <div class="pw-wrap">
-            <input type="password" class="text-inp" id="regPwC" placeholder="Re-enter password"
-                   autocomplete="new-password" oninput="clearErr('regPwCErr')"/>
-            <button class="pw-toggle" onclick="togglePw('regPwC')" type="button">
-              <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
-            </button>
-          </div>
-          <div class="field-helper error" id="regPwCErr"></div>
-        </div>
-
-        <button class="btn-primary" onclick="regStep1Next()">
-          <span class="btn-text">Continue</span>
-          <svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M8 4L11 7L8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="link-row">Already registered? <a onclick="switchTab('login')">Sign In →</a></div>
-      </div>
-
-      <!-- Step 2: Business Details -->
-      <div class="screen" id="regStep2">
-        <button class="back-btn" onclick="goRegStep(1)">
-          <svg viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Back
-        </button>
-        <div class="form-title">Business details</div>
-        <div class="form-sub">Step 2 of 3 — Required for GST invoicing.</div>
-
-        <div class="field">
-          <div class="field-top"><label>GSTIN</label><span class="req">Required</span></div>
-          <div class="gst-row">
-            <input type="text" class="text-inp" id="regGST" placeholder="37AABCU9603R1ZX"
-                   maxlength="15" style="text-transform:uppercase"
-                   oninput="this.value=this.value.toUpperCase();onGSTInput(this)"/>
-            <button class="verify-btn" id="gstVerifyBtn" onclick="verifyGST()" disabled>Verify</button>
-          </div>
-          <div class="field-helper" id="regGSTHelper">15-character GSTIN</div>
-          <div class="field-helper error" id="regGSTErr"></div>
-        </div>
-
-        <div class="field">
-          <div class="field-top"><label>Shop / Business Name</label><span class="req">Required</span></div>
-          <input type="text" class="text-inp" id="regShop" placeholder="e.g. Rao Agri Traders"
-                 oninput="clearErr('regShopErr')"/>
-          <div class="field-helper error" id="regShopErr"></div>
-        </div>
-
-        <div class="field">
-          <div class="field-top"><label>Owner Name</label><span class="req">Required</span></div>
-          <input type="text" class="text-inp" id="regOwner" placeholder="e.g. Venkata Rao"
-                 oninput="clearErr('regOwnerErr')"/>
-          <div class="field-helper error" id="regOwnerErr"></div>
-        </div>
-
-        <div class="two-col">
-          <div class="field">
-            <div class="field-top"><label>District</label><span class="req">*</span></div>
-            <input type="text" class="text-inp" id="regDistrict" placeholder="Guntur"
-                   oninput="clearErr('regDistrictErr')"/>
-            <div class="field-helper error" id="regDistrictErr"></div>
-          </div>
-          <div class="field">
-            <div class="field-top"><label>Pincode</label><span class="req">*</span></div>
-            <input type="text" class="text-inp" id="regPin" placeholder="522001"
-                   maxlength="6" inputmode="numeric"
-                   oninput="this.value=this.value.replace(/\D/,'');clearErr('regPinErr')"/>
-            <div class="field-helper error" id="regPinErr"></div>
-          </div>
-        </div>
-
-        <div class="field">
-          <div class="field-top"><label>State</label><span class="opt">Auto-filled from GST</span></div>
-          <input type="text" class="text-inp" id="regState" placeholder="Andhra Pradesh"/>
-        </div>
-
-        <button class="btn-primary" onclick="regStep2Next()">
-          <span class="btn-text">Continue</span>
-          <svg viewBox="0 0 14 14" fill="none"><path d="M3 7H11M8 4L11 7L8 10" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
-
-      <!-- Step 3: Review -->
-      <div class="screen" id="regStep3">
-        <button class="back-btn" onclick="goRegStep(2)">
-          <svg viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Back
-        </button>
-        <div class="form-title">Review & Submit</div>
-        <div class="form-sub">Step 3 of 3 — Confirm your details below.</div>
-        <div class="review-card" id="reviewCard"></div>
-        <div class="check-row">
-          <input type="checkbox" id="termsChk" onchange="document.getElementById('submitBtn').disabled=!this.checked"/>
-          <label for="termsChk">I agree to the <a href="#">Terms & Conditions</a> and confirm my GST details are accurate.</label>
-        </div>
-        <button class="btn-primary" id="submitBtn" onclick="doRegister()" disabled>
-          <span class="btn-text">Create Account</span>
-          <div class="spinner"></div>
-        </button>
-        <div style="font-size:.68rem;color:var(--ink3);text-align:center;margin-top:10px;line-height:1.5;">Your account will be reviewed and activated within 1 business day.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ════ FORGOT PASSWORD ════ -->
-  <div class="screen" id="screenForgot">
-    <div class="auth-card">
-      <button class="back-btn" onclick="switchTab('login')">
-        <svg viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Back to sign in
-      </button>
-
-      <!-- Forgot Step 1 -->
-      <div class="screen active" id="fgS1">
-        <div class="form-title">Reset password</div>
-        <div class="form-sub">Enter your registered mobile number.</div>
-        <div class="field">
-          <div class="field-top"><label>Phone Number</label></div>
-          <div class="phone-wrap">
-            <div class="phone-pre">
-              <svg width="20" height="13" viewBox="0 0 20 13"><rect width="20" height="13" rx="1" fill="#fff"/><rect width="20" height="4.33" fill="#FF9933"/><rect y="4.33" width="20" height="4.33" fill="#fff"/><rect y="8.67" width="20" height="4.33" fill="#138808"/><circle cx="10" cy="6.5" r="2.2" fill="none" stroke="#000088" stroke-width=".65"/><circle cx="10" cy="6.5" r=".5" fill="#000088"/></svg>
-              +91
-            </div>
-            <input type="tel" id="fgPhone" placeholder="98765 43210" maxlength="10"
-                   inputmode="numeric" autocomplete="tel"
-                   oninput="this.value=this.value.replace(/\D/,'');document.getElementById('fgSendBtn').disabled=this.value.length!==10"/>
-          </div>
-        </div>
-        <button class="btn-primary" id="fgSendBtn" onclick="fgSendOTP()" disabled>
-          <span class="btn-text">Send OTP</span>
-          <div class="spinner"></div>
-        </button>
-      </div>
-
-      <!-- Forgot Step 2 -->
-      <div class="screen" id="fgS2">
-        <div class="form-title">Enter OTP</div>
-        <div class="form-sub" id="fgSentMsg">OTP sent to <strong id="fgSentTo"></strong></div>
-        <div class="field">
-          <label style="font-size:.76rem;font-weight:600;display:block;margin-bottom:8px;">6-digit OTP</label>
-          <div class="otp-row">
-            <input class="obox" maxlength="1" type="text" inputmode="numeric" autocomplete="one-time-code" oninput="oNext(this,0)" onkeydown="oBack(event,this,0)"/>
-            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,1)" onkeydown="oBack(event,this,1)"/>
-            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,2)" onkeydown="oBack(event,this,2)"/>
-            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,3)" onkeydown="oBack(event,this,3)"/>
-            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,4)" onkeydown="oBack(event,this,4)"/>
-            <input class="obox" maxlength="1" type="text" inputmode="numeric" oninput="oNext(this,5)" onkeydown="oBack(event,this,5)"/>
-          </div>
-          <div class="resend-row">
-            <span class="rtimer" id="fgTimer">Resend in 30s</span>
-            <button class="rbtn" id="fgResendBtn" disabled onclick="fgSendOTP()">Resend OTP</button>
-          </div>
-        </div>
-        <button class="btn-primary" onclick="fgVerifyOTP()">
-          <span class="btn-text">Verify OTP</span>
-          <div class="spinner"></div>
-        </button>
-      </div>
-
-      <!-- Forgot Step 3 -->
-      <div class="screen" id="fgS3">
-        <div class="form-title">New password</div>
-        <div class="form-sub">Choose a strong new password.</div>
-        <div class="field">
-          <div class="field-top"><label>New Password</label><span class="req">Min 8 chars</span></div>
-          <div class="pw-wrap">
-            <input type="password" class="text-inp" id="fgNewPw" placeholder="New password" autocomplete="new-password"/>
-            <button class="pw-toggle" onclick="togglePw('fgNewPw')" type="button">
-              <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-top"><label>Confirm Password</label></div>
-          <div class="pw-wrap">
-            <input type="password" class="text-inp" id="fgCfmPw" placeholder="Confirm password" autocomplete="new-password"/>
-            <button class="pw-toggle" onclick="togglePw('fgCfmPw')" type="button">
-              <svg viewBox="0 0 16 16" fill="none"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5Z" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/></svg>
-            </button>
-          </div>
-        </div>
-        <button class="btn-primary" onclick="fgSetPassword()">
-          <span class="btn-text">Set New Password</span>
-          <div class="spinner"></div>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ════ SUCCESS ════ -->
-  <div class="screen" id="screenSuccess">
-    <div class="auth-card">
-      <div class="success-wrap">
-        <div class="s-icon">
-          <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.8"/><path d="M9 16L13.5 20.5L23 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="s-title" id="successTitle">Account Created!</div>
-        <div class="s-sub" id="successSub">Your account is under review. Our team will call you within 1 business day to activate it.</div>
-        <button class="btn-primary" onclick="window.location.href='index.html'">Go to Catalogue →</button>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /page -->
-
-<div class="toast" id="toast"></div>
+</div>
 
 <script src="js/api.js"></script>
-<script src="js/auth.js"></script>
+<script>
+// ── STATUS CONFIG ──────────────────────────────
+const STATUS_STEPS = [
+  { key: 'PLACED',           label: 'Order\nPlaced',      icon: '📋' },
+  { key: 'PACKING',          label: 'Packing',            icon: '📦' },
+  { key: 'OUT_FOR_DELIVERY', label: 'Out for\nDelivery',  icon: '🚚' },
+  { key: 'DELIVERED',        label: 'Delivered',          icon: '✅' },
+];
+
+const STATUS_LABEL = {
+  PLACED:           'Order Placed',
+  PACKING:          'Packing',
+  OUT_FOR_DELIVERY: 'Out for Delivery',
+  DELIVERED:        'Delivered',
+  CANCELLED:        'Cancelled',
+};
+
+// ── STATE ──────────────────────────────────────
+let allOrders    = [];
+let activeFilter = 'ALL';
+
+// ── INIT ───────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!isLoggedIn()) {
+    window.location.href = 'login.html';
+    return;
+  }
+  await loadOrders();
+});
+
+async function loadOrders() {
+  try {
+    const data = await Orders.getAll();
+    allOrders  = data.orders || [];
+    renderOrders();
+  } catch (err) {
+    document.getElementById('ordersWrap').innerHTML =
+      '<div class="empty-state"><p>Could not load orders. Please refresh.</p><a class="btn-shop" href="index.html">Browse Catalogue</a></div>';
+  }
+}
+
+// ── FILTER ─────────────────────────────────────
+function filterStatus(status, btn) {
+  activeFilter = status;
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderOrders();
+}
+
+// ── RENDER ─────────────────────────────────────
+function renderOrders() {
+  const wrap = document.getElementById('ordersWrap');
+  const list = activeFilter === 'ALL'
+    ? allOrders
+    : allOrders.filter(o => o.status === activeFilter);
+
+  if (!list.length) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 60 60" fill="none"><rect x="10" y="15" width="40" height="38" rx="4" stroke="currentColor" stroke-width="2"/><path d="M20 15V12a10 10 0 0120 0v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="30" x2="40" y2="30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="37" x2="35" y2="37" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <h2>${activeFilter === 'ALL' ? 'No orders yet' : 'No ' + STATUS_LABEL[activeFilter] + ' orders'}</h2>
+        <p>${activeFilter === 'ALL' ? 'Place your first bulk order from the catalogue.' : 'No orders in this status.'}</p>
+        <a class="btn-shop" href="index.html">Browse Catalogue →</a>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map(o => buildOrderCard(o)).join('');
+}
+
+function buildOrderCard(o) {
+  const stepIdx    = STATUS_STEPS.findIndex(s => s.key === o.status);
+  const isCancelled = o.status === 'CANCELLED';
+  const lineWidth  = isCancelled ? '0%' : stepIdx === -1 ? '0%' :
+    ['0%', '33%', '66%', '100%'][stepIdx] || '0%';
+
+  const stepsHtml = STATUS_STEPS.map((s, i) => {
+    const done   = !isCancelled && i < stepIdx;
+    const active = !isCancelled && i === stepIdx;
+    const cls    = done ? 'done' : active ? 'active' : '';
+    return `
+      <div class="track-step">
+        <div class="step-dot ${cls}">
+          ${!done && !active ? `<span style="font-size:.85rem;">${s.icon}</span>` : ''}
+        </div>
+        <div class="step-lbl ${cls}">${s.label.replace('\n','<br/>')}</div>
+      </div>`;
+  }).join('');
+
+  const itemsHtml = o.items.slice(0, 3).map(i => `
+    <div class="order-item">
+      ${i.product.imageUrl
+        ? `<img class="item-img" src="${i.product.imageUrl}" alt="${i.product.name}"/>`
+        : `<div class="item-img" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem;">📦</div>`
+      }
+      <div style="flex:1;">
+        <div class="item-name">${i.product.name}</div>
+        <div class="item-meta">${i.qty} ${i.product.unit}(s) × ₹${i.rate.toLocaleString('en-IN')}</div>
+      </div>
+      <div class="item-total">₹${i.total.toLocaleString('en-IN')}</div>
+    </div>`).join('');
+
+  const moreItems = o.items.length > 3
+    ? `<div style="font-size:.7rem;color:var(--ink3);padding:6px 0;">+${o.items.length - 3} more item(s)</div>` : '';
+
+  return `
+    <div class="order-card">
+      <div class="order-hd">
+        <div>
+          <div class="order-id">Order <strong>#${o.id.slice(-8).toUpperCase()}</strong></div>
+          <div class="order-date">${new Date(o.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+        <span class="status-badge s-${o.status}">${STATUS_LABEL[o.status] || o.status}</span>
+      </div>
+
+      ${!isCancelled ? `
+      <div class="tracking">
+        <div class="track-steps">
+          <div class="track-line" style="width:calc(${lineWidth} - 0px);"></div>
+          ${stepsHtml}
+        </div>
+      </div>` : `
+      <div style="padding:12px 16px;font-size:.78rem;color:var(--red);background:#FFEBEE;">
+        ✕ This order was cancelled.
+      </div>`}
+
+      <div class="order-items">
+        ${itemsHtml}
+        ${moreItems}
+      </div>
+
+      <div class="order-ft">
+        <div class="order-total-row">
+          ${o.items.length} item(s) · COD · GST incl.<br/>
+          Total: <strong>₹${o.grandTotal.toLocaleString('en-IN')}</strong>
+        </div>
+        <div class="order-ft-right">
+          <button class="btn-reorder" onclick="reorder('${o.id}')">Reorder</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── REORDER ────────────────────────────────────
+function reorder(orderId) {
+  const order = allOrders.find(o => o.id === orderId);
+  if (!order) return;
+  // Add all items back to cart
+  const cart = {};
+  order.items.forEach(i => {
+    cart[i.productId] = { p: i.product, qty: i.qty, rate: i.rate, total: i.total };
+  });
+  localStorage.setItem('mg_cart', JSON.stringify(cart));
+  window.location.href = 'index.html';
+}
+</script>
 </body>
 </html>

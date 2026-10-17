@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MahiGrow — Admin · Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#0a7a30;--g2:#086826;--g3:#e6f4ec;--g4:#b8dfc4;
+  --or:#e8620a;--ink:#111827;--ink2:#374151;--ink3:#6b7280;
+  --border:#e5e7eb;--bg:#f3f4f6;--card:#fff;--red:#dc2626;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+button{font-family:inherit;cursor:pointer;}
+
+/* NAV */
+.nav{background:var(--g2);border-bottom:3px solid var(--or);position:sticky;top:0;z-index:50;}
+.nav-inner{max-width:1300px;margin:0 auto;padding:0 20px;height:54px;display:flex;align-items:center;gap:10px;}
+.nav-logo{font-size:1rem;font-weight:800;color:#fff;}
+.nav-logo span{color:#7FD49A;}
+.nav-badge{background:var(--or);color:#fff;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;}
+.nav-links{display:flex;gap:2px;margin-left:10px;}
+.nav-link{color:rgba(255,255,255,.6);font-size:.78rem;font-weight:500;padding:6px 11px;border-radius:5px;background:none;border:none;cursor:pointer;text-decoration:none;}
+.nav-link:hover,.nav-link.active{color:#fff;background:rgba(255,255,255,.1);}
+.nav-right{margin-left:auto;}
+.btn-sm{font-size:.74rem;font-weight:600;padding:6px 12px;border-radius:5px;border:1px solid rgba(255,255,255,.3);background:none;color:rgba(255,255,255,.8);}
+
+/* PAGE */
+.page{max-width:1300px;margin:0 auto;padding:22px 20px;}
+.page-title{font-size:1.1rem;font-weight:800;margin-bottom:2px;}
+.page-sub{font-size:.76rem;color:var(--ink3);margin-bottom:18px;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+@media(max-width:700px){.stats{grid-template-columns:repeat(3,1fr);}}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px 14px;}
+.stat .n{font-size:1.4rem;font-weight:800;}
+.stat .l{font-size:.68rem;color:var(--ink3);margin-top:2px;}
+.stat.placed .n{color:#1565C0;}
+.stat.packing .n{color:var(--or);}
+.stat.delivery .n{color:var(--g);}
+.stat.delivered .n{color:var(--g2);}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.stab{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.74rem;font-weight:600;color:var(--ink3);}
+.stab.on{background:var(--g);border-color:var(--g);color:#fff;}
+.search-inp{flex:1;min-width:200px;max-width:280px;padding:8px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:.8rem;outline:none;}
+.search-inp:focus{border-color:var(--g);}
+
+/* ORDER CARDS */
+.orders-list{display:flex;flex-direction:column;gap:12px;}
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.order-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;}
+.order-meta .order-id{font-size:.78rem;font-weight:700;color:var(--ink);}
+.order-meta .retailer{font-size:.72rem;color:var(--ink3);margin-top:2px;}
+.order-meta .retailer strong{color:var(--ink2);}
+.order-date{font-size:.68rem;color:var(--ink3);}
+
+/* STATUS BADGE */
+.sbadge{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:20px;}
+.sbadge::before{content:'';width:6px;height:6px;border-radius:50%;}
+.s-PLACED{background:#E3F2FD;color:#1565C0;}.s-PLACED::before{background:#1565C0;}
+.s-PACKING{background:#FFF8E1;color:#E65100;}.s-PACKING::before{background:#E65100;}
+.s-OUT_FOR_DELIVERY{background:var(--g3);color:var(--g2);}.s-OUT_FOR_DELIVERY::before{background:var(--g);}
+.s-DELIVERED{background:var(--g3);color:var(--g2);}.s-DELIVERED::before{background:var(--g2);}
+.s-CANCELLED{background:#FFEBEE;color:#B71C1C;}.s-CANCELLED::before{background:var(--red);}
+
+/* ORDER BODY */
+.order-body{display:grid;grid-template-columns:1fr auto;gap:16px;padding:14px 16px;align-items:start;}
+@media(max-width:600px){.order-body{grid-template-columns:1fr;}}
+
+/* ITEMS LIST */
+.item-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg);}
+.item-row:last-child{border-bottom:none;}
+.item-img{width:36px;height:36px;border-radius:5px;object-fit:contain;border:1px solid var(--border);background:var(--bg);flex-shrink:0;}
+.item-name{font-size:.76rem;font-weight:600;flex:1;}
+.item-detail{font-size:.66rem;color:var(--ink3);}
+.item-amt{font-size:.78rem;font-weight:700;text-align:right;flex-shrink:0;}
+
+/* TOTALS */
+.totals-box{background:var(--bg);border-radius:8px;padding:12px;min-width:160px;}
+.tot-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--ink3);margin-bottom:4px;}
+.tot-row span:last-child{font-weight:600;color:var(--ink2);}
+.tot-grand{display:flex;justify-content:space-between;font-size:.88rem;font-weight:800;border-top:1px solid var(--border);padding-top:7px;margin-top:4px;}
+.tot-grand span:last-child{color:var(--g);}
+
+/* STATUS ACTIONS */
+.status-actions{padding:10px 16px;border-top:1px solid var(--border);background:var(--bg);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.status-label{font-size:.72rem;color:var(--ink3);font-weight:500;}
+.status-btn{padding:6px 12px;border-radius:6px;font-size:.72rem;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--ink2);transition:all .15s;}
+.status-btn:hover{border-color:var(--g);color:var(--g);}
+.status-btn.active-status{background:var(--g);color:#fff;border-color:var(--g);}
+.status-btn.cancel-btn{color:var(--red);border-color:#fecaca;}
+.status-btn.cancel-btn:hover{background:var(--red);color:#fff;}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px;color:var(--ink3);font-size:.82rem;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;font-size:.76rem;font-weight:500;padding:10px 16px;border-radius:7px;opacity:0;transform:translateY(10px);transition:all .22s;z-index:400;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.ok{background:var(--g);}
+.toast.err{background:var(--red);}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">Mahi<span>Grow</span></div>
+    <span class="nav-badge">Admin</span>
+    <div class="nav-links">
+      <a class="nav-link" href="admin-products.html">Products</a>
+      <a class="nav-link" href="admin-retailers.html">Retailers</a>
+      <a class="nav-link active">Orders</a>
+      <a class="nav-link" href="index.html">View Site</a>
+    </div>
+    <div class="nav-right">
+      <button class="btn-sm" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">Orders Management</div>
+  <div class="page-sub">View and update order statuses</div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat placed"><div class="n" id="sPlaced">—</div><div class="l">Placed</div></div>
+    <div class="stat packing"><div class="n" id="sPacking">—</div><div class="l">Packing</div></div>
+    <div class="stat delivery"><div class="n" id="sDelivery">—</div><div class="l">Out for Delivery</div></div>
+    <div class="stat delivered"><div class="n" id="sDelivered">—</div><div class="l">Delivered</div></div>
+    <div class="stat"><div class="n" id="sTotal">—</div><div class="l">Total Orders</div></div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <button class="stab on" onclick="setFilter('ALL',this)">All</button>
+    <button class="stab" onclick="setFilter('PLACED',this)">📋 Placed</button>
+    <button class="stab" onclick="setFilter('PACKING',this)">📦 Packing</button>
+    <button class="stab" onclick="setFilter('OUT_FOR_DELIVERY',this)">🚚 Out for Delivery</button>
+    <button class="stab" onclick="setFilter('DELIVERED',this)">✅ Delivered</button>
+    <button class="stab" onclick="setFilter('CANCELLED',this)">✕ Cancelled</button>
+    <input type="text" class="search-inp" id="searchInp" placeholder="Search retailer, order ID…" oninput="renderOrders()"/>
+  </div>
+
+  <div class="orders-list" id="ordersList">
+    <div class="empty">Loading orders…</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/api.js"></script>
+<script>
+// ── ADMIN AUTH ─────────────────────────────────
+(function(){
+  if (!localStorage.getItem('rs_admin_token')) window.location.href='admin-login.html';
+})();
+
+function adminLogout(){
+  localStorage.removeItem('rs_admin_token');
+  localStorage.removeItem('rs_admin_user');
+  window.location.href='admin-login.html';
+}
+
+async function adminHttp(method, path, body=null){
+  const token = localStorage.getItem('rs_admin_token');
+  const opts  = { method, headers:{'Content-Type':'application/json','Authorization':'Bearer '+token} };
+  if (body) opts.body = JSON.stringify(body);
+  const res  = await fetch(API_BASE + path, opts);
+  const data = await res.json();
+  if (res.status===401){ localStorage.removeItem('rs_admin_token'); window.location.href='admin-login.html'; throw data; }
+  if (!res.ok) throw data;
+  return data;
+}
+
+// ── STATE ──────────────────────────────────────
+let allOrders   = [];
+let activeFilter = 'ALL';
+
+const STATUS_LABEL = {
+  PLACED:'Order Placed', PACKING:'Packing',
+  OUT_FOR_DELIVERY:'Out for Delivery',
+  DELIVERED:'Delivered', CANCELLED:'Cancelled',
+};
+
+const STATUS_FLOW = ['PLACED','PACKING','OUT_FOR_DELIVERY','DELIVERED'];
+
+// ── LOAD ───────────────────────────────────────
+async function loadOrders(){
+  try {
+    const data = await adminHttp('GET', '/api/orders/admin/all');
+    allOrders  = data.orders || [];
+    updateStats();
+    renderOrders();
+  } catch(err){
+    document.getElementById('ordersList').innerHTML =
+      '<div class="empty">Failed to load orders: '+(err.error||'Check backend')+'</div>';
+  }
+}
+
+function updateStats(){
+  const count = s => allOrders.filter(o=>o.status===s).length;
+  document.getElementById('sPlaced').textContent   = count('PLACED');
+  document.getElementById('sPacking').textContent  = count('PACKING');
+  document.getElementById('sDelivery').textContent = count('OUT_FOR_DELIVERY');
+  document.getElementById('sDelivered').textContent= count('DELIVERED');
+  document.getElementById('sTotal').textContent    = allOrders.length;
+}
+
+// ── FILTER ─────────────────────────────────────
+function setFilter(f, btn){
+  activeFilter = f;
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderOrders();
+}
+
+// ── RENDER ─────────────────────────────────────
+function renderOrders(){
+  const q    = document.getElementById('searchInp').value.toLowerCase();
+  let list   = activeFilter==='ALL' ? allOrders : allOrders.filter(o=>o.status===activeFilter);
+  if (q) list = list.filter(o=>
+    o.id.toLowerCase().includes(q) ||
+    o.retailer?.shopName?.toLowerCase().includes(q) ||
+    o.retailer?.phone?.includes(q)
+  );
+
+  const wrap = document.getElementById('ordersList');
+  if (!list.length){ wrap.innerHTML='<div class="empty">No orders found.</div>'; return; }
+
+  wrap.innerHTML = list.map(o => buildCard(o)).join('');
+}
+
+function buildCard(o){
+  const items = o.items.map(i=>`
+    <div class="item-row">
+      ${i.product.imageUrl
+        ? `<img class="item-img" src="${i.product.imageUrl}" alt="${i.product.name}"/>`
+        : `<div class="item-img" style="display:flex;align-items:center;justify-content:center;">📦</div>`}
+      <div style="flex:1;">
+        <div class="item-name">${i.product.name}</div>
+        <div class="item-detail">${i.qty} ${i.product.unit}(s) × ₹${i.rate.toLocaleString('en-IN')}</div>
+      </div>
+      <div class="item-amt">₹${i.total.toLocaleString('en-IN')}</div>
+    </div>`).join('');
+
+  // Status action buttons — show next steps only
+  const curIdx  = STATUS_FLOW.indexOf(o.status);
+  const actionBtns = o.status==='CANCELLED' ? '' : STATUS_FLOW.map((s,i)=>`
+    <button class="status-btn ${o.status===s?'active-status':''}"
+            onclick="updateStatus('${o.id}','${s}')"
+            ${o.status===s?'disabled':''}>
+      ${STATUS_LABEL[s]}
+    </button>`).join('') +
+    `<button class="status-btn cancel-btn" onclick="updateStatus('${o.id}','CANCELLED')">Cancel Order</button>`;
+
+  return `
+    <div class="order-card" id="card-${o.id}">
+      <div class="order-hd">
+        <div class="order-meta">
+          <div class="order-id">#${o.id.slice(-8).toUpperCase()}</div>
+          <div class="retailer">
+            <strong>${o.retailer?.shopName||'—'}</strong> · ${o.retailer?.phone||'—'} · ${o.retailer?.district||'—'}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span class="order-date">${new Date(o.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+          <span class="sbadge s-${o.status}">${STATUS_LABEL[o.status]||o.status}</span>
+        </div>
+      </div>
+
+      <div class="order-body">
+        <div>${items}</div>
+        <div class="totals-box">
+          <div class="tot-row"><span>Subtotal</span><span>₹${o.subtotal.toLocaleString('en-IN')}</span></div>
+          <div class="tot-row"><span>GST (12%)</span><span>₹${o.gstAmount.toLocaleString('en-IN')}</span></div>
+          <div class="tot-grand"><span>Total</span><span>₹${o.grandTotal.toLocaleString('en-IN')}</span></div>
+          <div style="margin-top:8px;font-size:.66rem;color:var(--ink3);">💵 Cash on Delivery</div>
+        </div>
+      </div>
+
+      ${o.status!=='CANCELLED'?`
+      <div class="status-actions">
+        <span class="status-label">Update status:</span>
+        ${actionBtns}
+      </div>`:''}
+    </div>`;
+}
+
+// ── UPDATE STATUS ──────────────────────────────
+async function updateStatus(orderId, newStatus){
+  try {
+    await adminHttp('PATCH', '/api/orders/'+orderId+'/status', { status: newStatus });
+    // Update locally
+    const o = allOrders.find(x=>x.id===orderId);
+    if (o) o.status = newStatus;
+    updateStats();
+    renderOrders();
+    toast(STATUS_LABEL[newStatus]+' — updated ✓','ok');
+  } catch(err){
+    toast(err.error||'Update failed','err');
+  }
+}
+
+// ── TOAST ──────────────────────────────────────
+function toast(msg, type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+loadOrders();
+</script>
+</body>
+</html>
