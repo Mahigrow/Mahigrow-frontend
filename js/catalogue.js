@@ -20,6 +20,124 @@ const CAT_BG = {
 
 const CATS = ['seeds','pesticides','insecticides','fertilisers','fungicides','herbicides'];
 
+const CAT_EMOJI = {
+  seeds:'🌱', pesticides:'🧪', insecticides:'🐛',
+  fertilisers:'💧', fungicides:'🛡️', herbicides:'🌿'
+};
+
+// ── RENDER DYNAMIC CATEGORY GRID ─────────────────────────────
+function renderCategoryGrid(products) {
+  const grid = document.getElementById('catGrid');
+  if (!grid) return;
+
+  // Count products per category from real data
+  const counts = {};
+  products.forEach(p => {
+    counts[p.category] = (counts[p.category] || 0) + 1;
+  });
+
+  // Get unique categories that have products, in preferred order
+  const activeCats = CATS.filter(c => counts[c] > 0);
+
+  if (!activeCats.length) { grid.style.display = 'none'; return; }
+
+  grid.innerHTML = activeCats.map(cat => {
+    const label = cat.charAt(0).toUpperCase() + cat.slice(1);
+    const count = counts[cat] || 0;
+    return `
+      <div class="cat-tile" onclick="filterCat('${cat}', null)">
+        <div class="icon">${CAT_SVG[cat] || CAT_SVG.seeds}</div>
+        <div class="nm">${label}</div>
+        <div class="ct">${count} product${count !== 1 ? 's' : ''}</div>
+      </div>`;
+  }).join('');
+
+  // Also update category nav bar
+  const catnav = document.querySelector('.catnav-inner');
+  if (catnav) {
+    // Keep "All Products" button, replace rest
+    const allBtn = catnav.querySelector('.cnav-btn');
+    catnav.innerHTML = '';
+    if (allBtn) catnav.appendChild(allBtn);
+    activeCats.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'cnav-btn';
+      btn.innerHTML = CAT_EMOJI[cat] + ' ' + cat.charAt(0).toUpperCase() + cat.slice(1);
+      btn.onclick = () => filterCat(cat, btn);
+      catnav.appendChild(btn);
+    });
+  }
+}
+
+// ── RENDER DYNAMIC BRAND STRIP ────────────────────────────────
+function renderBrandStrip(products) {
+  const strip = document.getElementById('brandStrip');
+  const head  = document.getElementById('brandsHead');
+  if (!strip) return;
+
+  // Get unique brands sorted by product count
+  const brandCount = {};
+  products.forEach(p => {
+    if (p.brand) brandCount[p.brand] = (brandCount[p.brand] || 0) + 1;
+  });
+
+  const brands = Object.entries(brandCount)
+    .sort((a, b) => b[1] - a[1])   // most products first
+    .map(([brand]) => brand);
+
+  if (!brands.length) { strip.style.display = 'none'; return; }
+
+  if (head) head.style.display = '';
+  strip.innerHTML = brands.map(b =>
+    `<div class="brand-pill" onclick="searchBrand('${b.replace(/'/g,"\'")}')">
+       ${b}
+     </div>`
+  ).join('');
+}
+
+// ── SEARCH BY BRAND ───────────────────────────────────────────
+function searchBrand(brand) {
+  const inp = document.getElementById('searchInp');
+  if (inp) {
+    inp.value = brand;
+    activeCat = null;
+    // Reset nav
+    document.querySelectorAll('.cnav-btn').forEach((b, i) => {
+      b.classList.toggle('on', i === 0);
+    });
+    applyFilters();
+    document.getElementById('cat-section')?.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// ── RENDER HERO STATS DYNAMICALLY ────────────────────────────
+function renderHeroStats(products) {
+  const total  = products.length;
+  const brands = new Set(products.map(p => p.brand).filter(Boolean)).size;
+  const inStock = products.filter(p => p.inStock).length;
+
+  const stats = [
+    { n: total + '+',  l: 'Products' },
+    { n: brands + '+', l: 'Brands' },
+    { n: '100%',       l: 'CIB Certified' },
+    { n: '₹0',         l: 'Platform Fee' },
+  ];
+
+  // Update hero stats if they exist
+  const heroStats = document.querySelectorAll('.hstat');
+  heroStats.forEach((el, i) => {
+    if (stats[i]) {
+      const n = el.querySelector('.n');
+      const l = el.querySelector('.l');
+      if (n) n.textContent = stats[i].n;
+      if (l) l.textContent = stats[i].l;
+    }
+  });
+
+  // Update cat counts in hero section
+  document.getElementById('statTotal') && (document.getElementById('statTotal').textContent = total);
+}
+
 // ── STATE ─────────────────────────────────────
 let allProducts = [];
 let cart        = {};
@@ -311,7 +429,7 @@ function renderDrawer() {
 }
 
 // ── CHECKOUT — Cash on Delivery ───────────────
-function checkoutCOD() {
+async function checkoutCOD() {
   const items = Object.values(cart);
   if (!items.length) return;
 
@@ -322,34 +440,30 @@ function checkoutCOD() {
     return;
   }
 
-  // Build order summary
-  const retailer = getRetailer();
-  const lines = items.map(({p, qty, rate, total}) =>
-    `• ${p.name} — ${qty} ${p.unit}(s) × ₹${rate} = ₹${total.toLocaleString('en-IN')}`
-  ).join('%0A');
+  // Disable button to prevent double submit
+  const btn = document.querySelector('.pay-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Placing order…'; }
 
-  const sub   = items.reduce((s, {total}) => s + total, 0);
-  const gst   = Math.round(sub * 0.12);
-  const grand = sub + gst;
+  try {
+    const orderItems = items.map(({p, qty}) => ({ productId: p.id, qty }));
+    const data = await Orders.create(orderItems);
 
-  const msg = `Hello MahiGrow Team,%0A%0A` +
-    `*New Bulk Order — Cash on Delivery*%0A%0A` +
-    `*Retailer:* ${retailer?.shopName || 'N/A'}%0A` +
-    `*Phone:* ${retailer?.phone || 'N/A'}%0A%0A` +
-    `*Items:*%0A${lines}%0A%0A` +
-    `*Subtotal:* ₹${sub.toLocaleString('en-IN')}%0A` +
-    `*GST (12%):* ₹${gst.toLocaleString('en-IN')}%0A` +
-    `*Total Payable:* ₹${grand.toLocaleString('en-IN')}%0A%0A` +
-    `Please confirm and arrange delivery. Thank you!`;
+    // Success — clear cart
+    cart = {};
+    updateCartBadge();
+    renderDrawer();
+    closeDrawer();
 
-  window.open('https://wa.me/919876543210?text=' + msg, '_blank');
+    showToast('Order placed successfully! Track it in My Orders.');
 
-  // Clear cart after placing order
-  cart = {};
-  updateCartBadge();
-  renderDrawer();
-  closeDrawer();
-  showToast('Order sent via WhatsApp! Our team will confirm shortly.');
+    // Redirect to orders page after 1.5s
+    setTimeout(() => { window.location.href = 'orders.html'; }, 1500);
+
+  } catch (err) {
+    console.error('COD order error:', err);
+    showToast(err.error || 'Could not place order. Please try again.', true);
+    if (btn) { btn.disabled = false; btn.textContent = 'Place Order (Cash on Delivery)'; }
+  }
 }
 
 function orderViaWhatsApp() {
@@ -395,6 +509,9 @@ async function init() {
   try {
     const data  = await Products.getAll();
     allProducts = data.products;
+    renderCategoryGrid(allProducts);
+    renderBrandStrip(allProducts);
+    renderHeroStats(allProducts);
     renderProducts(null);
   } catch {
     if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#d32f2f;font-size:.82rem;">Could not load products. Please refresh.</div>';
