@@ -44,7 +44,7 @@ async function doLogin(e) {
     localStorage.setItem('mg_retailer', JSON.stringify(data.retailer));
 
     // Redirect to pending cart or homepage
-    const redirect = localStorage.getItem('rs_redirect') || '/index.html';
+    const redirect = localStorage.getItem('rs_redirect') || 'index.html';
     localStorage.removeItem('rs_redirect');
     window.location.href = redirect;
   } catch (err) {
@@ -255,7 +255,7 @@ async function fgResetPw(e) {
 window.addEventListener('DOMContentLoaded', () => {
   // If already logged in, redirect
   if (isLoggedIn()) {
-    const redirect = localStorage.getItem('rs_redirect') || '/index.html';
+    const redirect = localStorage.getItem('rs_redirect') || 'index.html';
     localStorage.removeItem('rs_redirect');
     window.location.href = redirect;
     return;
