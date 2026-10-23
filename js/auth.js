@@ -156,7 +156,8 @@ async function regSubmit(e) {
 // ═══════════════════════════════════════════════
 //  FORGOT PASSWORD
 // ═══════════════════════════════════════════════
-let fgPhone = '';
+let fgPhone      = '';
+let fgVerifiedOtp = ''; // store OTP after successful verify so step 3 can use it
 let fgStep  = 1; // 1=phone, 2=otp, 3=newpw
 
 function showForgot() {
@@ -212,6 +213,7 @@ async function fgVerifyOTP(e) {
 
   try {
     await Auth.verifyOTP({ phone: fgPhone, otp, purpose: 'RESET_PASSWORD' });
+    fgVerifiedOtp = otp; // save for step 3
     fgStep = 3;
     showFgStep(3);
   } catch (err) {
@@ -238,7 +240,7 @@ async function fgResetPw(e) {
   try {
     // We already verified OTP in step 2, but reset-password endpoint re-verifies
     // So we need the OTP value — get from field or store it
-    const otp = val('fgOtp') || document.getElementById('fgOtp')?.value || '';
+    const otp = fgVerifiedOtp || val('fgOtp') || '';
     await Auth.resetPassword({ phone: fgPhone, otp, newPassword: newPw });
     showFgStep(1);
     hideForgot();
