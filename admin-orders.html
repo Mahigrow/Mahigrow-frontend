@@ -159,22 +159,22 @@ button{font-family:inherit;cursor:pointer;}
 <script>
 // ── ADMIN AUTH ─────────────────────────────────
 (function(){
-  if (!localStorage.getItem('rs_admin_token')) window.location.href='admin-login.html';
+  if (!localStorage.getItem('mg_admin_token')) window.location.href='admin-login.html';
 })();
 
 function adminLogout(){
-  localStorage.removeItem('rs_admin_token');
+  localStorage.removeItem('mg_admin_token');
   localStorage.removeItem('rs_admin_user');
   window.location.href='admin-login.html';
 }
 
 async function adminHttp(method, path, body=null){
-  const token = localStorage.getItem('rs_admin_token');
+  const token = localStorage.getItem('mg_admin_token');
   const opts  = { method, headers:{'Content-Type':'application/json','Authorization':'Bearer '+token} };
   if (body) opts.body = JSON.stringify(body);
   const res  = await fetch(API_BASE + path, opts);
   const data = await res.json();
-  if (res.status===401){ localStorage.removeItem('rs_admin_token'); window.location.href='admin-login.html'; throw data; }
+  if (res.status===401){ localStorage.removeItem('mg_admin_token'); window.location.href='admin-login.html'; throw data; }
   if (!res.ok) throw data;
   return data;
 }

@@ -456,14 +456,14 @@ window.SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
 // ── ADMIN AUTH CHECK ──────────────────────────
 // Redirect to admin login if not authenticated
 (function() {
-  const token = localStorage.getItem('rs_admin_token');
+  const token = localStorage.getItem('mg_admin_token');
   if (!token) { window.location.href = 'admin-login.html'; }
 })();
 
 // Override http() to use admin token for all requests
 const _origHttp = http;
 async function http(method, path, body = null) {
-  const token = localStorage.getItem('rs_admin_token');
+  const token = localStorage.getItem('mg_admin_token');
   const opts = {
     method,
     headers: { 'Content-Type': 'application/json' },
@@ -474,7 +474,7 @@ async function http(method, path, body = null) {
   const data = await res.json();
   if (res.status === 401 || res.status === 403) {
     // Admin session expired or access revoked
-    localStorage.removeItem('rs_admin_token');
+    localStorage.removeItem('mg_admin_token');
     localStorage.removeItem('rs_admin_user');
     window.location.href = 'admin-login.html';
     throw data;
@@ -484,7 +484,7 @@ async function http(method, path, body = null) {
 }
 
 function adminLogout() {
-  localStorage.removeItem('rs_admin_token');
+  localStorage.removeItem('mg_admin_token');
   localStorage.removeItem('rs_admin_user');
   window.location.href = 'admin-login.html';
 }
