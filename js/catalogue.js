@@ -1,148 +1,427 @@
 // ─────────────────────────────────────────────
-//  js/catalogue.js  —  MahiGrow catalogue
-//  COD only — Razorpay removed
+//  js/catalogue.js  —  MahiGrow Bulk Portal
 // ─────────────────────────────────────────────
 
+// ── CATEGORY SVG ICONS ───────────────────────
+const CAT_SVG = {
+  seeds:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><ellipse cx="32" cy="15" rx="7" ry="13" fill="#0a7a30" opacity=".85"/><path d="M32 28 Q24 40 24 58" stroke="#086826" stroke-width="3.5" stroke-linecap="round"/><path d="M32 42 Q44 36 45 22" stroke="#0a7a30" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="24" cy="40" rx="6" ry="11" fill="#0a7a30" opacity=".55" transform="rotate(-28 24 40)"/><ellipse cx="42" cy="44" rx="6" ry="11" fill="#0a7a30" opacity=".55" transform="rotate(28 42 44)"/><circle cx="32" cy="58" r="6" fill="#e8a020"/></svg>`,
+  pesticides:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><rect x="20" y="22" width="24" height="36" rx="6" fill="#FDF3DC" stroke="#e8a020" stroke-width="2.5"/><rect x="24" y="12" width="16" height="13" rx="3.5" fill="#e8a020" opacity=".65"/><rect x="22" y="8" width="20" height="7" rx="3" fill="#e8a020"/><line x1="26" y1="33" x2="38" y2="33" stroke="#e8a020" stroke-width="2" stroke-linecap="round"/><line x1="26" y1="41" x2="38" y2="41" stroke="#e8a020" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="20" r="12" fill="#c0321a" opacity=".9"/><line x1="50" y1="14" x2="50" y2="21" stroke="white" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="25" r="2" fill="white"/></svg>`,
+  insecticides:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><ellipse cx="29" cy="46" rx="9" ry="13" fill="#c0321a" opacity=".75"/><circle cx="29" cy="23" r="10" fill="#c0321a" opacity=".85"/><line x1="24" y1="16" x2="18" y2="10" stroke="#c0321a" stroke-width="2.5" stroke-linecap="round"/><line x1="34" y1="16" x2="40" y2="10" stroke="#c0321a" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="38" x2="12" y2="35" stroke="#c0321a" stroke-width="2.2" stroke-linecap="round"/><line x1="20" y1="46" x2="12" y2="46" stroke="#c0321a" stroke-width="2.2" stroke-linecap="round"/><line x1="38" y1="38" x2="46" y2="35" stroke="#c0321a" stroke-width="2.2" stroke-linecap="round"/><line x1="38" y1="46" x2="46" y2="46" stroke="#c0321a" stroke-width="2.2" stroke-linecap="round"/><circle cx="50" cy="18" r="12" fill="white" stroke="#0a7a30" stroke-width="3"/><line x1="44" y1="12" x2="56" y2="24" stroke="#0a7a30" stroke-width="4" stroke-linecap="round"/><line x1="56" y1="12" x2="44" y2="24" stroke="#0a7a30" stroke-width="4" stroke-linecap="round"/></svg>`,
+  fertilisers:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><rect x="12" y="38" width="40" height="22" rx="6" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2.5"/><path d="M19 38 L25 18 L39 18 L45 38" stroke="#1D4ED8" stroke-width="2.8" stroke-linejoin="round" fill="none"/><path d="M25.5 18 Q32 12 38.5 18" stroke="#1D4ED8" stroke-width="2.5" fill="none" stroke-linecap="round"/><text x="32" y="54" text-anchor="middle" font-size="10" fill="#1D4ED8" font-weight="800" font-family="sans-serif" opacity=".75">NPK</text></svg>`,
+  fungicides:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><path d="M32 4L54 12V28C54 46 32 60 32 60C32 60 10 46 10 28V12L32 4Z" fill="#EDE9FE" stroke="#6D28D9" stroke-width="3" stroke-linejoin="round"/><path d="M20 30L27 37L44 22" stroke="#6D28D9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  herbicides:`<svg viewBox="0 0 64 64" fill="none" width="64" height="64"><path d="M32 60 L32 28" stroke="#0a7a30" stroke-width="4" stroke-linecap="round"/><path d="M32 44 Q20 36 20 18 Q32 20 32 32" fill="#0a7a30" opacity=".6"/><path d="M32 36 Q44 28 46 12 Q32 14 32 28" fill="#0a7a30" opacity=".45"/><path d="M22 24 L32 14 L42 24" stroke="#0a7a30" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+};
+
+const CAT_BG = {
+  seeds:'#E8F5E9', pesticides:'#FFF8E1',
+  insecticides:'#FFEBEE', fertilisers:'#E3F2FD',
+  fungicides:'#F3E8FF', herbicides:'#E8F5E9',
+};
+
+const CATS = ['seeds','pesticides','insecticides','fertilisers','fungicides','herbicides'];
+
+const CAT_EMOJI = {
+  seeds:'🌱', pesticides:'🧪', insecticides:'🐛',
+  fertilisers:'💧', fungicides:'🛡️', herbicides:'🌿'
+};
+
+// ── RENDER DYNAMIC CATEGORY GRID ─────────────────────────────
+function renderCategoryGrid(products) {
+  const grid = document.getElementById('catGrid');
+  if (!grid) return;
+
+  // Count products per category from real data
+  const counts = {};
+  products.forEach(p => {
+    counts[p.category] = (counts[p.category] || 0) + 1;
+  });
+
+  // Get unique categories that have products, in preferred order
+  const activeCats = CATS.filter(c => counts[c] > 0);
+
+  if (!activeCats.length) { grid.style.display = 'none'; return; }
+
+  grid.innerHTML = activeCats.map(cat => {
+    const label = cat.charAt(0).toUpperCase() + cat.slice(1);
+    const count = counts[cat] || 0;
+    return `
+      <div class="cat-tile" onclick="filterCat('${cat}', null)">
+        <div class="icon">${CAT_SVG[cat] || CAT_SVG.seeds}</div>
+        <div class="nm">${label}</div>
+        <div class="ct">${count} product${count !== 1 ? 's' : ''}</div>
+      </div>`;
+  }).join('');
+
+  // Also update category nav bar
+  const catnav = document.querySelector('.catnav-inner');
+  if (catnav) {
+    // Keep "All Products" button, replace rest
+    const allBtn = catnav.querySelector('.cnav-btn');
+    catnav.innerHTML = '';
+    if (allBtn) catnav.appendChild(allBtn);
+    activeCats.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'cnav-btn';
+      btn.innerHTML = CAT_EMOJI[cat] + ' ' + cat.charAt(0).toUpperCase() + cat.slice(1);
+      btn.onclick = () => filterCat(cat, btn);
+      catnav.appendChild(btn);
+    });
+  }
+}
+
+// ── RENDER DYNAMIC BRAND STRIP ────────────────────────────────
+function renderBrandStrip(products) {
+  const strip = document.getElementById('brandStrip');
+  const head  = document.getElementById('brandsHead');
+  if (!strip) return;
+
+  // Get unique brands sorted by product count
+  const brandCount = {};
+  products.forEach(p => {
+    if (p.brand) brandCount[p.brand] = (brandCount[p.brand] || 0) + 1;
+  });
+
+  const brands = Object.entries(brandCount)
+    .sort((a, b) => b[1] - a[1])   // most products first
+    .map(([brand]) => brand);
+
+  if (!brands.length) { strip.style.display = 'none'; return; }
+
+  if (head) head.style.display = '';
+  strip.innerHTML = brands.map(b =>
+    `<div class="brand-pill" onclick="searchBrand('${b.replace(/'/g,"\'")}')">
+       ${b}
+     </div>`
+  ).join('');
+}
+
+// ── SEARCH BY BRAND ───────────────────────────────────────────
+function searchBrand(brand) {
+  const inp = document.getElementById('searchInp');
+  if (inp) {
+    inp.value = brand;
+    activeCat = null;
+    // Reset nav
+    document.querySelectorAll('.cnav-btn').forEach((b, i) => {
+      b.classList.toggle('on', i === 0);
+    });
+    applyFilters();
+    document.getElementById('cat-section')?.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// ── RENDER HERO STATS DYNAMICALLY ────────────────────────────
+function renderHeroStats(products) {
+  const total  = products.length;
+  const brands = new Set(products.map(p => p.brand).filter(Boolean)).size;
+  const inStock = products.filter(p => p.inStock).length;
+
+  const stats = [
+    { n: total + '+',  l: 'Products' },
+    { n: brands + '+', l: 'Brands' },
+    { n: '100%',       l: 'CIB Certified' },
+    { n: '₹0',         l: 'Platform Fee' },
+  ];
+
+  // Update hero stats if they exist
+  const heroStats = document.querySelectorAll('.hstat');
+  heroStats.forEach((el, i) => {
+    if (stats[i]) {
+      const n = el.querySelector('.n');
+      const l = el.querySelector('.l');
+      if (n) n.textContent = stats[i].n;
+      if (l) l.textContent = stats[i].l;
+    }
+  });
+
+  // Update cat counts in hero section
+  document.getElementById('statTotal') && (document.getElementById('statTotal').textContent = total);
+}
+
+// ── STATE ─────────────────────────────────────
 let allProducts = [];
 let cart        = {};
 let activeCat   = null;
 
-// ── SVG icons per category ───────────────────
-function getCatSVG(cat, size = 48) {
-  const s = size;
-  const icons = {
-    seeds:        `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="12" rx="5" ry="10" fill="#0a7a30" opacity=".85"/><path d="M24 22 Q18 30 18 42" stroke="#086826" stroke-width="3" stroke-linecap="round"/><path d="M24 30 Q32 26 33 18" stroke="#0a7a30" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="24" cy="42" r="4" fill="#e8a020"/></svg>`,
-    pesticides:   `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><rect x="16" y="18" width="16" height="24" rx="4" fill="#FDF3DC" stroke="#e8a020" stroke-width="2"/><rect x="19" y="10" width="10" height="10" rx="2.5" fill="#e8a020" opacity=".65"/><rect x="17" y="7" width="14" height="5" rx="2" fill="#e8a020"/><line x1="20" y1="27" x2="28" y2="27" stroke="#e8a020" stroke-width="1.8" stroke-linecap="round"/><circle cx="36" cy="16" r="8" fill="#c0321a" opacity=".9"/><line x1="36" y1="12" x2="36" y2="17.5" stroke="white" stroke-width="2.5" stroke-linecap="round"/><circle cx="36" cy="19.5" r="1.5" fill="white"/></svg>`,
-    insecticides: `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><ellipse cx="22" cy="32" rx="7" ry="9" fill="#c0321a" opacity=".75"/><circle cx="22" cy="18" r="7" fill="#c0321a" opacity=".85"/><line x1="19" y1="13" x2="15" y2="9" stroke="#c0321a" stroke-width="2" stroke-linecap="round"/><line x1="25" y1="13" x2="29" y2="9" stroke="#c0321a" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="27" x2="9" y2="25" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><line x1="29" y1="27" x2="35" y2="25" stroke="#c0321a" stroke-width="1.8" stroke-linecap="round"/><circle cx="36" cy="13" r="9" fill="white" stroke="#0a7a30" stroke-width="2.2"/><line x1="32" y1="9" x2="40" y2="17" stroke="#0a7a30" stroke-width="2.8" stroke-linecap="round"/><line x1="40" y1="9" x2="32" y2="17" stroke="#0a7a30" stroke-width="2.8" stroke-linecap="round"/></svg>`,
-    fertilisers:  `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><rect x="10" y="28" width="28" height="16" rx="4" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="2"/><path d="M15 28 L19 14 L29 14 L33 28" stroke="#1D4ED8" stroke-width="2.2" stroke-linejoin="round" fill="none"/><path d="M19.5 14 Q24 10 28.5 14" stroke="#1D4ED8" stroke-width="2" fill="none" stroke-linecap="round"/><text x="24" y="40" text-anchor="middle" font-size="7" fill="#1D4ED8" font-weight="800" font-family="sans-serif" opacity=".75">NPK</text></svg>`,
-    fungicides:   `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><path d="M24 4L40 10V22C40 34 24 44 24 44C24 44 8 34 8 22V10L24 4Z" fill="#EDE9FE" stroke="#6D28D9" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 24L21 29L32 18" stroke="#6D28D9" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    herbicides:   `<svg width="${s}" height="${s}" viewBox="0 0 48 48" fill="none"><path d="M24 44 L24 22" stroke="#0a7a30" stroke-width="3" stroke-linecap="round"/><path d="M24 32 Q16 26 16 14 Q24 15 24 24" fill="#0a7a30" opacity=".6"/><path d="M24 26 Q32 20 33 10 Q24 11 24 20" fill="#0a7a30" opacity=".45"/><path d="M18 18 L24 12 L30 18" stroke="#0a7a30" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  };
-  return icons[cat] || icons.seeds;
-}
-
-const CAT_BG = {
-  seeds:'#E8F5E9', pesticides:'#FFF8E1', insecticides:'#FFEBEE',
-  fertilisers:'#EFF6FF', fungicides:'#F3E8FF', herbicides:'#E8F5E9',
-};
-
-// ── Get tier rate for a given qty ─────────────
+// ── HELPERS ───────────────────────────────────
 function getRate(tiers, qty) {
-  for (let i = tiers.length - 1; i >= 0; i--)
-    if (qty >= tiers[i][0]) return tiers[i][2];
-  return tiers[0][2];
+  let rate = tiers[0][2];
+  for (const [min, max, price] of tiers) {
+    if (qty >= min) {
+      rate = price;
+      if (max === null || max === undefined || qty <= max) break;
+    }
+  }
+  return rate;
 }
 
-// ── Fix broken images ─────────────────────────
-function fixBrokenImages() {
-  document.querySelectorAll('img.pcard-img-photo').forEach(img => {
-    img.addEventListener('error', function () {
-      this.style.display = 'none';
-    }, { once: true });
-  });
+// ── VARIANT HELPERS ────────────────────────────
+// Get current selected variant for a product card
+function getSelectedVariant(pid) {
+  const btn = document.querySelector(`.vbtn.sel[data-pid="${pid}"]`);
+  if (!btn) return null;
+  return btn.dataset.size || null;
 }
 
-// ── Build product card HTML ───────────────────
-function buildCard(p) {
-  const el = document.createElement('div');
-  el.className = 'pcard';
+// Get tiers for the selected variant (or product-level tiers)
+function getActiveTiers(p) {
+  const size = getSelectedVariant(p.id);
+  if (size && p.variants?.length) {
+    const v = p.variants.find(v => v.size === size);
+    if (v) return { tiers: v.tiers, mrp: v.mrp };
+  }
+  return { tiers: p.tiers, mrp: p.mrp };
+}
 
-  const base = p.tiers[0][2];
-  const disc = p.mrp > base ? Math.round((p.mrp - base) / p.mrp * 100) : 0;
+// ── BUILD CARD ────────────────────────────────
+function buildCard(p, gridMode = false) {
+  const el       = document.createElement('div');
+  el.className   = 'pcard' + (gridMode ? ' grid-card' : '');
+  el.style.cursor = 'pointer';
 
+  // Use first variant if variants exist, otherwise product-level data
+  const hasVariants = p.variants?.length > 0;
+  const firstVariant = hasVariants ? p.variants[0] : null;
+  const activeTiers  = firstVariant ? firstVariant.tiers : p.tiers;
+  const activeMrp    = firstVariant ? firstVariant.mrp   : p.mrp;
+
+  const base     = activeTiers[0][2];
+  const lastTier = activeTiers[activeTiers.length - 1];
+  const disc     = activeMrp > base ? Math.round((activeMrp - base) / activeMrp * 100) : 0;
+
+  // Click → product detail (but not on footer controls)
+  el.onclick = (e) => {
+    if (e.target.closest('.pcard-foot') || e.target.closest('.variant-picker')) return;
+    window.location.href = 'product.html?id=' + p.id;
+  };
+
+  // No onerror inline — handled by afterRender() below
   const imgHtml = p.imageUrl
-    ? `<img class="pcard-img-photo" src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:contain;">`
-    : getCatSVG(p.category, 64);
+    ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy" class="pcard-img-real" data-pid="${p.id}" style="width:100%;height:100%;object-fit:contain;padding:8px;display:block;"/>`
+    : `<div class="icon-wrap">${CAT_SVG[p.category] || CAT_SVG.seeds}</div>`;
+
+  // Variant size picker HTML
+  const variantPickerHtml = hasVariants ? `
+    <div class="variant-picker" id="vp-${p.id}">
+      ${p.variants.map((v, i) => `
+        <button class="vbtn${i===0?' sel':''}" data-pid="${p.id}" data-size="${v.size}"
+                onclick="selectVariant('${p.id}','${v.size}',this)">
+          ${v.size}
+        </button>`).join('')}
+    </div>` : '';
 
   el.innerHTML = `
-    <div class="pcard-img" style="background:${CAT_BG[p.category]||'#f0f0ec'}">
+    <div class="pcard-img" style="background:${CAT_BG[p.category] || '#f5f5f5'}">
       ${imgHtml}
-      ${disc > 0 ? `<div class="disc-badge">${disc}% OFF</div>` : ''}
-      <div class="bulk-badge">BULK</div>
-      <div class="cert-flag">${p.cert || 'CIB'} ${p.inStock ? '· In Stock' : '· Out of stock'}</div>
+      ${disc > 0 ? `<span class="disc-tag">${disc}% OFF</span>` : ''}
+      <span class="stock-tag ${p.inStock ? 'in' : 'out'}">${p.inStock ? 'In Stock' : 'Out of Stock'}</span>
+      <span class="cert-tag">${p.cert}</span>
     </div>
     <div class="pcard-body">
-      <div class="pcat-label">${p.category.toUpperCase()}</div>
+      <div class="pcat">${p.category}</div>
       <div class="pname">${p.name}</div>
-      <div class="psize">${p.brand} · ${p.size}</div>
-      <div class="price-row">
-        <div class="price-now">₹${base.toLocaleString('en-IN')}</div>
-        ${p.mrp > base ? `<div class="price-mrp">₹${p.mrp.toLocaleString('en-IN')}</div>` : ''}
+      <div class="pbrand">${p.brand}${!hasVariants ? ' · ' + p.size : ''}</div>
+      ${variantPickerHtml}
+      <div class="price-row" id="pr-${p.id}">
+        <span class="p-now">₹${base.toLocaleString('en-IN')}</span>
+        ${activeMrp > base ? `<span class="p-mrp">₹${activeMrp.toLocaleString('en-IN')}</span>` : ''}
+        ${disc > 0 ? `<span class="p-save">${disc}% off</span>` : ''}
       </div>
-      <div class="tier-chips">
-        ${p.tiers.map((t, i) => `<span class="tier-chip ${i === p.tiers.length - 1 ? 'bulk' : ''}">
-          ${t[0]}${t[1] ? '–' + t[1] : '+'}:<br>₹${t[2]}${i === p.tiers.length - 1 ? ' <b>BULK</b>' : ''}
-        </span>`).join('')}
+      <div class="tier-row" id="tr-${p.id}">
+        <span class="t1">${activeTiers[0][0]}–${(activeTiers[0][1] === null || activeTiers[0][1] >= 9999) ? '∞' : activeTiers[0][1]}: ₹${activeTiers[0][2]}</span>
+        <span class="tarr">→</span>
+        <span class="t2">${lastTier[0]}+: ₹${lastTier[2]}</span>
+        <span class="bulk-lbl">BULK</span>
       </div>
     </div>
     <div class="pcard-foot">
       <div class="qty-row">
         <div class="qty-ctl">
           <button class="qb" onclick="qAdj('${p.id}',-${p.step})">−</button>
-          <input class="qi" id="q-${p.id}" type="number" value="${p.moq}" min="${p.moq}" step="${p.step}"/>
+          <input class="qi" id="q-${p.id}" type="number"
+                 value="${p.moq}" min="${p.moq}" step="${p.step}" inputmode="numeric"/>
           <button class="qb" onclick="qAdj('${p.id}',${p.step})">+</button>
         </div>
-        <div class="qty-unit">${p.unit}s · min ${p.moq}</div>
+        <span class="qty-lbl">${p.unit}s<br/>min ${p.moq}</span>
       </div>
-      <button class="add-btn" id="ab-${p.id}" onclick="tryAddToCart('${p.id}')"
-        ${!p.inStock ? 'disabled style="background:#9ca3af"' : ''}>
-        <svg viewBox="0 0 12 12" fill="none"><path d="M1 1H2.5L4 8.5H9.5L11 4H4" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="10.5" r="1" fill="white"/><circle cx="8.5" cy="10.5" r="1" fill="white"/></svg>
+      <button class="add-btn" id="ab-${p.id}"
+              onclick="tryAddToCart('${p.id}')"
+              ${!p.inStock ? 'disabled' : ''}>
+        <svg viewBox="0 0 14 14" fill="none">
+          <path d="M1 1H2.5L4.5 9.5H11L12.5 4.5H4.5" stroke="currentColor"
+                stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="5.5" cy="12" r="1.3" fill="currentColor"/>
+          <circle cx="9.5" cy="12" r="1.3" fill="currentColor"/>
+        </svg>
         ${p.inStock ? 'Add to order' : 'Out of stock'}
       </button>
     </div>`;
   return el;
 }
 
-// ── Render sections ───────────────────────────
-const CATS = ['seeds','pesticides','insecticides','fertilisers','fungicides','herbicides'];
+// ── SELECT VARIANT ────────────────────────────
+function selectVariant(pid, size, clickedBtn) {
+  const p = allProducts.find(x => x.id === pid);
+  if (!p) return;
 
+  // Update selected button
+  document.querySelectorAll(`.vbtn[data-pid="${pid}"]`).forEach(b => b.classList.remove('sel'));
+  clickedBtn.classList.add('sel');
+
+  // Find variant
+  const v = p.variants.find(x => x.size === size);
+  if (!v) return;
+
+  const tiers    = v.tiers;
+  const mrp      = v.mrp;
+  const qty      = parseInt(document.getElementById('q-' + pid)?.value) || p.moq;
+  let   base     = tiers[0][2];
+  for (const [min, max, price] of tiers) {
+    if (qty >= min) base = price;
+    if (qty >= min && (max === null || qty <= max)) break;
+  }
+  const lastTier = tiers[tiers.length - 1];
+  const disc     = mrp > base ? Math.round((mrp - base) / mrp * 100) : 0;
+
+  // Update price row
+  const pr = document.getElementById('pr-' + pid);
+  if (pr) pr.innerHTML = `
+    <span class="p-now">₹${base.toLocaleString('en-IN')}</span>
+    ${mrp > base ? `<span class="p-mrp">₹${mrp.toLocaleString('en-IN')}</span>` : ''}
+    ${disc > 0 ? `<span class="p-save">${disc}% off</span>` : ''}`;
+
+  // Update tier row
+  const tr = document.getElementById('tr-' + pid);
+  if (tr) tr.innerHTML = `
+    <span class="t1">${tiers[0][0]}–${(tiers[0][1] === null || tiers[0][1] >= 9999) ? '∞' : tiers[0][1]}: ₹${tiers[0][2]}</span>
+    <span class="tarr">→</span>
+    <span class="t2">${lastTier[0]}+: ₹${lastTier[2]}</span>
+    <span class="bulk-lbl">BULK</span>`;
+}
+
+// ── RENDER SECTIONS ───────────────────────────
 function renderProducts(catFilter) {
   const wrap = document.getElementById('productSections');
   if (!wrap) return;
   wrap.innerHTML = '';
 
-  const catsToShow = catFilter ? [catFilter] : CATS;
-  catsToShow.forEach(cat => {
-    const items = allProducts.filter(p => p.category === cat);
-    if (!items.length) return;
-
-    const sec = document.createElement('div');
-    sec.className  = 'section';
-    sec.dataset.cat = cat;
-    sec.innerHTML = `
-      <div class="sec-head">
-        <div class="sec-title">
-          ${getCatSVG(cat, 18)}
-          ${cat.charAt(0).toUpperCase() + cat.slice(1)}
-          <span class="sec-sub">${items.length} products · Bulk pricing</span>
-        </div>
-        <button class="view-all" onclick="filterCat('${cat}',null)">View All →</button>
-      </div>
-      <div class="prod-scroll" id="grid-${cat}"></div>`;
+  if (catFilter) {
+    // Grid mode for filtered single category
+    const items = allProducts.filter(p => p.category === catFilter);
+    if (!items.length) {
+      wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#9e9e9e;">No products found.</div>';
+      return;
+    }
+    const sec    = document.createElement('div');
+    sec.className = 'section';
+    const head   = document.createElement('div');
+    head.className = 'sec-hd';
+    const cat = catFilter.charAt(0).toUpperCase() + catFilter.slice(1);
+    head.innerHTML = `
+      <div class="sec-title">${cat}</div>
+      <button class="view-all" onclick="filterAll(null)">← All Products</button>`;
+    sec.appendChild(head);
+    const grid = document.createElement('div');
+    grid.className = 'prod-grid';
+    items.forEach(p => grid.appendChild(buildCard(p, true)));
+    sec.appendChild(grid);
     wrap.appendChild(sec);
+    requestAnimationFrame(fixBrokenImages);
+  } else {
+    // Horizontal scroll rows per category (BigHaat style)
+    const q = (document.getElementById('searchInp')?.value || '').toLowerCase();
+    CATS.forEach(cat => {
+      let items = allProducts.filter(p => p.category === cat);
+      if (q) items = items.filter(p =>
+        p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
+      );
+      if (!items.length) return;
 
-    const grid = document.getElementById('grid-' + cat);
-    items.forEach(p => grid.appendChild(buildCard(p)));
-  });
+      const sec = document.createElement('div');
+      sec.className = 'section';
 
-  fixBrokenImages();
+      const catLabel = cat.charAt(0).toUpperCase() + cat.slice(1);
+      const head = document.createElement('div');
+      head.className = 'sec-hd';
+      head.innerHTML = `
+        <div class="sec-title">
+          <span style="font-size:1rem;">${getCatEmoji(cat)}</span>
+          ${catLabel}
+          <span style="font-size:.68rem;color:#9e9e9e;font-weight:400;margin-left:4px;">${items.length} products</span>
+        </div>
+        <button class="view-all" onclick="filterCat('${cat}',null)">View All →</button>`;
+      sec.appendChild(head);
+
+      // Horizontal scroll row
+      const row = document.createElement('div');
+      row.className = 'h-scroll';
+      items.forEach(p => row.appendChild(buildCard(p, false)));
+      sec.appendChild(row);
+      wrap.appendChild(sec);
+    });
+  }
 }
 
-// ── Quantity adjust ───────────────────────────
+// ── Handle broken product images without inline onerror ──────
+// Called once after any render — replaces broken <img> with SVG
+function fixBrokenImages() {
+  document.querySelectorAll('.pcard-img-real').forEach(img => {
+    if (img.dataset.errorHandled) return;
+    img.dataset.errorHandled = '1';
+    img.addEventListener('error', function() {
+      const cat     = img.closest('.pcard-img')?.style.background ? '' : '';
+      const imgBox  = img.parentNode;
+      img.remove();
+      // Find the category from the card
+      const catTag  = imgBox.closest('.pcard')?.querySelector('.pcat');
+      const catName = catTag ? catTag.textContent.trim().toLowerCase() : 'seeds';
+      const div     = document.createElement('div');
+      div.className = 'icon-wrap';
+      div.innerHTML = CAT_SVG[catName] || CAT_SVG.seeds;
+      imgBox.insertBefore(div, imgBox.firstChild);
+    });
+  });
+}
+
+function getCatEmoji(cat) {
+  return {seeds:'🌱',pesticides:'🧪',insecticides:'🐛',fertilisers:'💧',fungicides:'🛡️',herbicides:'🌿'}[cat] || '📦';
+}
+
+// ── FILTER ────────────────────────────────────
+function filterAll(btn) {
+  activeCat = null;
+  document.querySelectorAll('.cnav-btn').forEach(b => b.classList.remove('on'));
+  document.querySelector('.cnav-btn').classList.add('on');
+  renderProducts(null);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function filterCat(cat, btn) {
+  activeCat = cat;
+  document.querySelectorAll('.cnav-btn').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  renderProducts(cat);
+  setTimeout(() => document.getElementById('cat-section')?.scrollIntoView({behavior:'smooth'}), 50);
+}
+
+function applyFilters() {
+  renderProducts(activeCat);
+}
+
+// ── QTY ───────────────────────────────────────
 function qAdj(pid, delta) {
   const p   = allProducts.find(x => x.id === pid);
   const inp = document.getElementById('q-' + pid);
   if (!p || !inp) return;
-  const cur = parseInt(inp.value) || p.moq;
-  inp.value = Math.max(p.moq, cur + delta);
+  inp.value = Math.max(p.moq, (parseInt(inp.value) || p.moq) + delta);
 }
 
-// ── Add to cart with login gate ───────────────
+// ── CART ──────────────────────────────────────
 function tryAddToCart(pid) {
   if (!isLoggedIn()) {
     localStorage.setItem('rs_pending_add', pid);
     localStorage.setItem('rs_redirect', window.location.href);
-    window.location.href = '/login.html';
+    window.location.href = 'login.html';
     return;
   }
   addToCart(pid);
@@ -151,42 +430,68 @@ function tryAddToCart(pid) {
 function addToCart(pid) {
   const p   = allProducts.find(x => x.id === pid);
   const inp = document.getElementById('q-' + pid);
-  if (!p || !inp) return;
+  if (!p) return;
+  const qty = Math.max(p.moq, parseInt(inp?.value) || p.moq);
 
-  const qty  = Math.max(p.moq, parseInt(inp.value) || p.moq);
-  const rate = getRate(p.tiers, qty);
-  cart[pid]  = { p, qty, rate, total: rate * qty };
+  // Variant-aware: get selected size and tiers
+  const hasVariants  = p.variants?.length > 0;
+  const variantSize  = hasVariants ? getSelectedVariant(pid) : null;
+  let tiersToUse     = p.tiers;
 
+  if (variantSize && hasVariants) {
+    const v = p.variants.find(x => x.size === variantSize);
+    if (!v) { showToast('Please select a size', true); return; }
+    tiersToUse = v.tiers;
+  } else if (hasVariants && !variantSize) {
+    // Auto-select first variant if none chosen
+    const v = p.variants[0];
+    tiersToUse = v.tiers;
+    // Mark first btn as sel
+    const firstBtn = document.querySelector(`.vbtn[data-pid="${pid}"]`);
+    if (firstBtn) {
+      document.querySelectorAll(`.vbtn[data-pid="${pid}"]`).forEach(b => b.classList.remove('sel'));
+      firstBtn.classList.add('sel');
+    }
+  }
+
+  const rate = getRate(tiersToUse, qty);
+  // Cart key = pid + variantSize so same product in different sizes → separate line items
+  const cartKey    = variantSize ? `${pid}__${variantSize}` : pid;
+  cart[cartKey]    = { p, qty, rate, total: rate * qty, variantSize: variantSize || null };
   updateCartBadge();
   renderDrawer();
 
   const btn = document.getElementById('ab-' + pid);
-  if (!btn) return;
-  btn.classList.add('done');
-  btn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Added ✓';
-  setTimeout(() => {
-    btn.classList.remove('done');
-    btn.innerHTML = '<svg viewBox="0 0 12 12" fill="none"><path d="M1 1H2.5L4 8.5H9.5L11 4H4" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="10.5" r="1" fill="white"/><circle cx="8.5" cy="10.5" r="1" fill="white"/></svg> Add to order';
-  }, 1800);
-
-  showToast(p.name.split(' ').slice(0, 3).join(' ') + ' added');
+  if (btn) {
+    btn.classList.add('done');
+    btn.innerHTML = '✓ Added';
+    setTimeout(() => {
+      btn.classList.remove('done');
+      btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none"><path d="M1 1H2.5L4.5 9.5H11L12.5 4.5H4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5.5" cy="12" r="1.3" fill="currentColor"/><circle cx="9.5" cy="12" r="1.3" fill="currentColor"/></svg> Add to order`;
+    }, 1800);
+  }
+  const sizeLabel = variantSize ? ` (${variantSize})` : '';
+  showToast(p.name.split(' ').slice(0,3).join(' ') + sizeLabel + ' added');
 }
 
-function removeCart(pid) {
-  delete cart[pid];
+function removeCart(cartKey) {
+  delete cart[cartKey];
   updateCartBadge();
   renderDrawer();
 }
 
 function updateCartBadge() {
   const n = Object.keys(cart).length;
-  ['cn', 'mn-cn'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = n;
-  });
+  const el = document.getElementById('cn');
+  if (el) el.textContent = n;
+  const mn = document.getElementById('mn-cn');
+  if (mn) { mn.textContent = n; mn.style.display = n > 0 ? 'block' : 'none'; }
 }
 
-// ── Render cart drawer ────────────────────────
+// ── DRAWER ────────────────────────────────────
+function openDrawer()  { document.getElementById('drawer')?.classList.add('open'); document.getElementById('drawerMask')?.classList.add('open'); }
+function closeDrawer() { document.getElementById('drawer')?.classList.remove('open'); document.getElementById('drawerMask')?.classList.remove('open'); }
+
 function renderDrawer() {
   const items = Object.entries(cart);
   const body  = document.getElementById('drawerBody');
@@ -194,24 +499,25 @@ function renderDrawer() {
   if (!body || !foot) return;
 
   if (!items.length) {
-    body.innerHTML = `<div class="drawer-empty">
-      <svg viewBox="0 0 44 44" fill="none"><path d="M5 5H9.5L13 28H34L37.5 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="34" r="3" fill="currentColor" opacity=".3"/><circle cx="29" cy="34" r="3" fill="currentColor" opacity=".3"/></svg>
+    body.innerHTML = `<div class="drw-empty">
+      <svg viewBox="0 0 44 44" fill="none"><path d="M5 5H9L13 28H34L37 12H13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="34" r="3" fill="currentColor" opacity=".3"/><circle cx="29" cy="34" r="3" fill="currentColor" opacity=".3"/></svg>
       Add products to build your bulk order.</div>`;
     foot.style.display = 'none';
     return;
   }
 
   let sub = 0;
-  body.innerHTML = items.map(([pid, { p, qty, rate, total }]) => {
+  body.innerHTML = items.map(([cartKey, {p, qty, rate, total, variantSize}]) => {
     sub += total;
+    const sizeLabel = variantSize ? ` · ${variantSize}` : '';
     return `<div class="di">
-      <div class="di-ico">${getCatSVG(p.category, 28)}</div>
-      <div class="di-info">
-        <div class="di-name">${p.name}</div>
+      <div class="di-ico">${CAT_SVG[p.category] ? `<svg viewBox="0 0 64 64" width="28" height="28">${CAT_SVG[p.category].replace(/<svg[^>]*>/,'').replace('</svg>','')}</svg>` : '📦'}</div>
+      <div style="flex:1">
+        <div class="di-name">${p.name}${sizeLabel}</div>
         <div class="di-meta">${qty} ${p.unit}(s) × ₹${rate.toLocaleString('en-IN')}</div>
         <div class="di-row">
           <span class="di-price">₹${total.toLocaleString('en-IN')}</span>
-          <button class="di-rm" onclick="removeCart('${pid}')">Remove</button>
+          <button class="di-rm" onclick="removeCart('${cartKey}')">Remove</button>
         </div>
       </div>
     </div>`;
@@ -219,215 +525,113 @@ function renderDrawer() {
 
   const gst   = Math.round(sub * 0.12);
   const grand = sub + gst;
-  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  set('dfSub',   '₹' + sub.toLocaleString('en-IN'));
-  set('dfGst',   '₹' + gst.toLocaleString('en-IN'));
-  set('dfTotal', '₹' + grand.toLocaleString('en-IN'));
+  document.getElementById('dfSub').textContent   = '₹' + sub.toLocaleString('en-IN');
+  document.getElementById('dfGst').textContent   = '₹' + gst.toLocaleString('en-IN');
+  document.getElementById('dfTotal').textContent = '₹' + grand.toLocaleString('en-IN');
   foot.style.display = 'block';
 }
 
-// ── COD Checkout (replaces Razorpay) ─────────
+// ── CHECKOUT — Cash on Delivery ───────────────
 async function checkoutCOD() {
-  const items = Object.values(cart).map(({ p, qty }) => ({
-    productId: p.id,
-    qty,
-  }));
+  const items = Object.values(cart);
+  if (!items.length) return;
 
-  if (!items.length) return showToast('Your cart is empty', true);
-
+  // Login gate
   if (!isLoggedIn()) {
     localStorage.setItem('rs_redirect', window.location.href);
-    window.location.href = '/login.html';
+    window.location.href = 'login.html';
     return;
   }
 
-  const btn = document.getElementById('checkoutBtn');
+  // Disable button to prevent double submit
+  const btn = document.querySelector('.pay-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Placing order…'; }
 
   try {
-    await Orders.create(items);
+    const orderItems = items.map(({p, qty, variantSize}) => ({
+      productId: p.id,
+      qty,
+      ...(variantSize && { variantSize }),
+    }));
+    const data = await Orders.create(orderItems);
+
+    // Success — clear cart
     cart = {};
     updateCartBadge();
     renderDrawer();
     closeDrawer();
-    showToast('Order placed! Our team will contact you for delivery.');
-    setTimeout(() => window.location.href = '/orders.html', 1800);
+
+    showToast('Order placed successfully! Track it in My Orders.');
+
+    // Redirect to orders page after 1.5s
+    setTimeout(() => { window.location.href = 'orders.html'; }, 1500);
+
   } catch (err) {
-    console.error('Order error:', err);
-    showToast(err.error || 'Could not create order. Please try again.', true);
-  } finally {
+    console.error('COD order error:', err);
+    showToast(err.error || 'Could not place order. Please try again.', true);
     if (btn) { btn.disabled = false; btn.textContent = 'Place Order (Cash on Delivery)'; }
   }
 }
 
-// ── Drawer open/close ─────────────────────────
-function openDrawer() {
-  document.getElementById('drawer')?.classList.add('open');
-  document.getElementById('drawerMask')?.classList.add('open');
-}
-function closeDrawer() {
-  document.getElementById('drawer')?.classList.remove('open');
-  document.getElementById('drawerMask')?.classList.remove('open');
+function orderViaWhatsApp() {
+  const lines = Object.values(cart).map(({p, qty, rate, total}) =>
+    `${p.name} — ${qty} ${p.unit}(s) @ ₹${rate} = ₹${total.toLocaleString('en-IN')}`
+  ).join('%0A');
+  window.open(`https://wa.me/919876543210?text=Hello MahiGrow, bulk order:%0A%0A${lines}%0A%0APlease confirm.`, '_blank');
 }
 
-// ── Category filter ───────────────────────────
-function filterAll(btn) {
-  activeCat = null;
-  document.querySelectorAll('.cnav-btn').forEach(b => b.classList.remove('on'));
-  btn?.classList.add('on');
-  renderProducts(null);
-}
-function filterCat(cat, btn) {
-  activeCat = cat;
-  document.querySelectorAll('.cnav-btn').forEach(b => b.classList.remove('on'));
-  btn?.classList.add('on');
-  renderProducts(cat);
-  setTimeout(() => document.getElementById('cat-section')?.scrollIntoView({ behavior: 'smooth' }), 50);
+// ── NAV ───────────────────────────────────────
+function updateNav() {
+  const retailer = getRetailer();
+  ['tb-loginBtn', 'loginBtn'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    if (retailer) {
+      btn.textContent = retailer.shopName?.split(' ')[0] || 'Account';
+      btn.onclick = () => window.location.href = 'orders.html';
+    } else {
+      btn.onclick = () => window.location.href = 'login.html';
+    }
+  });
 }
 
-// ── Toast ─────────────────────────────────────
+// ── TOAST ─────────────────────────────────────
 function showToast(msg, isError = false) {
   const t = document.getElementById('toast');
   if (!t) return;
   t.textContent = msg;
-  t.style.background = isError ? '#dc2626' : '#111827';
+  t.style.background = isError ? '#d32f2f' : '#212121';
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── Nav: show user info if logged in ─────────
-function updateNav() {
-  const retailer = getRetailer();
-  const loginBtn = document.getElementById('loginBtn');
-  if (!loginBtn) return;
-  if (retailer) {
-    loginBtn.textContent = retailer.shopName || 'My Account';
-    loginBtn.onclick = () => window.location.href = '/orders.html';
-  } else {
-    loginBtn.textContent = 'Sign In';
-    loginBtn.onclick = () => window.location.href = '/login.html';
-  }
-}
-
-// ── Dynamic hero stats from API meta ─────────
-function updateHeroStats(meta) {
-  const total = meta.total || 0;
-  const cats  = Object.keys(meta.categoryCounts || {}).length;
-  const brands = (meta.brands || []).length;
-
-  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  set('heroProducts', total + '+');
-  set('heroBrands',   brands + '+');
-  set('heroCategories', cats);
-}
-
-// ── Dynamic category nav from API meta ───────
-function buildCatNav(meta) {
-  const nav = document.getElementById('catNav');
-  if (!nav) return;
-  const counts = meta.categoryCounts || {};
-  CATS.forEach(cat => {
-    const btn = nav.querySelector(`[data-cat="${cat}"]`);
-    if (btn && counts[cat]) {
-      const sub = btn.querySelector('.cat-count');
-      if (sub) sub.textContent = counts[cat] + ' products';
-    }
-  });
-}
-
-// ── Init ──────────────────────────────────────
+// ── INIT ──────────────────────────────────────
 async function init() {
   updateNav();
+  updateCartBadge();
 
   const wrap = document.getElementById('productSections');
-  if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:48px;color:#6b7280;">Loading products…</div>';
+  if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#9e9e9e;font-size:.85rem;">Loading products…</div>';
 
   try {
     const data  = await Products.getAll();
-    allProducts = data.products || [];
-
-    if (data.meta) {
-      updateHeroStats(data.meta);
-      buildCatNav(data.meta);
-    }
-
+    allProducts = data.products;
+    renderCategoryGrid(allProducts);
+    renderBrandStrip(allProducts);
+    renderHeroStats(allProducts);
     renderProducts(null);
-  } catch (err) {
-    console.error('Load products error:', err);
-    if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:48px;color:#dc2626;">Could not load products. Please refresh.</div>';
+  } catch {
+    if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#d32f2f;font-size:.82rem;">Could not load products. Please refresh.</div>';
   }
 
   renderDrawer();
 
-  // Resume pending cart add after login redirect
+  // Handle pending add after login
   const pendingPid = localStorage.getItem('rs_pending_add');
   if (pendingPid && isLoggedIn()) {
     localStorage.removeItem('rs_pending_add');
-    setTimeout(() => addToCart(pendingPid), 800);
+    setTimeout(() => addToCart(pendingPid), 600);
   }
-}
-
-// ── Search / filter ───────────────────────────
-function applyFilters() {
-  const q = (document.getElementById('searchInp')?.value || '').toLowerCase().trim();
-  const wrap = document.getElementById('productSections');
-  if (!wrap) return;
-
-  if (!q) {
-    renderProducts(activeCat);
-    return;
-  }
-
-  wrap.innerHTML = '';
-  const matched = allProducts.filter(p =>
-    p.name.toLowerCase().includes(q) ||
-    p.brand.toLowerCase().includes(q) ||
-    p.category.toLowerCase().includes(q)
-  );
-
-  if (!matched.length) {
-    wrap.innerHTML = '<div style="text-align:center;padding:48px;color:#6b7280;">No products found for "' + q + '"</div>';
-    return;
-  }
-
-  const sec = document.createElement('div');
-  sec.className = 'section';
-  sec.innerHTML = `
-    <div class="sec-head">
-      <div class="sec-title">Search results for "${q}" <span class="sec-sub">${matched.length} products</span></div>
-    </div>
-    <div class="prod-grid" id="search-grid"></div>`;
-  wrap.appendChild(sec);
-
-  const grid = document.getElementById('search-grid');
-  matched.forEach(p => {
-    const card = buildCard(p);
-    card.classList.add('grid-card');
-    grid.appendChild(card);
-  });
-
-  fixBrokenImages();
-}
-
-// ── WhatsApp order fallback ───────────────────
-function orderViaWhatsApp() {
-  const items = Object.values(cart);
-  if (!items.length) return showToast('Add products first', true);
-
-  const retailer = getRetailer();
-  const name = retailer ? (retailer.shopName || 'Retailer') : 'Guest';
-
-  let msg = `*MahiGrow Bulk Order*\nFrom: ${name}\n\n`;
-  let total = 0;
-  items.forEach(({ p, qty, rate, total: t }) => {
-    msg += `• ${p.name} — ${qty} ${p.unit}(s) × ₹${rate} = ₹${t.toLocaleString('en-IN')}\n`;
-    total += t;
-  });
-  const gst = Math.round(total * 0.12);
-  msg += `\n*Subtotal:* ₹${total.toLocaleString('en-IN')}\n*GST (~12%):* ₹${gst.toLocaleString('en-IN')}\n*Total:* ₹${(total + gst).toLocaleString('en-IN')}\n\nPayment: Cash on Delivery`;
-
-  const waUrl = 'https://wa.me/919876543210?text=' + encodeURIComponent(msg);
-  window.open(waUrl, '_blank');
 }
 
 window.addEventListener('DOMContentLoaded', init);

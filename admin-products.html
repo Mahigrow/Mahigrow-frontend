@@ -157,6 +157,33 @@ tr:hover td{background:#fafafa;}
 .tier-headers{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;}
 .tier-headers span{font-size:.65rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;text-align:center;}
 
+/* variant builder */
+.variant-list{display:flex;flex-direction:column;gap:12px;margin-top:4px;}
+.variant-card{border:1.5px solid var(--border);border-radius:9px;overflow:hidden;background:var(--bg);}
+.variant-card-hd{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid var(--border);}
+.variant-card-hd input{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.82rem;font-weight:600;color:var(--ink);background:var(--bg);outline:none;}
+.variant-card-hd input:focus{border-color:var(--g);background:#fff;}
+.variant-card-hd input::placeholder{font-weight:400;color:var(--ink3);}
+.variant-mrp-wrap{display:flex;align-items:center;gap:6px;}
+.variant-mrp-wrap span{font-size:.7rem;color:var(--ink3);white-space:nowrap;}
+.variant-mrp-wrap input{width:80px;padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:.82rem;color:var(--ink);background:var(--bg);outline:none;text-align:center;}
+.variant-mrp-wrap input:focus{border-color:var(--g);background:#fff;}
+.vdel-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:6px 10px;font-size:.7rem;font-weight:600;color:var(--red);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.vdel-btn:hover{background:var(--red2);}
+.variant-card-body{padding:10px 14px;}
+.vtier-headers{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:4px;}
+.vtier-headers span{font-size:.62rem;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;text-align:center;}
+.vtier-builder{display:flex;flex-direction:column;gap:6px;}
+.vtier-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:center;}
+.vtier-row input{padding:7px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:.78rem;color:var(--ink);background:var(--bg);outline:none;text-align:center;}
+.vtier-row input:focus{border-color:var(--g);background:#fff;}
+.add-vtier-btn{background:none;border:1.5px dashed var(--border);border-radius:5px;padding:5px;font-size:.7rem;color:var(--ink3);cursor:pointer;width:100%;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:4px;}
+.add-vtier-btn:hover{border-color:var(--g);color:var(--g);}
+.add-variant-btn{background:none;border:2px dashed var(--g4);border-radius:8px;padding:10px;font-size:.78rem;font-weight:600;color:var(--g);cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;}
+.add-variant-btn:hover{border-color:var(--g);background:var(--g3);}
+.variants-hint{font-size:.7rem;color:var(--ink3);line-height:1.5;margin-bottom:10px;}
+.no-variants-note{font-size:.75rem;color:var(--ink3);padding:8px 0;}
+
 /* modal footer */
 .modal-ft{display:flex;gap:10px;justify-content:flex-end;padding:16px 22px;border-top:1px solid var(--border);}
 .btn-cancel{background:var(--bg);border:1.5px solid var(--border);color:var(--ink2);font-weight:600;font-size:.85rem;padding:9px 18px;border-radius:7px;cursor:pointer;}
@@ -265,7 +292,7 @@ tr:hover td{background:#fafafa;}
             <th>Category</th>
             <th>Size / Unit</th>
             <th>MOQ</th>
-            <th>Tiers (₹)</th>
+            <th>Tiers / Variants</th>
             <th>Stock</th>
             <th>Actions</th>
           </tr>
@@ -421,6 +448,18 @@ tr:hover td{background:#fafafa;}
       </button>
       <div class="err-msg" id="eTiers" style="margin-top:4px;"></div>
 
+      <!-- SIZE VARIANTS -->
+      <div class="form-section" style="margin-top:22px;">Size Variants <span style="font-size:.65rem;font-weight:400;color:var(--ink3);text-transform:none;letter-spacing:0;">— optional</span></div>
+      <div class="variants-hint">
+        Add size variants (e.g. 100ml, 250ml, 500ml, 1L) so customers can choose the pack size. Each variant can have its own MRP and bulk pricing tiers. Leave empty to use the single size above.
+      </div>
+      <div class="variant-list" id="variantList"></div>
+      <div class="no-variants-note" id="noVariantsNote">No variants added. Customers will see only the pack size above.</div>
+      <button class="add-variant-btn" onclick="addVariantCard()" style="margin-top:10px;">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 2V11M2 6.5H11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Add Size Variant
+      </button>
+
     </div>
     <div class="modal-ft">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -475,7 +514,7 @@ async function http(method, path, body = null) {
   if (res.status === 401 || res.status === 403) {
     // Admin session expired or access revoked
     localStorage.removeItem('mg_admin_token');
-    localStorage.removeItem('rs_admin_user');
+    localStorage.removeItem('mg_admin_user');
     window.location.href = 'admin-login.html';
     throw data;
   }
@@ -485,14 +524,14 @@ async function http(method, path, body = null) {
 
 function adminLogout() {
   localStorage.removeItem('mg_admin_token');
-  localStorage.removeItem('rs_admin_user');
+  localStorage.removeItem('mg_admin_user');
   window.location.href = 'admin-login.html';
 }
 
 // Show admin name in nav
 window.addEventListener('DOMContentLoaded', () => {
   try {
-    const admin = JSON.parse(localStorage.getItem('rs_admin_user') || '{}');
+    const admin = JSON.parse(localStorage.getItem('mg_admin_user') || '{}');
     const el = document.getElementById('adminName');
     if (el && admin.shopName) el.textContent = admin.shopName;
   } catch {}
@@ -579,9 +618,15 @@ function renderTable() {
       <td><span class="cat-pill cat-${p.category}">${p.category}</span></td>
       <td style="white-space:nowrap;">${p.size}<br/><span style="font-size:.68rem;color:var(--ink3);">per ${p.unit} · MOQ ${p.moq}</span></td>
       <td style="font-weight:600;">${p.moq}</td>
-      <td class="tiers-cell">${p.tiers.map(t =>
-        `${t[0]}–${t[1] >= 9999 ? '∞' : t[1]}: ₹${t[2]}`
-      ).join('<br/>')}</td>
+      <td class="tiers-cell">
+        ${p.variants?.length
+          ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:600;color:var(--g);margin-bottom:3px;">
+               <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1.3"/><path d="M3 5h4M5 3v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+               ${p.variants.length} size${p.variants.length > 1 ? 's' : ''}: ${p.variants.map(v => v.size).join(', ')}
+             </span><br/>`
+          : ''}
+        ${p.tiers.map(t => `${t[0]}–${t[1] >= 9999 ? '∞' : t[1]}: ₹${t[2]}`).join('<br/>')}
+      </td>
       <td><span class="stock-dot ${stockClass}">${stockLabel}</span></td>
       <td>
         <div class="action-btns">
@@ -716,7 +761,7 @@ async function uploadToSupabase(file) {
 }
 
 // ─────────────────────────────────────────────
-//  TIER BUILDER
+//  TIER BUILDER (product-level tiers)
 // ─────────────────────────────────────────────
 function addTierRow(min = '', max = '', price = '') {
   const builder = document.getElementById('tierBuilder');
@@ -736,6 +781,89 @@ function getTiers() {
     parseFloat(row.querySelector('.tier-max').value)   || 9999,
     parseFloat(row.querySelector('.tier-price').value) || 0,
   ]);
+}
+
+// ─────────────────────────────────────────────
+//  VARIANT BUILDER
+// ─────────────────────────────────────────────
+function updateNoVariantsNote() {
+  const list = document.getElementById('variantList');
+  const note = document.getElementById('noVariantsNote');
+  if (note) note.style.display = list.children.length ? 'none' : 'block';
+}
+
+function addVariantCard(size = '', mrp = '', tiers = []) {
+  const list = document.getElementById('variantList');
+  const card = document.createElement('div');
+  card.className = 'variant-card';
+
+  // Default tiers if none provided
+  const defaultTiers = tiers.length ? tiers : [[1, 49, ''], [50, 9999, '']];
+
+  card.innerHTML = `
+    <div class="variant-card-hd">
+      <input type="text" class="variant-size" placeholder="Size (e.g. 100ml, 500g, 1L)" value="${size}" required/>
+      <div class="variant-mrp-wrap">
+        <span>MRP ₹</span>
+        <input type="number" class="variant-mrp" placeholder="0" value="${mrp}" min="0" step="0.01"/>
+      </div>
+      <button class="vdel-btn" onclick="removeVariantCard(this)">Remove</button>
+    </div>
+    <div class="variant-card-body">
+      <div class="vtier-headers">
+        <span>Min Qty</span><span>Max Qty</span><span>₹ / unit</span><span></span>
+      </div>
+      <div class="vtier-builder"></div>
+      <button class="add-vtier-btn" onclick="addVariantTierRow(this)">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1V9M1 5H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Add tier
+      </button>
+    </div>`;
+
+  list.appendChild(card);
+
+  // Add tier rows
+  const vtierBuilder = card.querySelector('.vtier-builder');
+  defaultTiers.forEach(([min, max, price]) =>
+    addVariantTierRow(card.querySelector('.add-vtier-btn'), min, max, price)
+  );
+
+  updateNoVariantsNote();
+}
+
+function addVariantTierRow(btn, min = '', max = '', price = '') {
+  const body = btn.closest('.variant-card-body');
+  const builder = body.querySelector('.vtier-builder');
+  const row = document.createElement('div');
+  row.className = 'vtier-row';
+  row.innerHTML = `
+    <input type="number" placeholder="Min" value="${min}" min="0" class="vtier-min"/>
+    <input type="number" placeholder="Max" value="${max}" min="0" class="vtier-max"/>
+    <input type="number" placeholder="₹" value="${price}" min="0" step="0.01" class="vtier-price"/>
+    <button class="tier-del-btn" onclick="this.parentNode.remove()">✕</button>`;
+  builder.appendChild(row);
+}
+
+function removeVariantCard(btn) {
+  btn.closest('.variant-card').remove();
+  updateNoVariantsNote();
+}
+
+function getVariants() {
+  const cards = document.querySelectorAll('.variant-card');
+  if (!cards.length) return [];
+
+  return [...cards].map(card => {
+    const size = card.querySelector('.variant-size').value.trim();
+    const mrp  = parseFloat(card.querySelector('.variant-mrp').value) || 0;
+    const rows = [...card.querySelectorAll('.vtier-row')];
+    const tiers = rows.map(row => [
+      parseFloat(row.querySelector('.vtier-min').value) || 0,
+      parseFloat(row.querySelector('.vtier-max').value) || 9999,
+      parseFloat(row.querySelector('.vtier-price').value) || 0,
+    ]);
+    return { size, mrp, tiers };
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -760,6 +888,7 @@ function openModal(product = null) {
   document.getElementById('fInStock').checked  = true;
   document.getElementById('inStockLabel').textContent = 'Available';
   document.getElementById('tierBuilder').innerHTML    = '';
+  document.getElementById('variantList').innerHTML    = '';
   document.getElementById('uploadProg').style.display = 'none';
 
   // Reset image zone
@@ -795,6 +924,12 @@ function openModal(product = null) {
     addTierRow(50, 99, '');
     addTierRow(100, 9999, '');
   }
+
+  // Populate variants
+  if (product?.variants?.length) {
+    product.variants.forEach(v => addVariantCard(v.size, v.mrp, v.tiers));
+  }
+  updateNoVariantsNote();
 
   document.getElementById('modalMask').classList.add('open');
 }
@@ -835,6 +970,7 @@ async function saveProduct() {
   const stockQty = parseInt(document.getElementById('fStock').value) || 0;
   const inStock  = document.getElementById('fInStock').checked;
   const tiers    = getTiers();
+  const variants = getVariants();
 
   // Validate
   let valid = true;
@@ -846,6 +982,13 @@ async function saveProduct() {
   if (!tiers.length)      { document.getElementById('eTiers').textContent   = 'Add at least one pricing tier'; valid=false; }
   else if (tiers.some(t => !t[2] || t[2] <= 0)) {
     document.getElementById('eTiers').textContent = 'All tier prices must be > 0'; valid=false;
+  }
+  // Validate variants
+  for (const v of variants) {
+    if (!v.size) { document.getElementById('eTiers').textContent = 'All variants need a size label (e.g. 100ml)'; valid=false; break; }
+    if (v.tiers.some(t => !t[2] || t[2] <= 0)) {
+      document.getElementById('eTiers').textContent = `Variant "${v.size}": all tier prices must be > 0`; valid=false; break;
+    }
   }
   if (!valid) return;
 
@@ -873,6 +1016,7 @@ async function saveProduct() {
       description: desc,
       mrp, unit, moq, step, stockQty, inStock,
       tiers,
+      variants: variants.length ? variants : [],
       imageUrl: imageUrl || null,
     };
 
