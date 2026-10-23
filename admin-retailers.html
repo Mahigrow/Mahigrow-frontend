@@ -274,7 +274,7 @@ function applyFilters() {
     const matchF = activeFilter === 'all' ||
       (activeFilter === 'pending' && !r.isActive) ||
       (activeFilter === 'active'  &&  r.isActive);
-    const matchQ = !q || [r.ownerName, r.shopName, r.phone, r.gstNumber, r.district]
+    const matchQ = !q || [r.ownerName, r.shopName, r.phone, r.gstin, r.district]
       .some(v => v?.toLowerCase().includes(q));
     return matchF && matchQ;
   });
@@ -296,7 +296,7 @@ function renderTable() {
         <div class="retailer-shop">${r.shopName || '—'}</div>
       </td>
       <td style="font-weight:500;">+91 ${r.phone}</td>
-      <td><span class="gst-code">${r.gstNumber || '—'}</span></td>
+      <td><span class="gst-code">${r.gstin || '—'}</span></td>
       <td>${r.district || '—'}, ${r.state || ''}</td>
       <td style="font-size:.72rem;color:var(--ink3);">${formatDate(r.createdAt)}</td>
       <td><span class="status ${r.isActive ? 'active' : 'pending'}">${r.isActive ? 'Active' : 'Pending'}</span></td>
@@ -347,7 +347,7 @@ function openModal(id) {
     ['Shop Name',    r.shopName  || '—'],
     ['Phone',        '+91 ' + r.phone],
     ['Email',        r.email || '—'],
-    ['GSTIN',        r.gstNumber || '—'],
+    ['GSTIN',        r.gstin || '—'],
     ['GST Verified', r.gstVerified ? '✓ Yes' : '⚠ Pending verification'],
     ['District',     r.district || '—'],
     ['State',        r.state    || '—'],

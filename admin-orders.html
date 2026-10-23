@@ -245,9 +245,9 @@ function buildCard(o){
         : `<div class="item-img" style="display:flex;align-items:center;justify-content:center;">📦</div>`}
       <div style="flex:1;">
         <div class="item-name">${i.product.name}</div>
-        <div class="item-detail">${i.qty} ${i.product.unit}(s) × ₹${i.rate.toLocaleString('en-IN')}</div>
+        <div class="item-detail">${i.qty} ${i.product.unit}(s) × ₹${(i.unitPrice||0).toLocaleString('en-IN')}</div>
       </div>
-      <div class="item-amt">₹${i.total.toLocaleString('en-IN')}</div>
+      <div class="item-amt">₹${(i.lineTotal||0).toLocaleString('en-IN')}</div>
     </div>`).join('');
 
   // Status action buttons — show next steps only
@@ -278,9 +278,9 @@ function buildCard(o){
       <div class="order-body">
         <div>${items}</div>
         <div class="totals-box">
-          <div class="tot-row"><span>Subtotal</span><span>₹${o.subtotal.toLocaleString('en-IN')}</span></div>
-          <div class="tot-row"><span>GST (12%)</span><span>₹${o.gstAmount.toLocaleString('en-IN')}</span></div>
-          <div class="tot-grand"><span>Total</span><span>₹${o.grandTotal.toLocaleString('en-IN')}</span></div>
+          <div class="tot-row"><span>Subtotal</span><span>₹${(o.totalAmount||0).toLocaleString('en-IN')}</span></div>
+          <div class="tot-row"><span>GST (~12%)</span><span>₹${Math.round((o.totalAmount||0)*0.12).toLocaleString('en-IN')}</span></div>
+          <div class="tot-grand"><span>Total</span><span>₹${((o.totalAmount||0)+Math.round((o.totalAmount||0)*0.12)).toLocaleString('en-IN')}</span></div>
           <div style="margin-top:8px;font-size:.66rem;color:var(--ink3);">💵 Cash on Delivery</div>
         </div>
       </div>

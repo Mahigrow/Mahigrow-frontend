@@ -237,9 +237,9 @@ function buildOrderCard(o) {
       }
       <div style="flex:1;">
         <div class="item-name">${i.product.name}</div>
-        <div class="item-meta">${i.qty} ${i.product.unit}(s) × ₹${i.rate.toLocaleString('en-IN')}</div>
+        <div class="item-meta">${i.qty} ${i.product.unit}(s) × ₹${(i.unitPrice||0).toLocaleString('en-IN')}</div>
       </div>
-      <div class="item-total">₹${i.total.toLocaleString('en-IN')}</div>
+      <div class="item-total">₹${(i.lineTotal||0).toLocaleString('en-IN')}</div>
     </div>`).join('');
 
   const moreItems = o.items.length > 3
@@ -274,7 +274,7 @@ function buildOrderCard(o) {
       <div class="order-ft">
         <div class="order-total-row">
           ${o.items.length} item(s) · COD · GST incl.<br/>
-          Total: <strong>₹${o.grandTotal.toLocaleString('en-IN')}</strong>
+          Total: <strong>₹${((o.totalAmount||0)+Math.round((o.totalAmount||0)*0.12)).toLocaleString('en-IN')}</strong>
         </div>
         <div class="order-ft-right">
           <button class="btn-reorder" onclick="reorder('${o.id}')">Reorder</button>
@@ -290,7 +290,7 @@ function reorder(orderId) {
   // Add all items back to cart
   const cart = {};
   order.items.forEach(i => {
-    cart[i.productId] = { p: i.product, qty: i.qty, rate: i.rate, total: i.total };
+    cart[i.productId] = { p: i.product, qty: i.qty, rate: i.unitPrice||0, total: i.lineTotal||0 };
   });
   localStorage.setItem('mg_cart', JSON.stringify(cart));
   window.location.href = 'index.html';

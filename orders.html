@@ -1,242 +1,286 @@
-// ─────────────────────────────────────────────────────────────
-//  routes/orders.js  —  COD Orders + Tracking
-// ─────────────────────────────────────────────────────────────
-const router  = require('express').Router();
-const prisma  = require('../utils/prisma');
-const { requireAuth, requireAdmin } = require('../middleware/auth');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>MahiGrow — My Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#0a7a30;--g2:#086826;--g3:#e8f5e9;--g4:#c8e6c9;
+  --or:#e8620a;--ink:#212121;--ink2:#424242;--ink3:#9e9e9e;
+  --border:#e0e0e0;--bg:#f5f5f5;--card:#fff;--red:#d32f2f;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;}
 
-// ─────────────────────────────────────────────────────────────
-//  POST /api/orders  —  Place a COD order
-// ─────────────────────────────────────────────────────────────
-router.post('/', requireAuth, async (req, res) => {
+/* TOPBAR */
+.topbar{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.tb{max-width:900px;margin:0 auto;padding:0 14px;height:52px;display:flex;align-items:center;gap:10px;}
+.logo{display:flex;align-items:center;gap:7px;text-decoration:none;}
+.logo svg{width:26px;height:26px;}
+.logo-name{font-size:.95rem;font-weight:800;color:var(--g);}
+.logo-name em{color:var(--or);font-style:normal;}
+.tb-right{margin-left:auto;display:flex;gap:8px;}
+.btn-home{background:none;border:1px solid var(--border);color:var(--ink2);font-size:.76rem;font-weight:500;padding:6px 12px;border-radius:6px;}
+
+/* PAGE */
+.page{max-width:900px;margin:0 auto;padding:16px 14px 40px;}
+.page-title{font-size:1.1rem;font-weight:800;margin-bottom:4px;}
+.page-sub{font-size:.76rem;color:var(--ink3);margin-bottom:18px;}
+
+/* STATUS FILTER */
+.status-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:18px;padding-bottom:2px;}
+.status-tabs::-webkit-scrollbar{display:none;}
+.stab{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:.74rem;font-weight:600;color:var(--ink3);white-space:nowrap;}
+.stab.on{background:var(--g);border-color:var(--g);color:#fff;}
+
+/* ORDER CARD */
+.order-card{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+.order-hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.order-id{font-size:.7rem;color:var(--ink3);}
+.order-id strong{color:var(--ink);font-weight:600;}
+.order-date{font-size:.7rem;color:var(--ink3);}
+
+/* STATUS BADGE */
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:20px;}
+.status-badge::before{content:'';width:6px;height:6px;border-radius:50%;}
+.s-PLACED{background:#E3F2FD;color:#1565C0;}.s-PLACED::before{background:#1565C0;}
+.s-PACKING{background:#FFF8E1;color:#E65100;}.s-PACKING::before{background:#E65100;}
+.s-OUT_FOR_DELIVERY{background:#E8F5E9;color:#1B5E20;}.s-OUT_FOR_DELIVERY::before{background:#2E7D32;}
+.s-DELIVERED{background:#E8F5E9;color:#1B5E20;}.s-DELIVERED::before{background:var(--g);}
+.s-CANCELLED{background:#FFEBEE;color:#B71C1C;}.s-CANCELLED::before{background:var(--red);}
+
+/* TRACKING TIMELINE */
+.tracking{padding:16px;}
+.track-steps{display:flex;justify-content:space-between;position:relative;margin-bottom:10px;}
+.track-steps::before{content:'';position:absolute;top:16px;left:10%;right:10%;height:2px;background:var(--border);z-index:0;}
+.track-line{position:absolute;top:16px;left:10%;height:2px;background:var(--g);z-index:1;transition:width .4s ease;}
+.track-step{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2;flex:1;}
+.step-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .3s;}
+.step-dot.done{background:var(--g);border-color:var(--g);}
+.step-dot.active{background:#fff;border-color:var(--g);box-shadow:0 0 0 3px rgba(10,122,48,.15);}
+.step-dot.done::after{content:'✓';color:#fff;font-weight:700;font-size:.8rem;}
+.step-dot.active::after{content:'';width:10px;height:10px;background:var(--g);border-radius:50%;display:block;}
+.step-lbl{font-size:.6rem;font-weight:600;color:var(--ink3);text-align:center;line-height:1.3;max-width:60px;}
+.step-lbl.done,.step-lbl.active{color:var(--g);}
+
+/* ORDER ITEMS */
+.order-items{border-top:1px solid var(--border);padding:12px 16px;}
+.order-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg);}
+.order-item:last-child{border-bottom:none;}
+.item-img{width:40px;height:40px;border-radius:6px;background:var(--bg);border:1px solid var(--border);object-fit:contain;padding:4px;flex-shrink:0;}
+.item-name{font-size:.78rem;font-weight:600;color:var(--ink);flex:1;}
+.item-meta{font-size:.68rem;color:var(--ink3);margin-top:2px;}
+.item-total{font-size:.82rem;font-weight:700;color:var(--ink);text-align:right;flex-shrink:0;}
+
+/* ORDER FOOTER */
+.order-ft{padding:12px 16px;background:var(--bg);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.order-total-row{font-size:.78rem;color:var(--ink2);}
+.order-total-row strong{font-size:.92rem;font-weight:800;color:var(--ink);}
+.order-ft-right{display:flex;gap:6px;}
+.btn-reorder{background:var(--g3);border:1px solid var(--g4);color:var(--g2);font-size:.72rem;font-weight:600;padding:6px 12px;border-radius:6px;}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-state svg{width:60px;height:60px;opacity:.2;margin:0 auto 14px;display:block;}
+.empty-state h2{font-size:1rem;font-weight:700;margin-bottom:6px;}
+.empty-state p{font-size:.8rem;color:var(--ink3);margin-bottom:20px;}
+.btn-shop{display:inline-block;background:var(--g);color:#fff;padding:11px 22px;border-radius:8px;font-weight:700;font-size:.84rem;text-decoration:none;}
+
+/* LOADING */
+.skel{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb">
+    <a class="logo" href="index.html">
+      <svg viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" fill="#e8f5e9"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(60 13 13)"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(120 13 13)"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(180 13 13)"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(240 13 13)"/><ellipse cx="13" cy="6" rx="2.2" ry="5.5" fill="#0a7a30" opacity=".9" transform="rotate(300 13 13)"/><circle cx="13" cy="13" r="3.5" fill="#0a7a30"/><circle cx="13" cy="13" r="1.5" fill="#e8620a"/></svg>
+      <span class="logo-name">Mahi<em>Grow</em></span>
+    </a>
+    <div class="tb-right">
+      <button class="btn-home" onclick="window.location.href='index.html'">← Catalogue</button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-title">My Orders</div>
+  <div class="page-sub">Track your bulk orders</div>
+
+  <div class="status-tabs">
+    <button class="stab on" onclick="filterStatus('ALL',this)">All Orders</button>
+    <button class="stab" onclick="filterStatus('PLACED',this)">Order Placed</button>
+    <button class="stab" onclick="filterStatus('PACKING',this)">Packing</button>
+    <button class="stab" onclick="filterStatus('OUT_FOR_DELIVERY',this)">Out for Delivery</button>
+    <button class="stab" onclick="filterStatus('DELIVERED',this)">Delivered</button>
+    <button class="stab" onclick="filterStatus('CANCELLED',this)">Cancelled</button>
+  </div>
+
+  <div id="ordersWrap">
+    <div class="order-card">
+      <div class="order-hd"><div class="skel" style="height:14px;width:200px;"></div><div class="skel" style="height:22px;width:100px;border-radius:20px;"></div></div>
+      <div class="tracking"><div class="skel" style="height:60px;border-radius:8px;"></div></div>
+      <div class="order-items"><div class="skel" style="height:50px;border-radius:6px;"></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+const STATUS_STEPS = [
+  { key: 'PLACED',           label: 'Order\nPlaced',     icon: '📋' },
+  { key: 'PACKING',          label: 'Packing',           icon: '📦' },
+  { key: 'OUT_FOR_DELIVERY', label: 'Out for\nDelivery', icon: '🚚' },
+  { key: 'DELIVERED',        label: 'Delivered',         icon: '✅' },
+];
+
+const STATUS_LABEL = {
+  PLACED:           'Order Placed',
+  PACKING:          'Packing',
+  OUT_FOR_DELIVERY: 'Out for Delivery',
+  DELIVERED:        'Delivered',
+  CANCELLED:        'Cancelled',
+};
+
+let allOrders    = [];
+let activeFilter = 'ALL';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!isLoggedIn()) {
+    localStorage.setItem('rs_redirect', '/orders.html');
+    window.location.href = 'login.html';
+    return;
+  }
+  await loadOrders();
+});
+
+async function loadOrders() {
   try {
-    const { items } = req.body;
+    const data = await Orders.getAll();
+    allOrders  = data.orders || [];
+    renderOrders();
+  } catch (err) {
+    document.getElementById('ordersWrap').innerHTML =
+      '<div class="empty-state"><p>Could not load orders. Please refresh.</p><a class="btn-shop" href="index.html">Browse Catalogue</a></div>';
+  }
+}
 
-    if (!items?.length) {
-      return res.status(400).json({ error: 'No items in order' });
-    }
+function filterStatus(status, btn) {
+  activeFilter = status;
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  renderOrders();
+}
 
-    // Fetch product details and calculate totals
-    let subtotal = 0;
-    const orderItems = [];
+function renderOrders() {
+  const wrap = document.getElementById('ordersWrap');
+  const list = activeFilter === 'ALL'
+    ? allOrders
+    : allOrders.filter(o => o.status === activeFilter);
 
-    for (const item of items) {
-      const product = await prisma.product.findUnique({
-        where:  { id: item.productId, isActive: true },
-        select: { id: true, name: true, tiers: true, unit: true, moq: true, inStock: true },
-      });
+  if (!list.length) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 60 60" fill="none"><rect x="10" y="15" width="40" height="38" rx="4" stroke="currentColor" stroke-width="2"/><path d="M20 15V12a10 10 0 0120 0v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="20" y1="30" x2="40" y2="30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="37" x2="35" y2="37" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <h2>${activeFilter === 'ALL' ? 'No orders yet' : 'No ' + (STATUS_LABEL[activeFilter] || activeFilter) + ' orders'}</h2>
+        <p>${activeFilter === 'ALL' ? 'Place your first bulk order from the catalogue.' : 'No orders in this status.'}</p>
+        <a class="btn-shop" href="index.html">Browse Catalogue →</a>
+      </div>`;
+    return;
+  }
 
-      if (!product) {
-        return res.status(400).json({ error: `Product not found: ${item.productId}` });
+  wrap.innerHTML = list.map(o => buildOrderCard(o)).join('');
+}
+
+function buildOrderCard(o) {
+  const stepIdx     = STATUS_STEPS.findIndex(s => s.key === o.status);
+  const isCancelled = o.status === 'CANCELLED';
+  const lineWidth   = isCancelled ? '0%' :
+    ['0%', '33%', '66%', '100%'][stepIdx] || '0%';
+
+  const stepsHtml = STATUS_STEPS.map((s, i) => {
+    const done   = !isCancelled && i < stepIdx;
+    const active = !isCancelled && i === stepIdx;
+    const cls    = done ? 'done' : active ? 'active' : '';
+    return `
+      <div class="track-step">
+        <div class="step-dot ${cls}">
+          ${!done && !active ? `<span style="font-size:.85rem;">${s.icon}</span>` : ''}
+        </div>
+        <div class="step-lbl ${cls}">${s.label.replace('\n','<br/>')}</div>
+      </div>`;
+  }).join('');
+
+  // Backend returns: unitPrice, lineTotal (not rate/total)
+  const itemsHtml = (o.items || []).slice(0, 3).map(i => `
+    <div class="order-item">
+      ${i.product?.imageUrl
+        ? `<img class="item-img" src="${i.product.imageUrl}" alt="${i.product.name || ''}" onerror="this.style.display='none'">`
+        : `<div class="item-img" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem;">📦</div>`
       }
-      if (!product.inStock) {
-        return res.status(400).json({ error: `${product.name} is out of stock` });
-      }
-      if (item.qty < product.moq) {
-        return res.status(400).json({
-          error: `Minimum order for ${product.name} is ${product.moq} ${product.unit}(s)`,
-        });
-      }
+      <div style="flex:1;">
+        <div class="item-name">${i.product?.name || 'Product'}</div>
+        <div class="item-meta">${i.qty} ${i.product?.unit || 'unit'}(s) × ₹${(i.unitPrice||0).toLocaleString('en-IN')}</div>
+      </div>
+      <div class="item-total">₹${(i.lineTotal||0).toLocaleString('en-IN')}</div>
+    </div>`).join('');
 
-      // Calculate price from tiers (stored in paise)
-      let rate = product.tiers[0][2];
-      for (const [min, max, price] of product.tiers) {
-        if (item.qty >= min) rate = price;
-        if (item.qty >= min && item.qty <= max) break;
-      }
+  const moreItems = (o.items||[]).length > 3
+    ? `<div style="font-size:.7rem;color:var(--ink3);padding:6px 0;">+${o.items.length - 3} more item(s)</div>` : '';
 
-      const total = rate * item.qty;
-      subtotal   += total;
+  // Backend returns totalAmount (not grandTotal)
+  const grandTotal = o.totalAmount || 0;
+  const gst        = Math.round(grandTotal * 0.12);
 
-      orderItems.push({
-        productId: product.id,
-        qty:       item.qty,
-        rate,
-        total,
-      });
-    }
+  return `
+    <div class="order-card">
+      <div class="order-hd">
+        <div>
+          <div class="order-id">Order <strong>#${o.id.slice(-8).toUpperCase()}</strong></div>
+          <div class="order-date">${new Date(o.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+        <span class="status-badge s-${o.status}">${STATUS_LABEL[o.status] || o.status}</span>
+      </div>
 
-    const gstAmount   = Math.round(subtotal * 0.12);
-    const grandTotal  = subtotal + gstAmount;
+      ${!isCancelled ? `
+      <div class="tracking">
+        <div class="track-steps">
+          <div class="track-line" style="width:${lineWidth};"></div>
+          ${stepsHtml}
+        </div>
+      </div>` : `
+      <div style="padding:12px 16px;font-size:.78rem;color:var(--red);background:#FFEBEE;">
+        ✕ This order was cancelled.
+      </div>`}
 
-    // Create order in DB
-    const order = await prisma.order.create({
-      data: {
-        retailerId:    req.retailer.id,
-        status:        'PLACED',
-        paymentMethod: 'COD',
-        subtotal,
-        gstAmount,
-        grandTotal,
-        items: {
-          create: orderItems,
-        },
-      },
-      include: {
-        items: {
-          include: { product: { select: { name: true, unit: true, imageUrl: true } } },
-        },
-      },
-    });
+      <div class="order-items">
+        ${itemsHtml}
+        ${moreItems}
+      </div>
 
-    // Format response (convert paise to rupees)
-    const formatted = {
-      ...order,
-      subtotal:   order.subtotal   / 100,
-      gstAmount:  order.gstAmount  / 100,
-      grandTotal: order.grandTotal / 100,
-      items: order.items.map(i => ({
-        ...i,
-        rate:  i.rate  / 100,
-        total: i.total / 100,
-      })),
-    };
+      <div class="order-ft">
+        <div class="order-total-row">
+          ${(o.items||[]).length} item(s) · Cash on Delivery<br/>
+          Subtotal: ₹${grandTotal.toLocaleString('en-IN')} + GST ₹${gst.toLocaleString('en-IN')}<br/>
+          Total: <strong>₹${(grandTotal + gst).toLocaleString('en-IN')}</strong>
+        </div>
+        <div class="order-ft-right">
+          ${o.status !== 'CANCELLED' ? `<button class="btn-reorder" onclick="reorder('${o.id}')">Reorder</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
 
-    res.status(201).json({ success: true, order: formatted });
-
-  } catch (err) {
-    console.error('Create order error:', err.message);
-    res.status(500).json({ error: 'Could not place order. Please try again.' });
-  }
-});
-
-// ─────────────────────────────────────────────────────────────
-//  GET /api/orders  —  Retailer's own orders
-// ─────────────────────────────────────────────────────────────
-router.get('/', requireAuth, async (req, res) => {
-  try {
-    const orders = await prisma.order.findMany({
-      where:   { retailerId: req.retailer.id },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        items: {
-          include: {
-            product: { select: { name: true, unit: true, imageUrl: true, category: true } },
-          },
-        },
-      },
-    });
-
-    const formatted = orders.map(o => ({
-      ...o,
-      subtotal:   o.subtotal   / 100,
-      gstAmount:  o.gstAmount  / 100,
-      grandTotal: o.grandTotal / 100,
-      items: o.items.map(i => ({
-        ...i,
-        rate:  i.rate  / 100,
-        total: i.total / 100,
-      })),
-    }));
-
-    res.json({ orders: formatted });
-  } catch (err) {
-    console.error('Get orders error:', err.message);
-    res.status(500).json({ error: 'Could not fetch orders' });
-  }
-});
-
-// ─────────────────────────────────────────────────────────────
-//  GET /api/orders/:id  —  Single order details
-// ─────────────────────────────────────────────────────────────
-router.get('/:id', requireAuth, async (req, res) => {
-  try {
-    const order = await prisma.order.findFirst({
-      where: { id: req.params.id, retailerId: req.retailer.id },
-      include: {
-        items: {
-          include: {
-            product: { select: { name: true, unit: true, imageUrl: true, category: true, brand: true } },
-          },
-        },
-      },
-    });
-
-    if (!order) return res.status(404).json({ error: 'Order not found' });
-
-    res.json({
-      order: {
-        ...order,
-        subtotal:   order.subtotal   / 100,
-        gstAmount:  order.gstAmount  / 100,
-        grandTotal: order.grandTotal / 100,
-        items: order.items.map(i => ({
-          ...i,
-          rate:  i.rate  / 100,
-          total: i.total / 100,
-        })),
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ error: 'Could not fetch order' });
-  }
-});
-
-// ─────────────────────────────────────────────────────────────
-//  PATCH /api/orders/:id/status  —  Admin updates order status
-// ─────────────────────────────────────────────────────────────
-router.patch('/:id/status', requireAdmin, async (req, res) => {
-  try {
-    const { status } = req.body;
-    const validStatuses = ['PLACED', 'PACKING', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'];
-
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ error: 'Invalid status. Must be one of: ' + validStatuses.join(', ') });
-    }
-
-    const order = await prisma.order.update({
-      where: { id: req.params.id },
-      data:  { status, updatedAt: new Date() },
-      select: { id: true, status: true, retailerId: true },
-    });
-
-    console.log(`[ADMIN] Order ${order.id} status → ${status} by ${req.retailer.phone}`);
-    res.json({ success: true, order });
-
-  } catch (err) {
-    if (err.code === 'P2025') return res.status(404).json({ error: 'Order not found' });
-    res.status(500).json({ error: 'Could not update order status' });
-  }
-});
-
-// ─────────────────────────────────────────────────────────────
-//  GET /api/orders/admin/all  —  Admin sees all orders
-// ─────────────────────────────────────────────────────────────
-router.get('/admin/all', requireAdmin, async (req, res) => {
-  try {
-    const { status } = req.query;
-    const where = status ? { status } : {};
-
-    const orders = await prisma.order.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        retailer: { select: { shopName: true, phone: true, district: true } },
-        items: {
-          include: {
-            product: { select: { name: true, unit: true, imageUrl: true } },
-          },
-        },
-      },
-    });
-
-    const formatted = orders.map(o => ({
-      ...o,
-      subtotal:   o.subtotal   / 100,
-      gstAmount:  o.gstAmount  / 100,
-      grandTotal: o.grandTotal / 100,
-      items: o.items.map(i => ({
-        ...i,
-        rate:  i.rate  / 100,
-        total: i.total / 100,
-      })),
-    }));
-
-    res.json({ orders: formatted, total: formatted.length });
-  } catch (err) {
-    console.error('Admin orders error:', err.message);
-    res.status(500).json({ error: 'Could not fetch orders' });
-  }
-});
-
-module.exports = router;
+function reorder(orderId) {
+  alert('Please add items again from the catalogue for reorder.');
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>

@@ -367,4 +367,67 @@ async function init() {
   }
 }
 
+// ── Search / filter ───────────────────────────
+function applyFilters() {
+  const q = (document.getElementById('searchInp')?.value || '').toLowerCase().trim();
+  const wrap = document.getElementById('productSections');
+  if (!wrap) return;
+
+  if (!q) {
+    renderProducts(activeCat);
+    return;
+  }
+
+  wrap.innerHTML = '';
+  const matched = allProducts.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    p.brand.toLowerCase().includes(q) ||
+    p.category.toLowerCase().includes(q)
+  );
+
+  if (!matched.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:48px;color:#6b7280;">No products found for "' + q + '"</div>';
+    return;
+  }
+
+  const sec = document.createElement('div');
+  sec.className = 'section';
+  sec.innerHTML = `
+    <div class="sec-head">
+      <div class="sec-title">Search results for "${q}" <span class="sec-sub">${matched.length} products</span></div>
+    </div>
+    <div class="prod-grid" id="search-grid"></div>`;
+  wrap.appendChild(sec);
+
+  const grid = document.getElementById('search-grid');
+  matched.forEach(p => {
+    const card = buildCard(p);
+    card.classList.add('grid-card');
+    grid.appendChild(card);
+  });
+
+  fixBrokenImages();
+}
+
+// ── WhatsApp order fallback ───────────────────
+function orderViaWhatsApp() {
+  const items = Object.values(cart);
+  if (!items.length) return showToast('Add products first', true);
+
+  const retailer = getRetailer();
+  const name = retailer ? (retailer.shopName || 'Retailer') : 'Guest';
+
+  let msg = `*MahiGrow Bulk Order*\nFrom: ${name}\n\n`;
+  let total = 0;
+  items.forEach(({ p, qty, rate, total: t }) => {
+    msg += `• ${p.name} — ${qty} ${p.unit}(s) × ₹${rate} = ₹${t.toLocaleString('en-IN')}\n`;
+    total += t;
+  });
+  const gst = Math.round(total * 0.12);
+  msg += `\n*Subtotal:* ₹${total.toLocaleString('en-IN')}\n*GST (~12%):* ₹${gst.toLocaleString('en-IN')}\n*Total:* ₹${(total + gst).toLocaleString('en-IN')}\n\nPayment: Cash on Delivery`;
+
+  const waUrl = 'https://wa.me/919876543210?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank');
+}
+
 window.addEventListener('DOMContentLoaded', init);
