@@ -99,7 +99,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;displa
 <script>
 // Redirect if already logged in as admin
 window.addEventListener('DOMContentLoaded', () => {
-  const token = localStorage.getItem('rs_admin_token');
+  const token = localStorage.getItem('mg_admin_token');
   if (token) window.location.href = 'admin-products.html';
 });
 
@@ -141,11 +141,11 @@ async function doAdminLogin() {
 
   try {
     // Use the same login endpoint — backend checks ADMIN_PHONES
-    const data = await http('POST', '/api/auth/admin/login', { phone, password: pw });
+    const data = await Auth.adminLogin({ phone, password: pw });
 
     // Store admin token separately from retailer token
-    localStorage.setItem('rs_admin_token',    data.token);
-    localStorage.setItem('rs_admin_user',     JSON.stringify(data.admin));
+    localStorage.setItem('mg_admin_token', data.token);
+    localStorage.setItem('mg_admin',       JSON.stringify(data.admin));
 
     window.location.href = 'admin-products.html';
 
