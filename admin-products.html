@@ -489,7 +489,7 @@ tr:hover td{background:#fafafa;}
 <script>
 // ── SUPABASE CONFIG ──────────────────────────
 // Get anon key from: Supabase Dashboard → Settings → API → anon public key
-window.SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwcWZ0dW5uZXJzZnVtZmdjYnFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxOTQ5NjIsImV4cCI6MjEwMjc3MDk2Mn0.Nl-6524kR_I0sfocF2NtwE8z3AOZvlE2Ns7ov_QHsCU';
 </script>
 <script>
 // ── ADMIN AUTH CHECK ──────────────────────────
@@ -700,64 +700,42 @@ function removeImage(e) {
   document.getElementById('imgFile').value                   = '';
 }
 
-// Upload to Supabase Storage — called just before saving the product
+// Upload image via backend → Supabase Storage
 async function uploadToSupabase(file) {
   const prog  = document.getElementById('uploadProg');
   const fill  = document.getElementById('uploadFill');
   const label = document.getElementById('uploadLabel');
   prog.style.display = 'block';
-  fill.style.width   = '20%';
+  fill.style.width   = '30%';
   label.textContent  = 'Uploading image…';
 
-  // Build unique filename
-  const mimeToExt = {'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif'};
-  const ext      = mimeToExt[file.type] || 'jpg';
-  const fileName = 'products/' + Date.now() + '-' + Math.random().toString(36).substring(2,8) + '.' + ext;
+  const token = localStorage.getItem('mg_admin_token');
+  const form  = new FormData();
+  form.append('image', file);
 
-  fill.style.width = '50%';
+  fill.style.width = '60%';
 
-  const SUPABASE_URL      = 'https://jpqftunnersfumfgcbqm.supabase.co';
-  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
-
-  console.log('[Upload] Starting upload to Supabase...');
-  console.log('[Upload] File:', file.name, file.type, file.size, 'bytes');
-  console.log('[Upload] Path:', fileName);
-  console.log('[Upload] Anon key present:', !!SUPABASE_ANON_KEY && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY_HERE');
-
-  const uploadUrl = SUPABASE_URL + '/storage/v1/object/product-images/' + fileName;
-  console.log('[Upload] URL:', uploadUrl);
-
-  const res = await fetch(uploadUrl, {
+  const res = await fetch(API_BASE + '/api/upload/product-image', {
     method:  'POST',
-    headers: {
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-      'Content-Type':  file.type,
-      'x-upsert':      'true',
-    },
-    body: file,
+    headers: { 'Authorization': 'Bearer ' + token },
+    body:    form,
+    // Do NOT set Content-Type — browser sets it with boundary for FormData
   });
 
   fill.style.width = '100%';
-  console.log('[Upload] Response status:', res.status);
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    console.error('[Upload] Error response:', err);
     prog.style.display = 'none';
     fill.style.width   = '0%';
-    throw new Error(err.message || err.error || 'Upload failed (status ' + res.status + ')');
+    throw new Error(err.error || 'Upload failed (status ' + res.status + ')');
   }
 
-  const respData = await res.json().catch(() => ({}));
-  console.log('[Upload] Success:', respData);
-
-  const publicUrl = SUPABASE_URL + '/storage/v1/object/public/product-images/' + fileName;
-  console.log('[Upload] Public URL:', publicUrl);
-
+  const data = await res.json();
   label.textContent = 'Upload complete ✓';
   setTimeout(() => { prog.style.display = 'none'; fill.style.width = '0%'; }, 1000);
 
-  return publicUrl;
+  return data.url;   // public URL from backend
 }
 
 // ─────────────────────────────────────────────
