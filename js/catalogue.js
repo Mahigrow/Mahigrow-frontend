@@ -176,7 +176,10 @@ function getActiveTiers(p) {
 // Open BigHaat-style bottom sheet with all variants for this product
 function openVariantSheet(pid) {
   const p = allProducts.find(x => x.id === pid);
-  if (!p || !p.variants?.length) return;
+  if (!p) return;
+  // Guard: variants must be a non-empty array
+  const variants = Array.isArray(p.variants) ? p.variants : [];
+  if (!variants.length) return;
 
   // Remove any existing sheet
   document.getElementById('vsheet-overlay')?.remove();
@@ -192,7 +195,7 @@ function openVariantSheet(pid) {
 
   const currentSize = getSelectedVariant(pid);
 
-  const rows = p.variants.map(v => {
+  const rows = variants.map(v => {
     const base  = v.tiers[0][2];
     const last  = v.tiers[v.tiers.length - 1];
     const disc  = v.mrp > base ? Math.round((v.mrp - base) / v.mrp * 100) : 0;
@@ -295,8 +298,10 @@ function buildCard(p, gridMode = false) {
   el.style.cursor = 'pointer';
 
   // Use first variant if variants exist, otherwise product-level data
-  const hasVariants = p.variants?.length > 0;
-  const firstVariant = hasVariants ? p.variants[0] : null;
+  // Guard: ensure variants is always a proper array
+  const variantArr  = Array.isArray(p.variants) ? p.variants : [];
+  const hasVariants = variantArr.length > 0;
+  const firstVariant = hasVariants ? variantArr[0] : null;
   const activeTiers  = firstVariant ? firstVariant.tiers : p.tiers;
   const activeMrp    = firstVariant ? firstVariant.mrp   : p.mrp;
 
@@ -317,13 +322,13 @@ function buildCard(p, gridMode = false) {
 
   // Variant picker: dropdown button that opens sheet + hidden input for selected size
   const variantPickerHtml = hasVariants ? `
-    <input type="hidden" id="vsel-${p.id}" value="${firstVariant ? firstVariant.size : ''}"/>
+    <input type="hidden" id="vsel-${p.id}" value="${firstVariant.size}"/>
     <div class="variant-picker" id="vp-${p.id}">
       <button class="vdrop-btn" id="vdrop-${p.id}"
               onclick="event.stopPropagation();openVariantSheet('${p.id}')">
-        ${firstVariant ? firstVariant.size : 'Select Size'} ▾
+        ${firstVariant.size} ▾
       </button>
-      <span class="vdrop-hint">tap to change size</span>
+      <span class="vdrop-hint">${variantArr.length} sizes · tap to change</span>
     </div>` : '';
 
   el.innerHTML = `

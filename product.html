@@ -101,6 +101,19 @@ table.tiers tr.active td.tr-price{color:var(--g);font-weight:800;font-size:.88re
 .tier-badge{display:inline-block;background:var(--g);color:#fff;font-size:.58rem;font-weight:700;padding:1px 6px;border-radius:3px;margin-left:5px;vertical-align:middle;}
 .tr-save{color:var(--red);font-weight:600;}
 
+/* variant picker (detail page) */
+.var-section{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.var-section-hd{font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:10px;}
+.var-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.vbtn{
+  padding:7px 14px;border:2px solid var(--border);border-radius:8px;
+  background:#fff;color:var(--ink2);font-size:.76rem;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.vbtn:hover{border-color:var(--g);color:var(--g);}
+.vbtn.vsel{background:var(--g);border-color:var(--g);color:#fff;}
+.vbtn .vbtn-price{display:block;font-size:.65rem;font-weight:400;opacity:.85;margin-top:2px;}
+
 /* order box */
 .order-box{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;}
 .order-box-title{font-size:.8rem;font-weight:700;color:var(--ink);margin-bottom:12px;}
@@ -282,6 +295,12 @@ table.tiers tr.active td.tr-price{color:var(--g);font-weight:800;font-size:.88re
           <div class="price-note">Price updates live based on quantity. GST extra (~12%).</div>
         </div>
 
+        <!-- Variant picker (shown only for variant products) -->
+        <div class="var-section" id="varSection" style="display:none;">
+          <div class="var-section-hd">📦 Select Size / Pack</div>
+          <div class="var-grid" id="varGrid"></div>
+        </div>
+
         <!-- Meta chips -->
         <div class="chip-row" id="metaChips"></div>
 
@@ -374,6 +393,7 @@ const CAT_BG = {seeds:'#E8F5E9',pesticides:'#FFF8E1',insecticides:'#FFEBEE',fert
 // ── STATE ──────────────────────────────────────
 let product = null;
 let moq = 1, step = 1;
+let selectedVariantSize = null;   // currently chosen variant size (null = product-level)
 
 // ── INIT ───────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -433,9 +453,29 @@ function render(p) {
     imgBox.insertBefore(sw, imgBox.firstChild);
   }
 
-  // Discount badge
-  const base = p.tiers[0][2];
-  const disc = p.mrp > base ? Math.round((p.mrp - base) / p.mrp * 100) : 0;
+  // Variants
+  const variants = Array.isArray(p.variants) ? p.variants : [];
+  if (variants.length > 0) {
+    // Default: select first variant
+    selectedVariantSize = variants[0].size;
+    const varGrid = document.getElementById('varGrid');
+    varGrid.innerHTML = variants.map((v, i) => {
+      const vbase = v.tiers[0][2];
+      const vdisc = v.mrp > vbase ? Math.round((v.mrp - vbase) / v.mrp * 100) : 0;
+      return `<button class="vbtn${i === 0 ? ' vsel' : ''}" id="vbtn-${v.size.replace(/\s/g,'_')}"
+                      onclick="selectVariant('${v.size}')">
+        ${v.size}
+        <span class="vbtn-price">₹${vbase.toLocaleString('en-IN')}${vdisc > 0 ? ' · ' + vdisc + '% off' : ''}</span>
+      </button>`;
+    }).join('');
+    document.getElementById('varSection').style.display = 'block';
+  }
+
+  // Discount badge — use first variant or product-level
+  const activeTiersInit = variants.length > 0 ? variants[0].tiers : p.tiers;
+  const activeMrpInit   = variants.length > 0 ? variants[0].mrp   : p.mrp;
+  const base = activeTiersInit[0][2];
+  const disc = activeMrpInit > base ? Math.round((activeMrpInit - base) / activeMrpInit * 100) : 0;
   if (disc > 0) {
     const db = document.getElementById('discBadge');
     db.textContent  = disc + '% OFF';
@@ -457,12 +497,12 @@ function render(p) {
   lbl.textContent = p.inStock ? 'In Stock' : 'Out of Stock';
   qty.textContent = p.inStock ? '(' + p.stockQty + ' units available)' : '';
 
-  // Price
+  // Price (uses activeTiersInit/activeMrpInit set above)
   document.getElementById('dPrice').textContent = '₹' + base.toLocaleString('en-IN');
   document.getElementById('dUnit').textContent  = 'per ' + p.unit;
-  if (p.mrp > base) {
+  if (activeMrpInit > base) {
     const mrpEl = document.getElementById('dMrp');
-    mrpEl.textContent   = '₹' + p.mrp.toLocaleString('en-IN');
+    mrpEl.textContent   = '₹' + activeMrpInit.toLocaleString('en-IN');
     mrpEl.style.display = 'inline';
     const saveEl = document.getElementById('dSave');
     saveEl.textContent   = 'Save ' + disc + '%';
@@ -477,16 +517,9 @@ function render(p) {
     {icon:'<svg viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 4V6.5L8.5 8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',label:'Step',val: p.step + ' ' + p.unit + 's'},
   ].map(c => `<div class="chip">${c.icon}<span>${c.label}: <strong>${c.val}</strong></span></div>`).join('');
 
-  // Tier table
+  // Tier table — uses active variant tiers if variants exist
   moq = p.moq; step = p.step || p.moq;
-  const tbase = p.tiers[0][2];
-  document.getElementById('tierBody').innerHTML = p.tiers.map((t, i) => `
-    <tr class="${i === 0 ? 'active' : ''}" id="tier-row-${i}">
-      <td>${t[0]}–${t[1] >= 9999 ? '∞' : t[1]} ${p.unit}s${i === 0 ? '<span class="tier-badge">Default</span>' : ''}</td>
-      <td class="tr-price">₹${t[2].toLocaleString('en-IN')}</td>
-      <td class="tr-save">${i === 0 ? '—' : '−₹' + (tbase - t[2]).toLocaleString('en-IN') + '/unit'}</td>
-    </tr>`
-  ).join('');
+  renderTierTable(activeTiersInit);
 
   // Qty controls
   const qi = document.getElementById('qInput');
@@ -543,28 +576,97 @@ function onQtyChange() {
   updateLivePrice();
 }
 
-function getRate(qty) {
+// Returns active tiers: selected variant's tiers, or product-level tiers
+function getActiveTiers() {
+  if (!product) return [];
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  if (selectedVariantSize && variants.length) {
+    const v = variants.find(x => x.size === selectedVariantSize);
+    if (v) return v.tiers;
+  }
+  return product.tiers;
+}
+
+function getActiveMrp() {
   if (!product) return 0;
-  let rate = product.tiers[0][2];
-  for (const [min, max, price] of product.tiers) {
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  if (selectedVariantSize && variants.length) {
+    const v = variants.find(x => x.size === selectedVariantSize);
+    if (v) return v.mrp;
+  }
+  return product.mrp;
+}
+
+function getRate(qty) {
+  const tiers = getActiveTiers();
+  if (!tiers.length) return 0;
+  let rate = tiers[0][2];
+  for (const [min, max, price] of tiers) {
     if (qty >= min) rate = price;
-    if (qty >= min && qty <= max) break;
+    if (qty >= min && (max === null || qty <= max)) break;
   }
   return rate;
 }
 
+function renderTierTable(tiers) {
+  const tbase = tiers[0][2];
+  document.getElementById('tierBody').innerHTML = tiers.map((t, i) => `
+    <tr class="${i === 0 ? 'active' : ''}" id="tier-row-${i}">
+      <td>${t[0]}–${(t[1] === null || t[1] >= 9999) ? '∞' : t[1]} ${product.unit}s${i === 0 ? '<span class="tier-badge">Default</span>' : ''}</td>
+      <td class="tr-price">₹${t[2].toLocaleString('en-IN')}</td>
+      <td class="tr-save">${i === 0 ? '—' : '−₹' + (tbase - t[2]).toLocaleString('en-IN') + '/unit'}</td>
+    </tr>`
+  ).join('');
+}
+
+// Called when user taps a variant size button
+function selectVariant(size) {
+  if (!product) return;
+  selectedVariantSize = size;
+
+  // Update button highlight
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  variants.forEach(v => {
+    const btn = document.getElementById('vbtn-' + v.size.replace(/\s/g,'_'));
+    if (btn) btn.classList.toggle('vsel', v.size === size);
+  });
+
+  // Re-render tier table
+  const tiers = getActiveTiers();
+  renderTierTable(tiers);
+
+  // Update MRP / discount badge
+  const mrp  = getActiveMrp();
+  const base = tiers[0][2];
+  const disc = mrp > base ? Math.round((mrp - base) / mrp * 100) : 0;
+  const mrpEl  = document.getElementById('dMrp');
+  const saveEl = document.getElementById('dSave');
+  if (mrp > base) {
+    mrpEl.textContent = '₹' + mrp.toLocaleString('en-IN'); mrpEl.style.display = 'inline';
+    saveEl.textContent = 'Save ' + disc + '%'; saveEl.style.display = 'inline';
+  } else {
+    mrpEl.style.display = 'none'; saveEl.style.display = 'none';
+  }
+  const db = document.getElementById('discBadge');
+  if (disc > 0) { db.textContent = disc + '% OFF'; db.style.display = 'block'; }
+  else db.style.display = 'none';
+
+  updateLivePrice();
+}
+
 function updateLivePrice() {
   if (!product) return;
+  const tiers = getActiveTiers();
   const qty   = getQty();
   const rate  = getRate(qty);
   const total = rate * qty;
 
   // Find active tier index
   let activeIdx = 0;
-  product.tiers.forEach((t, i) => { if (qty >= t[0]) activeIdx = i; });
+  tiers.forEach((t, i) => { if (qty >= t[0]) activeIdx = i; });
 
   // Highlight tier rows
-  product.tiers.forEach((_, i) => {
+  tiers.forEach((_, i) => {
     const row = document.getElementById('tier-row-' + i);
     if (row) row.className = i === activeIdx ? 'active' : '';
   });
@@ -572,7 +674,7 @@ function updateLivePrice() {
   // Update price displays
   document.getElementById('dPrice').textContent  = '₹' + rate.toLocaleString('en-IN');
   document.getElementById('lbRate').textContent  = '₹' + rate.toLocaleString('en-IN');
-  document.getElementById('lbTier').textContent  = 'per ' + product.unit + ' · Tier ' + (activeIdx + 1) + ' of ' + product.tiers.length;
+  document.getElementById('lbTier').textContent  = 'per ' + product.unit + ' · Tier ' + (activeIdx + 1) + ' of ' + tiers.length;
   document.getElementById('lbTotal').textContent = '₹' + total.toLocaleString('en-IN');
   document.getElementById('sbPrice').textContent = '₹' + rate.toLocaleString('en-IN');
   document.getElementById('sbUnit').textContent  = 'per ' + product.unit;
@@ -589,8 +691,10 @@ function addToOrder() {
   }
   const qty   = getQty();
   const rate  = getRate(qty);
+  // Use variant-keyed cart key so each size is a separate line item
+  const cartKey = selectedVariantSize ? `${product.id}__${selectedVariantSize}` : String(product.id);
   const cart  = JSON.parse(localStorage.getItem('mg_cart') || '{}');
-  cart[product.id] = { p: product, qty, rate, total: rate * qty };
+  cart[cartKey] = { p: product, qty, rate, total: rate * qty, variantSize: selectedVariantSize || null };
   localStorage.setItem('mg_cart', JSON.stringify(cart));
   // Sync to sessionStorage for catalogue.js compatibility
   sessionStorage.setItem('mg_cart', JSON.stringify(cart));
