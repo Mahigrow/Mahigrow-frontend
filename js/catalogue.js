@@ -156,11 +156,10 @@ function getRate(tiers, qty) {
 }
 
 // ── VARIANT HELPERS ────────────────────────────
-// Get current selected variant for a product card
+// Get current selected variant size for a product card (from hidden input)
 function getSelectedVariant(pid) {
-  const btn = document.querySelector(`.vbtn.sel[data-pid="${pid}"]`);
-  if (!btn) return null;
-  return btn.dataset.size || null;
+  const inp = document.getElementById('vsel-' + pid);
+  return inp ? (inp.value || null) : null;
 }
 
 // Get tiers for the selected variant (or product-level tiers)
@@ -171,6 +170,122 @@ function getActiveTiers(p) {
     if (v) return { tiers: v.tiers, mrp: v.mrp };
   }
   return { tiers: p.tiers, mrp: p.mrp };
+}
+
+// ── VARIANT SHEET ─────────────────────────────
+// Open BigHaat-style bottom sheet with all variants for this product
+function openVariantSheet(pid) {
+  const p = allProducts.find(x => x.id === pid);
+  if (!p || !p.variants?.length) return;
+
+  // Remove any existing sheet
+  document.getElementById('vsheet-overlay')?.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'vsheet-overlay';
+  overlay.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+    display:flex;align-items:flex-end;justify-content:center;
+    animation:fadeIn .15s ease;
+  `;
+  overlay.onclick = (e) => { if (e.target === overlay) closeVariantSheet(); };
+
+  const currentSize = getSelectedVariant(pid);
+
+  const rows = p.variants.map(v => {
+    const base  = v.tiers[0][2];
+    const last  = v.tiers[v.tiers.length - 1];
+    const disc  = v.mrp > base ? Math.round((v.mrp - base) / v.mrp * 100) : 0;
+    const isSel = v.size === currentSize;
+    return `
+      <div class="vsheet-row${isSel ? ' vsheet-sel' : ''}" data-size="${v.size}">
+        <div class="vsheet-size">${v.size}</div>
+        <div class="vsheet-prices">
+          <span class="vsheet-price">₹${base.toLocaleString('en-IN')}</span>
+          ${v.mrp > base ? `<span class="vsheet-mrp">₹${v.mrp.toLocaleString('en-IN')}</span>` : ''}
+          ${disc > 0 ? `<span class="vsheet-disc">${disc}% off</span>` : ''}
+        </div>
+        <div class="vsheet-tiers">
+          ${v.tiers.map(([mn, mx, pr]) =>
+            `<span>${mn}${mx ? '–'+mx : '+'}×: ₹${pr}</span>`
+          ).join('')}
+        </div>
+        <button class="vsheet-add${isSel ? ' vsheet-add-sel' : ''}"
+                onclick="addFromSheet('${pid}','${v.size}')">
+          ${isSel ? '✓ Selected' : 'Add to Cart'}
+        </button>
+      </div>`;
+  }).join('');
+
+  overlay.innerHTML = `
+    <div class="vsheet" onclick="event.stopPropagation()">
+      <div class="vsheet-header">
+        <div class="vsheet-title">
+          <span>${p.name}</span>
+          <span class="vsheet-brand">${p.brand}</span>
+        </div>
+        <button class="vsheet-close" onclick="closeVariantSheet()">✕</button>
+      </div>
+      <div class="vsheet-body">${rows}</div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+}
+
+function closeVariantSheet() {
+  const overlay = document.getElementById('vsheet-overlay');
+  if (overlay) {
+    overlay.style.animation = 'fadeOut .15s ease forwards';
+    setTimeout(() => overlay.remove(), 150);
+  }
+}
+
+// Add to cart from variant sheet — selects size + adds
+function addFromSheet(pid, size) {
+  const p = allProducts.find(x => x.id === pid);
+  if (!p) return;
+
+  // Update hidden input for selected size
+  const inp = document.getElementById('vsel-' + pid);
+  if (inp) inp.value = size;
+
+  // Update the card's size dropdown display
+  const dropBtn = document.getElementById('vdrop-' + pid);
+  if (dropBtn) dropBtn.textContent = size + ' ▾';
+
+  // Update card price display
+  const v = p.variants.find(x => x.size === size);
+  if (v) {
+    const qty  = parseInt(document.getElementById('q-' + pid)?.value) || p.moq;
+    let rate   = v.tiers[0][2];
+    for (const [mn, mx, pr] of v.tiers) {
+      if (qty >= mn) rate = pr;
+      if (qty >= mn && (mx === null || qty <= mx)) break;
+    }
+    const last = v.tiers[v.tiers.length - 1];
+    const disc = v.mrp > rate ? Math.round((v.mrp - rate) / v.mrp * 100) : 0;
+    const pr   = document.getElementById('pr-' + pid);
+    if (pr) pr.innerHTML = `
+      <span class="p-now">₹${rate.toLocaleString('en-IN')}</span>
+      ${v.mrp > rate ? `<span class="p-mrp">₹${v.mrp.toLocaleString('en-IN')}</span>` : ''}
+      ${disc > 0 ? `<span class="p-save">${disc}% off</span>` : ''}`;
+    const tr = document.getElementById('tr-' + pid);
+    if (tr) tr.innerHTML = `
+      <span class="t1">${v.tiers[0][0]}–${(v.tiers[0][1]===null||v.tiers[0][1]>=9999)?'∞':v.tiers[0][1]}: ₹${v.tiers[0][2]}</span>
+      <span class="tarr">→</span>
+      <span class="t2">${last[0]}+: ₹${last[2]}</span>
+      <span class="bulk-lbl">BULK</span>`;
+  }
+
+  closeVariantSheet();
+
+  if (!isLoggedIn()) {
+    localStorage.setItem('rs_pending_add', pid + '__' + size);
+    localStorage.setItem('rs_redirect', window.location.href);
+    window.location.href = 'login.html';
+    return;
+  }
+  addToCart(pid);
 }
 
 // ── BUILD CARD ────────────────────────────────
@@ -200,14 +315,15 @@ function buildCard(p, gridMode = false) {
     ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy" class="pcard-img-real" data-pid="${p.id}" style="width:100%;height:100%;object-fit:contain;padding:8px;display:block;"/>`
     : `<div class="icon-wrap">${CAT_SVG[p.category] || CAT_SVG.seeds}</div>`;
 
-  // Variant size picker HTML
+  // Variant picker: dropdown button that opens sheet + hidden input for selected size
   const variantPickerHtml = hasVariants ? `
+    <input type="hidden" id="vsel-${p.id}" value="${firstVariant ? firstVariant.size : ''}"/>
     <div class="variant-picker" id="vp-${p.id}">
-      ${p.variants.map((v, i) => `
-        <button class="vbtn${i===0?' sel':''}" data-pid="${p.id}" data-size="${v.size}"
-                onclick="selectVariant('${p.id}','${v.size}',this)">
-          ${v.size}
-        </button>`).join('')}
+      <button class="vdrop-btn" id="vdrop-${p.id}"
+              onclick="event.stopPropagation();openVariantSheet('${p.id}')">
+        ${firstVariant ? firstVariant.size : 'Select Size'} ▾
+      </button>
+      <span class="vdrop-hint">tap to change size</span>
     </div>` : '';
 
   el.innerHTML = `
@@ -259,44 +375,9 @@ function buildCard(p, gridMode = false) {
   return el;
 }
 
-// ── SELECT VARIANT ────────────────────────────
-function selectVariant(pid, size, clickedBtn) {
-  const p = allProducts.find(x => x.id === pid);
-  if (!p) return;
-
-  // Update selected button
-  document.querySelectorAll(`.vbtn[data-pid="${pid}"]`).forEach(b => b.classList.remove('sel'));
-  clickedBtn.classList.add('sel');
-
-  // Find variant
-  const v = p.variants.find(x => x.size === size);
-  if (!v) return;
-
-  const tiers    = v.tiers;
-  const mrp      = v.mrp;
-  const qty      = parseInt(document.getElementById('q-' + pid)?.value) || p.moq;
-  let   base     = tiers[0][2];
-  for (const [min, max, price] of tiers) {
-    if (qty >= min) base = price;
-    if (qty >= min && (max === null || qty <= max)) break;
-  }
-  const lastTier = tiers[tiers.length - 1];
-  const disc     = mrp > base ? Math.round((mrp - base) / mrp * 100) : 0;
-
-  // Update price row
-  const pr = document.getElementById('pr-' + pid);
-  if (pr) pr.innerHTML = `
-    <span class="p-now">₹${base.toLocaleString('en-IN')}</span>
-    ${mrp > base ? `<span class="p-mrp">₹${mrp.toLocaleString('en-IN')}</span>` : ''}
-    ${disc > 0 ? `<span class="p-save">${disc}% off</span>` : ''}`;
-
-  // Update tier row
-  const tr = document.getElementById('tr-' + pid);
-  if (tr) tr.innerHTML = `
-    <span class="t1">${tiers[0][0]}–${(tiers[0][1] === null || tiers[0][1] >= 9999) ? '∞' : tiers[0][1]}: ₹${tiers[0][2]}</span>
-    <span class="tarr">→</span>
-    <span class="t2">${lastTier[0]}+: ₹${lastTier[2]}</span>
-    <span class="bulk-lbl">BULK</span>`;
+// selectVariant kept as no-op for backward compat (old calls replaced by sheet)
+function selectVariant(pid, size, btn) {
+  openVariantSheet(pid);
 }
 
 // ── RENDER SECTIONS ───────────────────────────
@@ -446,12 +527,9 @@ function addToCart(pid) {
     // Auto-select first variant if none chosen
     const v = p.variants[0];
     tiersToUse = v.tiers;
-    // Mark first btn as sel
-    const firstBtn = document.querySelector(`.vbtn[data-pid="${pid}"]`);
-    if (firstBtn) {
-      document.querySelectorAll(`.vbtn[data-pid="${pid}"]`).forEach(b => b.classList.remove('sel'));
-      firstBtn.classList.add('sel');
-    }
+    // Set hidden input to first variant
+    const inp = document.getElementById('vsel-' + pid);
+    if (inp && !inp.value) inp.value = v.size;
   }
 
   const rate = getRate(tiersToUse, qty);
